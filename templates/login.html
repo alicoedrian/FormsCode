@@ -1,0 +1,133 @@
+{% extends "layouts/base_minimal.html" %}
+
+{% block title %}Iniciar Sesión - Planta Plásticos{% endblock %}
+
+{% block head_css %}
+<style>
+    html, body.login-page-body { /* Aplicamos al body específico de esta página */
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ECF0F1;
+        font-family: 'Roboto', sans-serif;
+    }
+    .login-container {
+        background-color: #FFFFFF;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+    }
+    .login-logo img {
+        max-width: 150px;
+        margin-bottom: 25px;
+    }
+    .login-title {
+        color: #2C3E50;
+        margin-bottom: 25px;
+        font-weight: 500;
+        font-size: 1.8em;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        font-size: 0.95em;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #BDC3C7;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #18BC9C;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(24, 188, 156, 0.25);
+    }
+    .btn-submit {
+        background-color: #18BC9C;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 500;
+        width: 100%;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+    .btn-submit:hover {
+        background-color: #15A589;
+    }
+    .flash-messages {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .flash-message {
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        font-size: 0.9em;
+    }
+    .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="login-container">
+    <div class="login-logo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
+    </div>
+    <h2 class="login-title">Acceso al Sistema</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        <div class="form-group">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn-submit">Ingresar</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Añade una clase específica al body de la página de login
+    // para evitar conflictos con estilos globales de 'body' si los hubiera.
+    document.body.classList.add('login-page-body');
+</script>
+{% endblock %}

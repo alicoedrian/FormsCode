@@ -1,0 +1,103 @@
+{% extends "layouts/base_minimal.html" %}
+
+{% block title %}{% block process_title %}Proceso{% endblock %} - Planta Plásticos{% endblock %}
+
+{% block head_css %}
+<style>
+    body.process-page-body { /* Clase específica para el body de páginas de proceso */
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', sans-serif;
+        padding-top: 65px; /* Espacio para el header fijo */
+    }
+
+    .process-header { /* Cabecera (similar a home-header) */
+        background-color: #2C3E50;
+        color: white;
+        padding: 0 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 65px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+    .process-header .logo-area img {
+        max-height: 40px;
+        vertical-align: middle;
+    }
+    .process-header .user-info {
+        font-size: 0.95em;
+    }
+    .process-header .user-info span {
+        margin-right: 15px;
+    }
+    .process-header .user-info a {
+        color: #ECF0F1;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .process-header .user-info a:hover {
+        background-color: #3f5870;
+    }
+
+    .process-main-content {
+        padding: 30px;
+        max-width: 1200px; /* Opcional: limita el ancho */
+        margin: 0 auto; /* Centra el contenido */
+    }
+
+    /* Estilos para mensajes flash (puedes copiarlos de home.html si los necesitas aquí) */
+    .flash-messages-process { list-style: none; padding: 0; margin: 0 0 20px 0; }
+    .flash-messages-process li {
+        padding: 12px 18px; border-radius: 6px; margin-bottom: 10px; font-size: 0.95em;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+</style>
+{% block process_head_css %}{% endblock %} {% endblock %}
+
+{% block body_content %}
+    <header class="process-header">
+        <div class="logo-area">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
+            </a>
+        </div>
+        <div class="user-info">
+            <span><i class="fas fa-user-circle"></i> {{ session.get('user', 'Invitado') }}</span>
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <main class="process-main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages-process">
+                {% for category, message in messages %}
+                    <li class="flash-{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block process_page_content %}{% endblock %} </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.body.classList.add('process-page-body');
+</script>
+{% block process_scripts %}{% endblock %}
+{% endblock %}

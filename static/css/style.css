@@ -1,0 +1,20 @@
+/* static/css/style.css */
+/* Estilos globales muy básicos que se aplican a todas las páginas si es necesario */
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Fuente por defecto */
+    color: #333; /* Color de texto por defecto */
+    line-height: 1.6;
+    font-size: 16px;
+    /* El background específico lo manejará cada página (login vs home) */
+}
+
+a {
+    text-decoration: none; /* Quita subrayado de enlaces por defecto */
+}
