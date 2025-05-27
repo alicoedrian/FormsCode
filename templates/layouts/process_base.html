@@ -76,7 +76,7 @@
             </a>
         </div>
         <div class="user-info">
-            <span><i class="fas fa-user-circle"></i> {{ session.get('user', 'Invitado') }}</span>
+            <span><i class="fas fa-user-circle"></i> {{ session.get('user_name', 'Invitado') }}</span>
             <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
         </div>
     </header>
