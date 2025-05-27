@@ -1,26 +1,21 @@
-# fabrica_plasticos_visualizacion/app.py
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
 from functools import wraps
 import requests
 
 app = Flask(__name__)
-# Clave secreta: fundamental para la seguridad de las sesiones.
-# En producción, usa una cadena compleja y guárdala de forma segura (ej. variable de entorno).
+
 app.secret_key = os.urandom(24)
-# Para producción, considera una clave fija:
-# app.secret_key = 'tu_super_clave_secreta_fija_aqui_cambiame_por_algo_real'
 
 # --- Configuración de la API de Epicor ---
-EPICOR_API_TOKEN = "aW50ZWdyYXRpb246cjUwJEsyOHZhSUZpWXhhWQ==" # Tu token de autorización
+EPICOR_API_TOKEN = "aW50ZWdyYXRpb246cjUwJEsyOHZhSUZpWXhhWQ==" 
 EPICOR_API_BASE_URL = "https://centralusdtapp73.epicorsaas.com/SaaS5333/api/v1/BaqSvc/HMP_ValidadorID/"
 
-# --- Decorador para verificar si el usuario ha iniciado sesión ---
+
 def login_required(f):
-    @wraps(f) # Preserva metadatos de la función original
+    @wraps(f) 
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session: # Verifica 'user_id' en la sesión
+        if 'user_id' not in session:
             flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
@@ -222,8 +217,7 @@ def proceso_sellado_dashboard():
     opciones_sellado = [
         {"nombre": "Estándares de Máquina", "url": url_for('proceso_sellado_form_estandares'), "icono": "fas fa-cogs", "descripcion": "Registro y consulta de parámetros estándar de máquinas."},
         {"nombre": "Control de Calidad", "url": "#", "icono": "fas fa-clipboard-check", "descripcion": "Formatos y guías de calidad para sellado (en desarrollo)."},
-        # Aquí podrías añadir también "Solicitud de Cores" si aplica para Sellado
-        # {"nombre": "Solicitud de Cores", "url": url_for('solicitud_cores_form', origen='sellado'), "icono": "fas fa-tape", "descripcion": "Realizar una nueva solicitud de cores."},
+        
     ]
     return render_template('processes/sellado/sellado_dashboard.html',
                            username=session.get('user_name'),
@@ -245,8 +239,7 @@ def proceso_sellado_form_estandares():
 @app.route('/proceso/insertadoras')
 @login_required
 def proceso_insertadoras():
-    # Cuando desarrolles esta sección, crea 'insertadoras_dashboard.html'
-    # y añade la opción de "Solicitud de Cores" si es relevante.
+
     flash("La sección de Insertadoras está en desarrollo. ¡Vuelve pronto!", "info")
     return redirect(url_for('home'))
 
