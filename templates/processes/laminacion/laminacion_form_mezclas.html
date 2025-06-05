@@ -1,104 +1,607 @@
 {% extends "layouts/process_base.html" %}
 
-{% block process_title %}{{ subseccion }} - {{ nombre_proceso }}{% endblock %}
+{# Define el título de la página #}
+{% block process_title %}Registro Relación de Mezcla - {{ nombre_proceso }}{% endblock %}
 
+{# Define el CSS específico para esta sección con mejoras de interfaz #}
 {% block process_head_css %}
 <style>
+    /* Estilos existentes para títulos, breadcrumbs, etc. */
     .page-title-sub {
-        font-size: 1.8em;
+        font-size: 1.9em;
         color: #2C3E50;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
         border-bottom: 1px solid #e0e0e0;
         display: flex;
         align-items: center;
+        font-weight: 600;
     }
-    .page-title-sub i.fa-flask { /* Ícono específico para "Relación de Mezclas" */
-        margin-right: 12px;
-        color: #007bff; /* Un azul genérico para formularios, o puedes elegir otro representativo */
+    .page-title-sub i.fa-flask {
+        margin-right: 15px;
+        color: #007bff;
+        font-size: 1.1em;
     }
     .breadcrumb-nav {
-        margin-bottom: 25px;
-        font-size: 0.9em;
+        margin-bottom: 30px;
+        font-size: 0.95em;
     }
     .breadcrumb-nav a {
         color: #007bff;
         text-decoration: none;
+        transition: color 0.2s ease;
     }
     .breadcrumb-nav a:hover {
+        color: #0056b3;
         text-decoration: underline;
     }
     .breadcrumb-nav .separator {
-        margin: 0 8px;
-        color: #6c757d;
+        margin: 0 10px;
+        color: #adb5bd;
     }
     .breadcrumb-nav .current-page {
-        color: #495057;
-        font-weight: 500;
+        color: #343a40;
+        font-weight: 600;
     }
 
-    .form-iframe-container {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        overflow: hidden; /* Asegura que el iframe no desborde los bordes redondeados */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        background-color: #fff; /* Fondo mientras carga el iframe */
+    /* ESTILOS CLAVE PARA EL CONTENEDOR Y AGRUPACIONES DEL FORMULARIO */
+    .custom-form-container {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        background-color: #fff;
+        padding: 35px;
+        margin-bottom: 30px;
     }
-    .form-iframe-container iframe {
-        width: 100%;
-        height: 700px; /* Puedes ajustar esta altura según el largo del formulario */
-        border: none;   /* Quita el borde por defecto del iframe */
-        display: block; /* Evita espacios extra debajo del iframe */
-    }
-    .back-button-container {
-        margin-top: 25px;
-        margin-bottom: 20px; /* Espacio después del botón */
-        text-align: left; /* Alineación del botón de volver */
-    }
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        background-color: #6c757d; /* Gris estándar para "volver" */
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.95em;
-        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    /* Estilo para las leyendas de los fieldset (agrupaciones) */
+    .custom-form-container fieldset {
         border: none;
-        cursor: pointer;
+        padding: 0;
+        margin-bottom: 25px;
+        background-color: transparent;
+        box-shadow: none;
     }
-    .btn-back i {
-        margin-right: 8px;
+    .custom-form-container legend {
+        float: none;
+        width: auto;
+        padding: 0 15px;
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #0056b3;
+        border-bottom: none;
+        margin-left: 0;
+        background-color: transparent;
+        border-radius: 0;
+        margin-bottom: 20px;
     }
-    .btn-back:hover {
-        background-color: #5a6268; /* Gris más oscuro al pasar el mouse */
+
+    /* --- ESTILO PARA CADA PREGUNTA INDIVIDUAL (SIMILAR A GOOGLE FORMS) --- */
+    .form-question-card {
+        background-color: #fff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 20px; /* Espacio entre cada pregunta */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .form-question-card:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        border-color: #c9ccd0;
+    }
+
+    /* Estilo para el asterisco de requerido */
+    .form-label .required-asterisk {
+        color: #dc3545;
+        margin-left: 4px;
+        font-weight: normal;
+    }
+
+    /* Ajustes para inputs y selects para SIMETRÍA Y UNIFORMIDAD */
+    .form-label {
+        font-weight: 400;
+        color: #202124;
+        font-size: 1em;
+        margin-bottom: 12px;
+        display: block;
+    }
+    .form-control, .form-select {
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 1em;
+        border: 1px solid #dadce0;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        min-height: 40px;
+        box-sizing: border-box;
+        background-color: #f8fafd;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 1px #1a73e8;
+        background-color: #fff;
+    }
+    .form-text { 
+        font-size: 0.85em; 
+        color: #5f6368; 
+        margin-top: 5px; 
+    }
+
+    /* Botones */
+    .btn-success {
+        padding: 12px 25px;
+        font-size: 1.1em;
+        border-radius: 8px;
+        transition: background-color 0.2s ease, transform 0.1s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    .btn-success:hover {
+        background-color: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Estilos para el botón de volver */
+    .btn-back {
+        padding: 12px 25px;
+        font-size: 1.05em;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+
+    /* Estilos para las NOTIFICACIONES (Toast / Alerta Flotante) */
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        max-width: 350px;
+    }
+    .toast {
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,.1);
+        border-radius: .25rem;
+        box-shadow: 0 .25rem .75rem rgba(0,0,0,.1);
+        padding: .75rem 1.25rem;
+        margin-bottom: 1rem;
+        transition: opacity .15s linear;
+        opacity: 0;
+        visibility: hidden;
+        color: #212529;
+    }
+    .toast.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .toast-header {
+        display: flex;
+        align-items: center;
+        padding-bottom: .25rem;
+        margin-bottom: .5rem;
+        border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .toast-header strong {
+        font-weight: 700;
+    }
+    .toast-body {
+        font-size: .875em;
+        word-wrap: break-word;
+    }
+    .toast.bg-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+    .toast.bg-warning { background-color: #fff3cd; border-color: #ffeeba; color: #856404; }
+    .toast.bg-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+    .toast .btn-close {
+        padding: 0.5rem;
+        margin-left: auto;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 1em;
+        line-height: 1;
+        color: inherit;
+        opacity: .5;
+    }
+    .toast .btn-close:hover {
+        opacity: .8;
+    }
+
 </style>
 {% endblock %}
 
+{# Contenido principal de la página #}
 {% block process_page_content %}
+    {# Breadcrumb #}
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
         <a href="{{ url_for('proceso_laminacion_dashboard') }}">{{ nombre_proceso }}</a>
         <span class="separator">&raquo;</span>
         <span class="current-page">{{ subseccion }}</span>
     </nav>
 
-    <h1 class="page-title-sub"><i class="fas fa-flask"></i>{{ subseccion }}</h1>
-    <p style="margin-bottom:20px;">Completa o consulta el siguiente formulario para la {{ subseccion }} del proceso de {{ nombre_proceso }}.</p>
+    {# Título y Descripción #}
+    <h1 class="page-title-sub"><i class="fas fa-flask"></i> Registro relación de mezcla</h1>
+    <p class="mb-5 text-secondary">Ingresar información de colaborador, máquina, y turno, así como el dato obtenido de la relación de mezcla realizada.</p>
 
-    <div class="form-iframe-container">
-        <iframe title="Formulario de Relación de Mezclas para Laminación" src="{{ formulario_url }}">
-            Cargando formulario... Si el formulario no carga, puedes intentar acceder
-            <a href="{{ formulario_url }}" target="_blank" rel="noopener noreferrer">directamente aquí</a>.
-        </iframe>
+    {# Contenedor para las notificaciones (AJAX) #}
+    <div id="notification-container" class="notification-container">
+        {# Las notificaciones Toast se insertarán aquí por JavaScript #}
     </div>
 
+    {# Contenedor para tu formulario HTML personalizado #}
+    <div class="custom-form-container">
+        {# Este bloque de mensajes flash de Flask se mantiene para mensajes no relacionados con AJAX si los hubiera #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form id="relacionMezclasForm" method="POST" action="{{ url_for('proceso_laminacion_form_mezclas') }}">
+            {# Sección: Datos Generales #}
+            <fieldset>
+                <legend>Datos Generales</legend>
+                <div class="row">
+                    {# 1. Máquina (Seleccionable) - Ahora full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="maquina" class="form-label">1. Máquina: <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="maquina" name="maquina" required>
+                                <option value="" disabled selected>Selecciona una máquina</option>
+                                <option value="LA02 - ITALAM" {% if maquina_val == 'LA02 - ITALAM' %}selected{% endif %}>LA02 - ITALAM</option>
+                                <option value="LA03 - DUAL 1" {% if maquina_val == 'LA03 - DUAL 1' %}selected{% endif %}>LA03 - DUAL 1</option>
+                                <option value="LA04 - EVO 1" {% if maquina_val == 'LA04 - EVO 1' %}selected{% endif %}>LA04 - EVO 1</option>
+                                <option value="LA05 - DUAL 2" {% if maquina_val == 'LA05 - DUAL 2' %}selected{% endif %}>LA05 - DUAL 2</option>
+                                <option value="LA06 - EVO 2" {% if maquina_val == 'LA06 - EVO 2' %}selected{% endif %}>LA06 - EVO 2</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {# 2. Turno (Seleccionable) - Ahora full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="turno" class="form-label">2. Turno: <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="turno" name="turno" required>
+                                <option value="" disabled selected>Selecciona un turno</option>
+                                <option value="TURNO 1 (9:30PM - 5:30AM)" {% if turno_val == 'TURNO 1 (9:30PM - 5:30AM)' %}selected{% endif %}>TURNO 1 (9:30PM - 5:30AM)</option>
+                                <option value="TURNO 2 (5:30AM - 1:30 PM)" {% if turno_val == 'TURNO 2 (5:30AM - 1:30 PM)' %}selected{% endif %}>TURNO 2 (5:30AM - 1:30 PM)</option>
+                                <option value="TURNO 3 (1:30 PM - 9:30 PM)" {% if turno_val == 'TURNO 3 (1:30 PM - 9:30 PM)' %}selected{% endif %}>TURNO 3 (1:30 PM - 9:30 PM)</option>
+                                <option value="TURNO L-J (DIURNO)" {% if turno_val == 'TURNO L-J (DIURNO)' %}selected{% endif %}>TURNO L-J (DIURNO)</option>
+                                <option value="TURNO L-J (NOCTURNO)" {% if turno_val == 'TURNO L-J (NOCTURNO)' %}selected{% endif %}>TURNO L-J (NOCTURNO)</option>
+                                <option value="TURNO V-D (DIURNO)" {% if turno_val == 'TURNO V-D (DIURNO)' %}selected{% endif %}>TURNO V-D (DIURNO)</option>
+                                <option value="TURNO V-D (NOCTURNO)" {% if turno_val == 'TURNO V-D (NOCTURNO)' %}selected{% endif %}>TURNO V-D (NOCTURNO)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div> {# Cierre de row #}
+
+                <div class="row">
+                    {# 3. Operario responsable (Seleccionable) - Sigue full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="operario_responsable" class="form-label">3. Operario responsable: <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="operario_responsable" name="operario_responsable" required>
+                                <option value="" disabled selected>Selecciona un operario</option>
+                                <option value="ALEXIS RIVERA MUÑOZ" {% if operario_responsable_val == 'ALEXIS RIVERA MUÑOZ' %}selected{% endif %}>ALEXIS RIVERA MUÑOZ</option>
+                                <option value="ALVARO ANDRES GAVIRIA TABARES" {% if operario_responsable_val == 'ALVARO ANDRES GAVIRIA TABARES' %}selected{% endif %}>ALVARO ANDRES GAVIRIA TABARES</option>
+                                <option value="CAMILO HENAO MONSALVE" {% if operario_responsable_val == 'CAMILO HENAO MONSALVE' %}selected{% endif %}>CAMILO HENAO MONSALVE</option>
+                                <option value="CARLOS ANDRÉS LUNA TOBON" {% if operario_responsable_val == 'CARLOS ANDRÉS LUNA TOBON' %}selected{% endif %}>CARLOS ANDRÉS LUNA TOBON</option>
+                                <option value="CARLOS MARIO CANO QUINTERO" {% if operario_responsable_val == 'CARLOS MARIO CANO QUINTERO' %}selected{% endif %}>CARLOS MARIO CANO QUINTERO</option>
+                                <option value="CARLOS YERLIN GÓMEZ MONTOYA" {% if operario_responsable_val == 'CARLOS YERLIN GÓMEZ MONTOYA' %}selected{% endif %}>CARLOS YERLIN GÓMEZ MONTOYA</option>
+                                <option value="CÉSAR AUGUSTO RAMÍREZ LÓPEZ" {% if operario_responsable_val == 'CÉSAR AUGUSTO RAMÍREZ LÓPEZ' %}selected{% endif %}>CÉSAR AUGUSTO RAMÍREZ LÓPEZ</option>
+                                <option value="DAIRON VILLA TORRES" {% if operario_responsable_val == 'DAIRON VILLA TORRES' %}selected{% endif %}>DAIRON VILLA TORRES</option>
+                                <option value="DANIEL VELASQUEZ" {% if operario_responsable_val == 'DANIEL VELASQUEZ' %}selected{% endif %}>DANIEL VELASQUEZ</option>
+                                <option value="DUVAN ALEXIS MARTÍNEZ HOYOS" {% if operario_responsable_val == 'DUVAN ALEXIS MARTÍNEZ HOYOS' %}selected{% endif %}>DUVAN ALEXIS MARTÍNEZ HOYOS</option>
+                                <option value="FABIAN ALONSO VARELA" {% if operario_responsable_val == 'FABIAN ALONSO VARELA' %}selected{% endif %}>FABIAN ALONSO VARELA</option>
+                                <option value="FAUSTO ELÍAS RÍOS" {% if operario_responsable_val == 'FAUSTO ELÍAS RÍOS' %}selected{% endif %}>FAUSTO ELÍAS RÍOS</option>
+                                <option value="FRANCISCO JAVIER ARANGO" {% if operario_responsable_val == 'FRANCISCO JAVIER ARANGO' %}selected{% endif %}>FRANCISCO JAVIER ARANGO</option>
+                                <option value="GERSAIN NIETO TABORDA" {% if operario_responsable_val == 'GERSAIN NIETO TABORDA' %}selected{% endif %}>GERSAIN NIETO TABORDA</option>
+                                <option value="HUGO ARMANDO ARAQUE" {% if operario_responsable_val == 'HUGO ARMANDO ARAQUE' %}selected{% endif %}>HUGO ARMANDO ARAQUE</option>
+                                <option value="JEISSON ALZATE RAMIREZ" {% if operario_responsable_val == 'JEISSON ALZATE RAMIREZ' %}selected{% endif %}>JEISSON ALZATE RAMIREZ</option>
+                                <option value="JHON FREDY VANEGAS TAMAYO" {% if operario_responsable_val == 'JHON FREDY VANEGAS TAMAYO' %}selected{% endif %}>JHON FREDY VANEGAS TAMAYO</option>
+                                <option value="JHON JAIRO SUAREZ CORRECHA" {% if operario_responsable_val == 'JHON JAIRO SUAREZ CORRECHA' %}selected{% endif %}>JHON JAIRO SUAREZ CORRECHA</option>
+                                <option value="JHON JEISSON PÉREZ MARTÍNEZ" {% if operario_responsable_val == 'JHON JEISSON PÉREZ MARTÍNEZ' %}selected{% endif %}>JHON JEISSON PÉREZ MARTÍNEZ</option>
+                                <option value="JHON REINOSO YOTAGRI" {% if operario_responsable_val == 'JHON REINOSO YOTAGRI' %}selected{% endif %}>JHON REINOSO YOTAGRI</option>
+                                <option value="JOHAN MOLINA" {% if operario_responsable_val == 'JOHAN MOLINA' %}selected{% endif %}>JOHAN MOLINA</option>
+                                <option value="JUAN FELIPE SUAREZ" {% if operario_responsable_val == 'JUAN FELIPE SUAREZ' %}selected{% endif %}>JUAN FELIPE SUAREZ</option>
+                                <option value="JULIAN ESPINOZA" {% if operario_responsable_val == 'JULIAN ESPINOZA' %}selected{% endif %}>JULIAN ESPINOZA</option>
+                                <option value="JULIAN STIVEN GALEANO" {% if operario_responsable_val == 'JULIAN STIVEN GALEANO' %}selected{% endif %}>JULIAN STIVEN GALEANO</option>
+                                <option value="MILTON ALEJANDRO VÉLEZ ORTIZ" {% if operario_responsable_val == 'MILTON ALEJANDRO VÉLEZ ORTIZ' %}selected{% endif %}>MILTON ALEJANDRO VÉLEZ ORTIZ</option>
+                                <option value="NILTON MESA MARULANDA" {% if operario_responsable_val == 'NILTON MESA MARULANDA' %}selected{% endif %}>NILTON MESA MARULANDA</option>
+                                <option value="RICARDO ALONSO MAZO" {% if operario_responsable_val == 'RICARDO ALONSO MAZO' %}selected{% endif %}>RICARDO ALONSO MAZO</option>
+                                <option value="SANTIAGO GONZALEZ" {% if operario_responsable_val == 'SANTIAGO GONZALEZ' %}selected{% endif %}>SANTIAGO GONZALEZ</option>
+                                <option value="SEBASTIAN VELEZ" {% if operario_responsable_val == 'SEBASTIAN VELEZ' %}selected{% endif %}>SEBASTIAN VELEZ</option>
+                                <option value="STIVEN ZAPATA CORREA" {% if operario_responsable_val == 'STIVEN ZAPATA CORREA' %}selected{% endif %}>STIVEN ZAPATA CORREA</option>
+                                <option value="YEREMITH WILCHES" {% if operario_responsable_val == 'YEREMITH WILCHES' %}selected{% endif %}>YEREMITH WILCHES</option>
+                            </select>
+                        </div>
+                    </div>
+                </div> {# Cierre de row #}
+            </fieldset>
+
+            {# Sección: Medidas de Mezcla #}
+            <fieldset>
+                <legend>Medidas de Mezcla</legend>
+                <div class="row">
+                    {# 4. Peso adhesivo (usar punto decimal) - Ahora full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="peso_adhesivo" class="form-label">4. Peso adhesivo (kg): <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="peso_adhesivo" name="peso_adhesivo" min="0" placeholder="Ej. 10.5" value="{{ peso_adhesivo_val if peso_adhesivo_val is not none else '' }}" required inputmode="decimal"> {# inputmode="decimal" para teclados móviles #}
+                        </div>
+                    </div>
+
+                    {# 5. Peso correactante (usar punto decimal) - Ahora full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="peso_correactante" class="form-label">5. Peso correactante (kg): <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="peso_correactante" name="peso_correactante" min="0" placeholder="Ej. 1.23" value="{{ peso_correactante_val if peso_correactante_val is not none else '' }}" required inputmode="decimal">
+                        </div>
+                    </div>
+                </div> {# Cierre de row #}
+
+                <div class="row">
+                    {# 6. Relación de mezcla (usar punto decimal) - Sigue full width #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="relacion_mezcla" class="form-label">6. Relación de mezcla: <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="relacion_mezcla" name="relacion_mezcla" min="0" placeholder="Ej. 5.67" value="{{ relacion_mezcla_val if relacion_mezcla_val is not none else '' }}" required inputmode="decimal">
+                        </div>
+                    </div>
+                </div> {# Cierre de row #}
+            </fieldset>
+
+            <button type="submit" class="btn btn-success me-2">Enviar Registro</button>
+        </form>
+    </div>
+
+    {# Botón de Volver #}
     <div class="back-button-container">
         <a href="{{ url_volver or url_for('proceso_laminacion_dashboard') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i> Volver a Opciones de Laminación
         </a>
     </div>
+{% endblock %}
+
+{# Script JavaScript para manejar submission AJAX y truncar decimales en tiempo real #}
+{% block process_page_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Script de formulario de relación de mezclas cargado.");
+
+        const form = document.getElementById('relacionMezclasForm');
+        const notificationContainer = document.getElementById('notification-container');
+        const pesoAdhesivoInput = document.getElementById('peso_adhesivo');
+        const pesoCorreactanteInput = document.getElementById('peso_correactante');
+        const relacionMezclaInput = document.getElementById('relacion_mezcla');
+
+        // --- Funciones para manejar Notificaciones (Toasts) ---
+        function showNotification(message, category = 'info', delay = 5000) {
+            const toast = document.createElement('div');
+            // Clases de Bootstrap para Toasts y colores
+            toast.className = `toast align-items-center text-white bg-${category} border-0 show`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            // Ajustar el color del texto para que sea legible en los fondos de Bootstrap
+            let textColorClass = 'text-white'; 
+            if (category === 'warning' || category === 'success' || category === 'info') {
+                textColorClass = 'text-dark'; // Texto oscuro para fondos claros
+            }
+
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body ${textColorClass}">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close ${textColorClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            notificationContainer.append(toast);
+
+            // Eliminar el toast después de un tiempo
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, delay);
+        }
+
+        // --- Lógica de Truncamiento y Validación de Decimales en Tiempo Real (para type="text") ---
+        const setupDecimalInput = (inputElement) => {
+            if (!inputElement) return; // Asegura que el elemento existe
+
+            // Listener para 'input' (mientras el usuario escribe)
+            inputElement.addEventListener('input', function(event) {
+                let value = event.target.value;
+                let cursorPosition = event.target.selectionStart;
+
+                // 1. Reemplaza comas por puntos
+                value = value.replace(',', '.'); 
+                
+                // 2. Filtra caracteres no numéricos y maneja la estructura
+                let currentVal = value;
+                
+                // Eliminar cualquier cosa que no sea dígito, punto o guion
+                currentVal = currentVal.replace(/[^0-9.-]/g, '');
+
+                // Asegurar que el guion esté solo al principio
+                if (currentVal.startsWith('-') && currentVal.indexOf('-', 1) !== -1) {
+                    currentVal = '-' + currentVal.substring(1).replace(/-/g, '');
+                } else if (!currentVal.startsWith('-') && currentVal.includes('-')) {
+                    currentVal = currentVal.replace(/-/g, '');
+                }
+
+                // Asegurar que solo haya un punto decimal
+                const parts = currentVal.split('.');
+                if (parts.length > 2) {
+                    currentVal = parts[0] + '.' + parts.slice(1).join('');
+                }
+                
+                // Truncar a 2 decimales si el punto ya existe y hay más de 2 decimales
+                if (currentVal.includes('.')) {
+                    const decimalPart = currentVal.split('.')[1];
+                    if (decimalPart.length > 2) {
+                        currentVal = currentVal.substring(0, currentVal.indexOf('.') + 3);
+                    }
+                }
+
+                // Limpiar ceros iniciales (ej. 012 -> 12, 00.5 -> 0.5)
+                if (currentVal.length > 1 && currentVal.startsWith('0') && currentVal[1] !== '.') {
+                     currentVal = currentVal.substring(1);
+                }
+                
+                // Asegurar que no sea negativo si min="0" (validación visual)
+                if (inputElement.min === '0' && parseFloat(currentVal) < 0 && currentVal !== '-') {
+                    currentVal = ''; 
+                }
+
+
+                // Actualizar el valor del input solo si ha cambiado
+                if (event.target.value !== currentVal) {
+                    event.target.value = currentVal;
+                    // Reajustar la posición del cursor
+                    event.target.setSelectionRange(cursorPosition, cursorPosition);
+                }
+                
+                // Llama a la función de cálculo de relación después de la manipulación del input
+                checkRelationMixtureAlert();
+            });
+
+            // Listener para 'change' (cuando el campo pierde el foco) para formatear a 2 decimales finales
+            inputElement.addEventListener('change', function(event) {
+                let value = event.target.value;
+                if (typeof value === 'string') {
+                    value = value.replace(',', '.');
+                }
+                let floatValue = parseFloat(value);
+
+                if (!isNaN(floatValue)) {
+                    inputElement.value = floatValue.toFixed(2);
+                    if (inputElement.min === '0' && floatValue < 0) {
+                        inputElement.value = '0.00';
+                    }
+                } else if (value !== '' && value !== '-' && value !== '.') {
+                    inputElement.value = '';
+                }
+                checkRelationMixtureAlert();
+            });
+
+            // Inicializar el valor al cargar la página si hay un valor preexistente
+            if (inputElement.value !== '') {
+                let initialValue = inputElement.value.replace(',', '.');
+                if (!isNaN(parseFloat(initialValue))) {
+                    inputElement.value = parseFloat(initialValue).toFixed(2);
+                } else {
+                    inputElement.value = '';
+                }
+            }
+        };
+
+        // Aplica la configuración de entrada decimal a los campos relevantes
+        setupDecimalInput(pesoAdhesivoInput);
+        setupDecimalInput(pesoCorreactanteInput);
+        // NO aplicar setupDecimalInput a relacionMezclaInput porque es un campo de salida/resultado visual
+
+        // --- Lógica del Cálculo de Relación y Alerta en Frontend ---
+        function checkRelationMixtureAlert() {
+            const pesoAdhesivoVal = pesoAdhesivoInput.value.replace(',', '.');
+            const pesoCorreactanteVal = pesoCorreactanteInput.value.replace(',', '.');
+
+            const pesoAdhesivo = parseFloat(pesoAdhesivoVal);
+            const pesoCorreactante = parseFloat(pesoCorreactanteVal);
+            
+            // Remover alertas de cuidado previas para no duplicarlas
+            const existingWarningToasts = notificationContainer.querySelectorAll('.toast.bg-warning');
+            existingWarningToasts.forEach(toast => toast.remove());
+
+            if (isNaN(pesoAdhesivo) || isNaN(pesoCorreactante) || pesoAdhesivoVal === '' || pesoCorreactanteVal === '') {
+                // No podemos calcular si los valores no son números o están vacíos
+                return;
+            }
+
+            if (pesoCorreactante === 0) {
+                showNotification('El peso correactante no puede ser cero para calcular la relación.', 'warning', 7000);
+                return; 
+            }
+
+            const relacionCalculada = pesoAdhesivo / pesoCorreactante;
+            const relacionCalculadaRedondeada = Math.round(relacionCalculada * 100) / 100; // Redondeamos a 2 decimales para la comparación
+
+            // Actualizar el campo de Relación de Mezcla visualmente
+            if (!isNaN(relacionCalculadaRedondeada)) {
+                relacionMezclaInput.value = relacionCalculadaRedondeada.toFixed(2);
+            } else {
+                relacionMezclaInput.value = '';
+            }
+
+
+            if (relacionCalculadaRedondeada >= 1.23 && relacionCalculadaRedondeada <= 1.32) {
+                showNotification('TENER CUIDADO CON LA RELACIÓN DE MEZCLAS', 'warning', 10000); // 10 segundos para verla
+            }
+        }
+
+
+        // --- Manejo del Envío del Formulario (AJAX) ---
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Deshabilitar botón y mostrar spinner
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...`;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log("Respuesta del servidor:", result);
+
+                // Mostrar la notificación del resultado de la submission
+                showNotification(result.message, result.category || 'info');
+                
+                // Si la submission fue exitosa (el backend aceptó los datos)
+                if (result.success) {
+                    form.reset(); // Limpia el formulario
+                    // También resetear los valores val de los select para que se reestablezcan a la opción por defecto
+                    document.getElementById('maquina').value = "";
+                    document.getElementById('turno').value = "";
+                    document.getElementById('operario_responsable').value = "";
+
+                    // Redirigir siempre después de un éxito
+                    setTimeout(() => {
+                        window.location.href = result.redirect_url || "{{ url_for('proceso_laminacion_dashboard') }}";
+                    }, 2500); // Redirige después de 2.5 segundos
+                } else {
+                    // Si success es false (error de validación crítica del backend o de Sheets)
+                    // No limpiamos el formulario para que el usuario vea sus errores
+                }
+            } catch (error) {
+                console.error('Error en la solicitud AJAX:', error);
+                showNotification('Hubo un problema de conexión. Intenta de nuevo.', 'danger');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Enviar Registro'; // Restaurar texto del botón
+            }
+        });
+
+        // Llamar a checkRelationMixtureAlert al cargar la página y cuando los campos relevantes cambian
+        checkRelationMixtureAlert(); // Para valores iniciales al cargar
+        // checkRelationMixtureAlert ya se llama en cada 'input' event en setupDecimalInput
+        // pero podemos asegurarnos de que se llama si los valores cambian por otras vías
+        // (por ejemplo, autocompletado del navegador, aunque el 'input' suele cubrirlo)
+        // Por ahora, los listeners en setupDecimalInput son suficientes.
+    });
+</script>
 {% endblock %}

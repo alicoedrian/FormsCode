@@ -1,0 +1,101 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}Monitoreo de Estado de Core{% endblock %}
+
+{% block process_head_css %}
+<style>
+    .page-title-sub {
+        font-size: 1.8em;
+        color: #2C3E50;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+    }
+    .page-title-sub i.fa-tasks { /* Ícono para Monitoreo/Estado */
+        margin-right: 12px;
+        color: #6c757d; /* Un color neutro */
+    }
+    .breadcrumb-nav {
+        margin-bottom: 25px;
+        font-size: 0.9em;
+    }
+    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
+    .breadcrumb-nav a:hover { text-decoration: underline; }
+    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
+    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
+
+    .sheet-iframe-container {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background-color: #fff; /* Fondo mientras carga el iframe */
+        margin-top: 20px;
+    }
+    .sheet-iframe-container iframe {
+        width: 100%;
+        height: 75vh; /* Usa un porcentaje de la altura de la ventana gráfica, ajustable */
+        border: none;
+        display: block;
+    }
+    .back-button-container {
+        margin-top: 25px;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        background-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95em;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-back i { margin-right: 8px; }
+    .btn-back:hover {
+        background-color: #5a6268;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('home') }}">Inicio (Procesos)</a>
+        {% if proceso_origen_nombre and url_volver_proceso %}
+            <span class="separator">&raquo;</span>
+            <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
+        {% endif %}
+        <span class="separator">&raquo;</span>
+        <span class="current-page">Monitoreo de Estado de Core</span>
+    </nav>
+
+    <h1 class="page-title-sub"><i class="fas fa-tasks"></i>Monitoreo de Estado de Core</h1>
+    <p style="margin-bottom:5px;">Visualiza el estado actual de los cores en el siguiente panel.</p>
+    <p style="font-size:0.85em; color: #555;">Nota: Puede que necesites hacer scroll dentro del panel para ver toda la información.</p>
+
+    <div class="sheet-iframe-container">
+        <iframe title="Monitoreo de Estado de Core" src="{{ sheet_url }}">
+            Cargando hoja de cálculo... Si no carga, verifica que el enlace esté correctamente publicado para la web.
+        </iframe>
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_volver_proceso or url_for('home') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            {% if proceso_origen_nombre %}
+                Volver a Opciones de {{ proceso_origen_nombre }}
+            {% else %}
+                Volver al Inicio
+            {% endif %}
+        </a>
+    </div>
+{% endblock %}

@@ -1,126 +1,685 @@
 {% extends "layouts/base_minimal.html" %}
 
-{% block title %}Iniciar Sesión- Alico SAS BIC{% endblock %}
+{% block title %}Iniciar Sesión - Alico SAS BIC{% endblock %}
 
 {% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/all2.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css2.css') }}">
 <style>
-    html, body.login-page-body { /* Aplicamos al body específico de esta página */
-        height: 100%;
+    /* ================================================== */
+    /* VARIABLES CSS - PALETA CORPORATIVA ALICO MEJORADA */
+    /* ================================================== */
+    :root {
+        /* Colores principales - Adjusted to match the second example's deeper tones */
+        --alico-primary: #000F9F; 
+        --alico-primary-light: #2D3A8C; 
+        --alico-primary-dark: #00084F; 
+        --alico-secondary: #DB9500; 
+        --alico-secondary-light: #F2B01E; 
+        --alico-accent: #71B338; 
+        
+        /* Colores de texto */
+        --text-primary: #1f2937; /* Keeping for general text on glass */
+        --text-secondary: #6b7280; /* Keeping for icons on glass */
+        --text-light: #9ca3af; /* Keeping for placeholders on glass */
+        
+        /* Colores de fondo */
+        --bg-primary: #ffffff; /* Used for logo circle and input bg */
+        --bg-secondary: #f8fafc; /* Not directly used, but good to keep */
+        --bg-glass: rgba(255, 255, 255, 0.25); /* The key for glassmorphism */
+        
+        /* Efectos */
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); 
+        
+        /* Bordes */
+        --border-radius: 12px;
+        --border-radius-lg: 16px;
+        --border-color: #e5e7eb;
+    }
+
+    /* ================================================== */
+    /* RESET Y CONFIGURACIÓN BASE */
+    /* ================================================== */
+    * {
         margin: 0;
         padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #ECF0F1;
-        font-family: 'Roboto', sans-serif;
-    }
-    .login-container {
-        background-color: #FFFFFF;
-        padding: 40px 50px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 420px;
-        text-align: center;
-    }
-    .login-logo img {
-        max-width: 150px;
-        margin-bottom: 25px;
-    }
-    .login-title {
-        color: #2C3E50;
-        margin-bottom: 25px;
-        font-weight: 500;
-        font-size: 1.8em;
-    }
-    .form-group {
-        margin-bottom: 25px; /* Aumentamos un poco el espacio para un solo campo */
-        text-align: left;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #555;
-        font-weight: 500;
-        font-size: 0.95em;
-    }
-    .form-control {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #BDC3C7;
-        border-radius: 6px;
         box-sizing: border-box;
-        font-size: 1em;
-        transition: border-color 0.3s ease;
     }
-    .form-control:focus {
-        border-color: #18BC9C;
-        outline: none;
-        box-shadow: 0 0 0 0.2rem rgba(24, 188, 156, 0.25);
+
+    html, body {
+        height: 100%;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Preferred font from first example */
+        line-height: 1.6;
+        color: var(--text-primary);
+        overflow: hidden;
     }
-    .btn-submit {
-        background-color: #18BC9C;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1.1em;
-        font-weight: 500;
+
+    /* ================================================== */
+    /* FONDO ANIMADO CON GRADIENTE DINÁMICO */
+    /* ================================================== */
+    body {
+        background: linear-gradient(-45deg, 
+            #667eea, 
+            var(--alico-primary), 
+            var(--alico-secondary), 
+            var(--alico-accent)
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Partículas flotantes de fondo */
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        transition: background-color 0.3s ease;
-        margin-top: 10px;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        animation: float 20s ease-in-out infinite;
     }
-    .btn-submit:hover {
-        background-color: #15A589;
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
     }
+
+    /* ================================================== */
+    /* CONTENEDOR PRINCIPAL DEL LOGIN */
+    /* ================================================== */
+    .login-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+
+    .login-container {
+        background: var(--bg-glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 3rem 2.5rem;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-xl);
+        width: 100%;
+        max-width: 440px;
+        position: relative;
+        overflow: hidden;
+        
+        /* Animación de entrada mejorada */
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+        animation: slideInScale 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes slideInScale {
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Efecto de brillo superior */
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.8), 
+            transparent
+        );
+    }
+
+    /* ================================================== */
+    /* HEADER DEL LOGIN */
+    /* ================================================== */
+    .login-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .login-logo {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .logo-container { /* This is the new logo wrapper */
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        background: var(--bg-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+            var(--alico-primary), 
+            var(--alico-secondary), 
+            var(--alico-accent), 
+            var(--alico-primary)
+        );
+        animation: rotate 3s linear infinite;
+        z-index: -1;
+    }
+
+    .logo-container::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        background: var(--bg-primary);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .logo-img { /* Style for the actual image logo */
+        max-width: 60px; /* Adjust size as needed */
+        max-height: 60px;
+        position: relative;
+        z-index: 1; /* Ensure logo is above the gradient */
+    }
+
+    .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--bg-primary); /* Changed to white for better contrast on glass */
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8); /* Changed to white for better contrast on glass */
+        font-weight: 400;
+    }
+
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--bg-primary); /* Changed to white for better contrast on glass */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-wrapper { /* Renamed from .input-group to match first example */
+        position: relative;
+    }
+
+    .form-input { /* Renamed from .form-control to match first example */
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid transparent;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-input::placeholder {
+        color: var(--text-light);
+    }
+
+    .form-input:focus {
+        outline: none;
+        background: var(--bg-primary);
+        border-color: var(--alico-primary);
+        box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1); /* Using primary color with transparency */
+        transform: translateY(-2px);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+        z-index: 10;
+    }
+
+    .form-input:focus + .input-icon {
+        color: var(--alico-primary);
+    }
+
+    /* Add styles for validation feedback */
+    .error-message {
+        color: #ef4444; /* Specific error red */
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+        display: none; /* Hidden by default */
+    }
+
+    .form-group.invalid .error-message {
+        display: block;
+    }
+
+    /* ================================================== */
+    /* BOTÓN DE LOGIN MEJORADO */
+    /* ================================================== */
+    .btn-login {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, var(--alico-primary), var(--alico-primary-light));
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        margin-top: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex; /* For spinner */
+        align-items: center; /* For spinner */
+        justify-content: center; /* For spinner */
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.2), 
+            transparent
+        );
+        transition: left 0.5s ease;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 15, 159, 0.3); /* Adjusted shadow color */
+        background: linear-gradient(135deg, var(--alico-primary-light), var(--alico-primary));
+    }
+
+    .btn-login:hover::before {
+        left: 100%;
+    }
+
+    .btn-login:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-login:disabled {
+        background: var(--text-light); /* Changed to text-light for disabled state */
+        color: var(--alico-text); /* Ensure text is visible */
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* ================================================== */
+    /* MENSAJES FLASH MEJORADOS */
+    /* ================================================== */
     .flash-messages {
-        margin-bottom: 20px;
-        text-align: left;
+        margin-bottom: 1.5rem;
     }
+
     .flash-message {
-        padding: 10px 15px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        font-size: 0.9em;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        backdrop-filter: blur(10px); /* Glassmorphism effect */
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Light border */
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: slideInLeft 0.5s ease forwards;
     }
-    .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-    .flash-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; } /* Añadido para consistencia */
+
+    @keyframes slideInLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .flash-icon {
+        margin-right: 0.75rem;
+        font-size: 1.2rem;
+    }
+
+    .flash-success {
+        background: rgba(113, 179, 56, 0.15); /* Using alico-accent with transparency */
+        color: var(--alico-accent);
+        border-left: 4px solid var(--alico-accent);
+    }
+
+    .flash-danger { 
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-left: 4px solid #ef4444;
+    }
+
+    .flash-warning {
+        background: rgba(219, 149, 0, 0.15); /* Using alico-secondary with transparency */
+        color: var(--alico-secondary);
+        border-left: 4px solid var(--alico-secondary);
+    }
+
+    .flash-info {
+        background: rgba(0, 15, 159, 0.15); /* Using alico-primary with transparency */
+        color: var(--alico-primary);
+        border-left: 4px solid var(--alico-primary);
+    }
+
+    /* ================================================== */
+    /* EFECTOS ADICIONALES */
+    /* ================================================== */
+    .loading-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ================================================== */
+    /* RESPONSIVE DESIGN */
+    /* ================================================== */
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+        
+        .login-title {
+            font-size: 1.5rem;
+        }
+        
+        .logo-container {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .logo-img {
+            max-width: 45px; /* Adjust for smaller logo container */
+            max-height: 45px;
+        }
+    }
+
+    @media (max-height: 600px) {
+        .login-container {
+            padding: 1.5rem;
+        }
+        
+        .login-header {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    /* ================================================== */
+    /* ANIMACIONES DE INTERACCIÓN */
+    /* ================================================== */
+    .form-group {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    /* Since there's only one form-group now, we can simplify animation-delay */
+    .form-group:nth-child(1) { animation-delay: 0.1s; } 
+    .btn-login { 
+        animation: fadeInUp 0.6s ease forwards;
+        animation-delay: 0.2s; /* Adjusted delay for the button */
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body_content %}
-<div class="login-container">
-    <div class="login-logo">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
-    </div>
-    <h2 class="login-title">Acceso al Sistema</h2>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-            {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">{{ message }}</div>
-            {% endfor %}
+<div class="login-wrapper">
+    <div class="login-container">
+        <header class="login-header">
+            <div class="login-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Alico SAS BIC" class="logo-img">
+                </div>
             </div>
-        {% endif %}
-    {% endwith %}
+            <h1 class="login-title">Bienvenido</h1>
+            <p class="login-subtitle">Ingrese su ID de empleado para continuar</p> {# Adjusted subtitle #}
+        </header>
 
-    <form method="POST" action="{{ url_for('login') }}">
-        {% if next %}
-            <input type="hidden" name="next" value="{{ next }}">
-        {% endif %}
-        <div class="form-group">
-            <label for="username">ID de Empleado</label> <input type="text" id="username" name="username" class="form-control" required placeholder="Ingresa tu ID"> </div>
-        <button type="submit" class="btn-submit">Ingresar</button>
-    </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} flash-icon"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="username" class="form-label">ID de Empleado</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        required 
+                        placeholder="Ingrese su ID de empleado"
+                        autocomplete="username"
+                    >
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                <p class="error-message" id="usernameError"></p>
+            </div>
+
+            {# PASSWORD FIELD REMOVED HERE #}
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <span id="btnText">Ingresar</span>
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    document.body.classList.add('login-page-body');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-focus en el campo de usuario con delay
+        const usernameField = document.getElementById('username');
+        setTimeout(() => {
+            if (usernameField) {
+                usernameField.focus();
+            }
+        }, 800);
+
+        // Efectos de input mejorados
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            // Efecto de focus mejorado
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+
+            // Validación en tiempo real (only for username since no password field)
+            input.addEventListener('input', function() {
+                validateInput(this);
+            });
+        });
+
+        // Efecto de hover en el botón (re-added for JS control)
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) { // Ensure button exists before adding listeners
+            loginBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.02)';
+            });
+
+            loginBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        }
+    });
+
+    // Función de validación de inputs (adapted for single input)
+    function validateInput(input) {
+        const value = input.value.trim();
+        const inputWrapper = input.parentElement;
+        const errorMessageElement = document.getElementById(`${input.id}Error`);
+
+        // Remover clases de validación previas
+        inputWrapper.classList.remove('valid', 'invalid');
+        input.style.borderColor = 'transparent'; 
+        if (errorMessageElement) errorMessageElement.textContent = ''; // Clear previous message
+
+        if (value.length > 0) {
+            let isValid = true;
+            let message = '';
+
+            // Only validate username length
+            if (input.id === 'username') {
+                if (value.length < 3) { // You can adjust this minimum length as needed
+                    isValid = false;
+                    message = 'El ID de empleado debe tener al menos 3 caracteres.';
+                }
+            }
+            
+            if (isValid) {
+                inputWrapper.classList.add('valid');
+                input.style.borderColor = 'var(--alico-accent)';
+            } else {
+                inputWrapper.classList.add('invalid');
+                input.style.borderColor = '#ef4444';
+                if (errorMessageElement) errorMessageElement.textContent = message;
+            }
+        }
+    }
+
+    // Handle login submission (adapted for Flask form submission and single input)
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        const loginBtn = document.getElementById('loginBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Basic client-side check if username is empty
+        const username = document.getElementById('username').value.trim();
+
+        if (!username) {
+            // If the field is empty on submit, apply the error visual feedback
+            validateInput(document.getElementById('username'));
+            return; 
+        }
+
+        // Show loading state
+        loginBtn.disabled = true;
+        loadingSpinner.style.display = 'inline-block';
+        btnText.textContent = 'Ingresando...';
+        loginBtn.style.background = 'var(--text-light)'; // Change background to disabled look
+        loginBtn.style.color = 'var(--alico-text-light)'; // Ensure text color is adjusted for disabled
+        loginBtn.style.boxShadow = 'none'; // Remove shadow when disabled
+        loginBtn.style.transform = 'none'; // Remove hover transform when disabled
+    });
+
+    // Mouse parallax effect
+    document.addEventListener('mousemove', function(event) {
+        const container = document.querySelector('.login-container');
+        if (!container) return; // Guard clause if element not found
+        
+        const rect = container.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 20; // Adjust divisor for sensitivity
+        const rotateY = (centerX - x) / 20; // Adjust divisor for sensitivity
+        
+        container.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    // Reset transformation when mouse leaves container
+    const loginContainer = document.querySelector('.login-container');
+    if (loginContainer) { // Ensure container exists
+        loginContainer.addEventListener('mouseleave', function() {
+            this.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+    }
 </script>
 {% endblock %}
