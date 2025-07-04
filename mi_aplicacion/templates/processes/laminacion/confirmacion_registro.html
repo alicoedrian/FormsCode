@@ -1,0 +1,33 @@
+{% extends "layouts/process_base.html" %}
+{% block process_title %}Confirmación de Registro{% endblock %}
+
+{% block process_page_content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">✅ Registro Exitoso</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success">
+                <h5 class="alert-heading">Los datos se han guardado correctamente</h5>
+                <hr>
+                <div class="mb-3">
+                    <strong>Máquina:</strong> {{ maquina }}<br>
+                    <strong>Turno:</strong> {{ turno }}<br>
+                    <strong>Operario:</strong> {{ operario }}<br>
+                    <strong>Relación de mezcla:</strong> {{ relacion }}
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_volver }}" class="btn btn-secondary me-md-2">
+                    <i class="fas fa-arrow-left me-1"></i> Volver al formulario
+                </a>
+                <a href="{{ url_nuevo }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Nuevo registro
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

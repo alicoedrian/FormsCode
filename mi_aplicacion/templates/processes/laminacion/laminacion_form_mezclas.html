@@ -1,0 +1,226 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}Registro Relación de Mezcla{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a>
+        <span class="separator">&raquo;</span>
+        <a href="{{ url_for('laminacion.proceso_laminacion_dashboard') }}">{{ nombre_proceso }}</a> {# Enlace al dashboard de laminación #}
+        <span class="separator">&raquo;</span>
+        <span class="current-page">{{ subseccion }}</span> {# Usar la variable subseccion #}
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Registro relación de mezcla</h1>
+        <p class="mb-4 text-secondary">Ingrese la información del proceso.</p>
+
+        <div id="notification-container" style="position: fixed; top: 80px; right: 20px; z-index: 1050; width: 350px;"></div>
+
+        <form id="relacionMezclasForm" method="POST" action="{{ url_for('laminacion.proceso_laminacion_form_mezclas') }}">
+            
+            <div class="mb-3">
+                <label for="maquina" class="form-label">Máquina <span style="color:red;">*</span></label>
+                <select class="form-select" id="maquina" name="maquina" required>
+                    <option value="" disabled selected>Selecciona una máquina</option>
+                    <option value="LA02 - ITALAM">LA02 - ITALAM</option>
+                    <option value="LA03 - DUAL 1">LA03 - DUAL 1</option>
+                    <option value="LA04 - EVO 1">LA04 - EVO 1</option>
+                    <option value="LA05 - DUAL 2">LA05 - DUAL 2</option>
+                    <option value="LA06 - EVO 2">LA06 - EVO 2</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="turno" class="form-label">Turno <span style="color:red;">*</span></label>
+                <select class="form-select" id="turno" name="turno" required>
+                    <option value="" disabled selected>Selecciona un turno</option>
+                    <option value="TURNO 1 (9:30PM - 5:30AM)">TURNO 1 (9:30PM - 5:30AM)</option>
+                    <option value="TURNO 2 (5:30AM - 1:30 PM)">TURNO 2 (5:30AM - 1:30 PM)</option>
+                    <option value="TURNO 3 (1:30 PM - 9:30 PM)">TURNO 3 (1:30 PM - 9:30 PM)</option>
+                    <option value="TURNO L-J (DIURNO)">TURNO L-J (DIURNO)</option>
+                    <option value="TURNO L-J (NOCTURNO)">TURNO L-J (NOCTURNO)</option>
+                    <option value="TURNO V-D (DIURNO)">TURNO V-D (DIURNO)</option>
+                    <option value="TURNO V-D (NOCTURNO)">TURNO V-D (NOCTURNO)</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="operario_responsable" class="form-label">Operario responsable <span style="color:red;">*</span></label>
+                <select class="form-select" id="operario_responsable" name="operario_responsable" required>
+                    <option value="" disabled selected>Selecciona un operario</option>
+                    <option value="ALEXIS RIVERA MUÑOZ">ALEXIS RIVERA MUÑOZ</option>
+                    <option value="ALVARO ANDRES GAVIRIA TABARES">ALVARO ANDRES GAVIRIA TABARES</option>
+                    <option value="CAMILO HENAO MONSALVE">CAMILO HENAO MONSALVE</option>
+                    <option value="CARLOS ANDRÉS LUNA TOBON">CARLOS ANDRÉS LUNA TOBON</option>
+                    <option value="CARLOS MARIO CANO QUINTERO">CARLOS MARIO CANO QUINTERO</option>
+                    <option value="CARLOS YERLIN GÓMEZ MONTOYA">CARLOS YERLIN GÓMEZ MONTOYA</option>
+                    <option value="CÉSAR AUGUSTO RAMÍREZ LÓPEZ">CÉSAR AUGUSTO RAMÍREZ LÓPEZ</option>
+                    <option value="DAIRON VILLA TORRES">DAIRON VILLA TORRES</option>
+                    <option value="DANIEL VELASQUEZ">DANIEL VELASQUEZ</option>
+                    <option value="DUVAN ALEXIS MARTÍNEZ HOYOS">DUVAN ALEXIS MARTÍNEZ HOYOS</option>
+                    <option value="FABIAN ALONSO VARELA">FABIAN ALONSO VARELA</option>
+                    <option value="FAUSTO ELÍAS RÍOS">FAUSTO ELÍAS RÍOS</option>
+                    <option value="FRANCISCO JAVIER ARANGO">FRANCISCO JAVIER ARANGO</option>
+                    <option value="GERSAIN NIETO TABORDA">GERSAIN NIETO TABORDA</option>
+                    <option value="HUGO ARMANDO ARAQUE">HUGO ARMANDO ARAQUE</option>
+                    <option value="JEISSON ALZATE RAMIREZ">JEISSON ALZATE RAMIREZ</option>
+                    <option value="JHON FREDY VANEGAS TAMAYO">JHON FREDY VANEGAS TAMAYO</option>
+                    <option value="JHON JAIRO SUAREZ CORRECHA">JHON JAIRO SUAREZ CORRECHA</option>
+                    <option value="JHON JEISSON PÉREZ MARTÍNEZ">JHON JEISSON PÉREZ MARTÍNEZ</option>
+                    <option value="JHON REINOSO YOTAGRI">JHON REINOSO YOTAGRI</option>
+                    <option value="JOHAN MOLINA">JOHAN MOLINA</option>
+                    <option value="JUAN FELIPE SUAREZ">JUAN FELIPE SUAREZ</option>
+                    <option value="JULIAN ESPINOZA">JULIAN ESPINOZA</option>
+                    <option value="JULIAN STIVEN GALEANO">JULIAN STIVEN GALEANO</option>
+                    <option value="MILTON ALEJANDRO VÉLEZ ORTIZ">MILTON ALEJANDRO VÉLEZ ORTIZ</option>
+                    <option value="NILTON MESA MARULANDA">NILTON MESA MARULANDA</option>
+                    <option value="RICARDO ALONSO MAZO">RICARDO ALONSO MAZO</option>
+                    <option value="SANTIAGO GONZALEZ">SANTIAGO GONZALEZ</option>
+                    <option value="SEBASTIAN VELEZ">SEBASTIAN VELEZ</option>
+                    <option value="STIVEN ZAPATA CORREA">STIVEN ZAPATA CORREA</option>
+                    <option value="YEREMITH WILCHES">YEREMITH WILCHES</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="peso_adhesivo" class="form-label">Peso adhesivo (kg) <span style="color:red;">*</span></label>
+                <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 10.50">
+            </div>
+            <div class="mb-3">
+                <label for="peso_correactante" class="form-label">Peso correactante (kg) <span style="color:red;">*</span></label>
+                <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 1.23">
+            </div>
+            <div class="mb-3">
+                <label for="relacion_mezcla" class="form-label">Relación de mezcla <span style="color:red;">*</span></label>
+                <input type="number" step="0.01" class="form-control" id="relacion_mezcla" name="relacion_mezcla" required placeholder="Ej. 5.67">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Enviar Registro</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block process_page_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('relacionMezclasForm');
+    if (!form) return;
+
+    // Función mejorada para mostrar notificaciones
+    function showNotification(response) {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+        
+        // Limpiar notificaciones anteriores
+        container.innerHTML = '';
+        
+        // Crear elemento de notificación
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${response.category} alert-dismissible fade show`;
+        alert.role = 'alert';
+        
+        // Icono según el tipo de notificación
+        let icon = '';
+        if (response.category === 'success') {
+            icon = '<i class="fas fa-check-circle me-2"></i>';
+        } else if (response.category === 'danger') {
+            icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+        } else {
+            icon = '<i class="fas fa-info-circle me-2"></i>';
+        }
+        
+        // Construir contenido de la notificación
+        let content = `
+            <div class="d-flex align-items-center">
+                ${icon}
+                <div>
+                    <strong>${response.message}</strong>
+                    ${response.details ? `<div class="small mt-1">${response.details}</div>` : ''}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        alert.innerHTML = content;
+        container.appendChild(alert);
+        
+        // Auto-eliminar después de 8 segundos para notificaciones de éxito
+        if (response.category === 'success') {
+            setTimeout(() => {
+                alert.remove();
+            }, 8000);
+        }
+    }
+
+    // Manejar envío del formulario
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Enviando datos...
+        `;
+        
+        try {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error en el servidor');
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Reset completo del formulario
+                form.reset();
+                document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+                
+                // Mostrar notificación de éxito con detalles
+                showNotification({
+                    ...result,
+                    details: result.details || `Relación calculada: ${result.data.relacion_calculada}:1`
+                });
+                
+                // Enfocar el primer campo
+                setTimeout(() => document.querySelector('select').focus(), 100);
+            } else {
+                showNotification(result);
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification({
+                message: error.message || 'Error al procesar la solicitud',
+                category: 'danger',
+                details: 'Por favor intente nuevamente'
+            });
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        }
+    });
+
+    // Prevenir envío con Enter
+    form.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+});
+</script>
+{% endblock %}

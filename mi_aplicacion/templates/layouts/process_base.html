@@ -71,13 +71,13 @@
 {% block body_content %}
     <header class="process-header">
         <div class="logo-area">
-            <a href="{{ url_for('home') }}">
+            <a href="{{ url_for('main.home') }}">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
             </a>
         </div>
         <div class="user-info">
             <span><i class="fas fa-user-circle"></i> {{ session.get('user_name', 'Invitado') }}</span>
-            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            <a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
         </div>
     </header>
 

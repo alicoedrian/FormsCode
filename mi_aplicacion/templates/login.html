@@ -522,7 +522,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+        <form method="POST" action="{{ url_for('main.login') }}" id="loginForm">
             {% if next %}
                 <input type="hidden" name="next" value="{{ next }}">
             {% endif %}

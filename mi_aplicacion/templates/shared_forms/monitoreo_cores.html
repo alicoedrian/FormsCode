@@ -1,0 +1,179 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}Monitoreo de Cores - {{ subseccion }}{% endblock %}
+
+{% block process_head_css %}
+<style>
+    /* Estilos generales (mantener consistencia con otros formularios) */
+    .page-title-sub {
+        font-size: 1.8em;
+        color: #2C3E50;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+    }
+    .page-title-sub i.fa-tasks { /* Icono para monitoreo */
+        margin-right: 12px;
+        color: #007bff; /* Color azul para monitoreo */
+    }
+    .breadcrumb-nav {
+        margin-bottom: 25px;
+        font-size: 0.9em;
+    }
+    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
+    .breadcrumb-nav a:hover { text-decoration: underline; }
+    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
+    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
+
+    /* Estilos de la tabla */
+    .table-container {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+        margin-bottom: 30px;
+        border: 1px solid #e0e0e0;
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 0.9em;
+    }
+    .data-table th, .data-table td {
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        text-align: left;
+        white-space: nowrap; /* Evita que el texto se ajuste */
+    }
+    .data-table th {
+        background-color: #e9ecef;
+        font-weight: 600;
+        color: #343a40;
+        position: sticky; /* Encabezado pegajoso al hacer scroll horizontal */
+        top: 0;
+        z-index: 10;
+    }
+    .data-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    .data-table tbody tr:hover {
+        background-color: #e2f3ff; /* Un ligero resaltado al pasar el ratón */
+    }
+
+    /* Mensajes de alerta */
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    /* Botón de volver */
+    .back-button-container {
+        margin-top: 25px;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        background-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95em;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .btn-back i { margin-right: 8px; }
+    .btn-back:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('home') }}">Inicio (Procesos)</a>
+        {% if proceso_origen_nombre and url_volver_proceso %}
+            <span class="separator">&raquo;</span>
+            <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
+        {% endif %}
+        <span class="separator">&raquo;</span>
+        <span class="current-page">Monitoreo de Cores</span>
+    </nav>
+
+    <h1 class="page-title-sub"><i class="fas fa-tasks"></i> Monitoreo de Estado de Solicitudes de Cores</h1>
+    <p style="margin-bottom:20px;">Aquí puedes ver el historial de todas las solicitudes de cores. Los registros más recientes aparecen primero.</p>
+
+    {# Mostrar mensajes flash #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages-container" style="max-width: 800px; margin: 0 auto 20px auto;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="table-container">
+        {% if records %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {# Renderizar los encabezados de la tabla #}
+                        {% for header in headers %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {# Iterar sobre cada fila de registro #}
+                    {% for row in records %}
+                        <tr>
+                            {% for cell in row %}
+                                <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No hay solicitudes de cores para mostrar.
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_volver_proceso or url_for('home') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            {% if proceso_origen_nombre %}
+                Volver a Opciones de {{ proceso_origen_nombre }}
+            {% else %}
+                Volver
+            {% endif %}
+        </a>
+    </div>
+{% endblock %}
