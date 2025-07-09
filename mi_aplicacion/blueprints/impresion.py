@@ -19,6 +19,12 @@ def proceso_impresion_dashboard():
         "url": url_for('shared_forms.solicitud_cores_form', origen='impresion'), 
         "icono": "fas fa-tape", 
         "descripcion": "Solicitar cores para el proceso de Impresión."
+    },{
+            # === NUEVA OPCIÓN ===
+            "nombre": "Empalme de Turno (Checklist 5S)",
+            "url": url_for('empalme_turno.empalme_turno_form', origen='impresion'), 
+            "icono": "fas fa-handshake", 
+            "descripcion": "Registrar checklist 5S y novedades del empalme de turno."
     }]
     
     return render_template(

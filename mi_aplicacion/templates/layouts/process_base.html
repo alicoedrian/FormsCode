@@ -1,34 +1,38 @@
+{# d:\DocumentacionEmpaques\mi_aplicacion\templates\layouts\process_base.html #}
 {% extends "layouts/base_minimal.html" %}
 
+{# Bloque para el título de la página en la pestaña del navegador #}
 {% block title %}{% block process_title %}Proceso{% endblock %} - Planta Empaque{% endblock %}
 
+{# Bloque para añadir estilos CSS específicos de la página de proceso #}
 {% block head_css %}
 <style>
-    body.process-page-body { /* Clase específica para el body de páginas de proceso */
-        background-color: #f4f6f8;
+    /* Estilos globales para las páginas de proceso (afectan al body y header/main general) */
+    body.process-page-body {
+        background-color: #f4f6f8; /* Un color de fondo suave para las páginas de proceso */
         margin: 0;
         padding: 0;
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Roboto', sans-serif; /* Fuente recomendada */
         padding-top: 65px; /* Espacio para el header fijo */
     }
 
-    .process-header { /* Cabecera (similar a home-header) */
-        background-color: #2C3E50;
-        color: white;
+    .process-header {
+        background-color: #2C3E50; /* Color de fondo oscuro para la cabecera */
+        color: white; /* Color del texto de la cabecera */
         padding: 0 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 65px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        position: fixed;
+        height: 65px; /* Altura fija de la cabecera */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra suave */
+        position: fixed; /* Hace que la cabecera sea fija al desplazar */
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 1000;
+        z-index: 1000; /* Asegura que la cabecera esté siempre encima de otros elementos */
     }
     .process-header .logo-area img {
-        max-height: 40px;
+        max-height: 40px; /* Tamaño del logo */
         vertical-align: middle;
     }
     .process-header .user-info {
@@ -38,7 +42,7 @@
         margin-right: 15px;
     }
     .process-header .user-info a {
-        color: #ECF0F1;
+        color: #ECF0F1; /* Color de enlace claro */
         text-decoration: none;
         font-weight: 500;
         padding: 8px 12px;
@@ -46,16 +50,16 @@
         transition: background-color 0.2s ease;
     }
     .process-header .user-info a:hover {
-        background-color: #3f5870;
+        background-color: #3f5870; /* Cambio de color al pasar el ratón */
     }
 
     .process-main-content {
         padding: 30px;
-        max-width: 1200px; /* Opcional: limita el ancho */
-        margin: 0 auto; /* Centra el contenido */
+        max-width: 1200px; /* Opcional: limita el ancho máximo del contenido principal */
+        margin: 0 auto; /* Centra el contenido principal en la página */
     }
 
-    /* Estilos para mensajes flash (puedes copiarlos de home.html si los necesitas aquí) */
+    /* Estilos para mensajes flash (notificaciones) */
     .flash-messages-process { list-style: none; padding: 0; margin: 0 0 20px 0; }
     .flash-messages-process li {
         padding: 12px 18px; border-radius: 6px; margin-bottom: 10px; font-size: 0.95em;
@@ -66,22 +70,28 @@
     .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
 
 </style>
-{% block process_head_css %}{% endblock %} {% endblock %}
+{# Este bloque permite que las plantillas hijas añadan estilos CSS adicionales a la sección <head> #}
+{% block process_head_css %}{% endblock %} 
+{% endblock %}
 
+{# Este bloque 'body_content' es heredado de base_minimal.html y contendrá toda la estructura del body #}
 {% block body_content %}
     <header class="process-header">
         <div class="logo-area">
+            {# Enlace a la página principal usando el blueprint 'main' #}
             <a href="{{ url_for('main.home') }}">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
             </a>
         </div>
         <div class="user-info">
             <span><i class="fas fa-user-circle"></i> {{ session.get('user_name', 'Invitado') }}</span>
+            {# Enlace para cerrar sesión usando el blueprint 'main' #}
             <a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
         </div>
     </header>
 
     <main class="process-main-content">
+        {# Aquí se muestran los mensajes flash (notificaciones) de Flask #}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flash-messages-process">
@@ -92,12 +102,29 @@
             {% endif %}
         {% endwith %}
 
-        {% block process_page_content %}{% endblock %} </main>
+        {# ESTE ES EL BLOQUE PRINCIPAL DONDE SE INYECTARÁ EL CONTENIDO ESPECÍFICO DE CADA PÁGINA #}
+        {% block process_page_content %}{% endblock %} 
+    </main>
+
+    {# Pie de página común a todas las páginas de proceso #}
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <span>© 2025 Documentación Empaques. Todos los derechos reservados.</span>
+        </div>
+    </footer>
 {% endblock %}
 
+{# Este bloque 'scripts' es heredado de base_minimal.html y es donde se incluyen todos los scripts JS #}
 {% block scripts %}
-<script>
-    document.body.classList.add('process-page-body');
-</script>
-{% block process_scripts %}{% endblock %}
+    {# ¡IMPORTANTE! Bootstrap Bundle JS debe cargarse antes de tus scripts personalizados #}
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    
+    {# ESTE ES EL BLOQUE ESPECÍFICO PARA SCRIPTS DE LA PÁGINA INDIVIDUAL #}
+    {# Las plantillas hijas como empalme_turno_form.html deben usar este bloque #}
+    {% block process_page_scripts %}{% endblock %} 
+
+    {# Pequeño script para añadir una clase al body, si es necesario. Puede moverse al CSS si es estático. #}
+    <script>
+        document.body.classList.add('process-page-body');
+    </script>
 {% endblock %}

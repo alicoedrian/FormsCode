@@ -16,8 +16,13 @@ def proceso_extrusion_dashboard():
             "url": url_for('shared_forms.solicitud_cores_form', origen='extrusion'), 
             "icono": "fas fa-tape", 
             "descripcion": "Solicitar cores para el proceso de Extrusión."
-        }
-    ]
+        },{
+            # === NUEVA OPCIÓN ===
+            "nombre": "Empalme de Turno (Checklist 5S)",
+            "url": url_for('empalme_turno.empalme_turno_form', origen='extrusion'), 
+            "icono": "fas fa-handshake", 
+            "descripcion": "Registrar checklist 5S y novedades del empalme de turno."
+        }]
     return render_template(
         'processes/extrusion/extrusion_dashboard.html',
         nombre_proceso="Extrusión",

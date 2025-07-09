@@ -1,3 +1,4 @@
+{# d:\DocumentacionEmpaques\mi_aplicacion\templates\shared_forms\solicitud_cores_form.html #}
 {% extends "layouts/process_base.html" %}
 
 {% block process_title %}FO-MN-034 Solicitud de Cores V.1{% endblock %}
@@ -109,14 +110,27 @@
         background-color: #218838;
         box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
+    .btn-submit:disabled {
+        background-color: #a0a0a0;
+        border-color: #a0a0a0;
+        cursor: not-allowed;
+    }
 
-    /* Estilos para mensajes flash */
+    /* Estilos para mensajes flash / notificaciones flotantes */
+    #notification-container {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1050; /* Por encima de la mayoría de los elementos */
+        width: 350px;
+    }
     .alert {
         padding: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 10px; /* Margen entre alertas en el contenedor */
         border: 1px solid transparent;
         border-radius: 4px;
         font-weight: 500;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .alert-success {
         color: #155724;
@@ -153,13 +167,17 @@
         transition: background-color 0.2s ease, box-shadow 0.2s ease;
         border: none;
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Sombra añadida */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     }
     .btn-back i { margin-right: 8px; }
     .btn-back:hover {
         background-color: #5a6268;
         box-shadow: 0 4px 8px rgba(0,0,0,0.12);
     }
+
+    /* === ESTILO ELIMINADO: Ya no ocultamos la refiladora por defecto con CSS === */
+    /* #refiladora_field_container { display: none; } */
+    /* ======================================================================= */
 </style>
 {% endblock %}
 
@@ -177,17 +195,8 @@
     <h1 class="page-title-sub"><i class="fas fa-tape"></i>FO-MN-034 Solicitud de Cores V.1</h1>
     <p style="margin-bottom:20px;">Llena cada uno de los campos de información para hacer tu solicitud de cores.</p>
 
-    {# Mostrar mensajes flash #}
-    {# Este bloque se ocultará o eliminará si solo usas AJAX toasts #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="messages-container" style="max-width: 600px; margin: 0 auto 20px auto;">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+    {# Contenedor para las notificaciones flotantes (toasts) #}
+    <div id="notification-container"></div>
 
     <div class="form-container">
         <form id="solicitudCoresForm" method="POST" action="{{ url_for('shared_forms.solicitud_cores_form', origen=request.args.get('origen')) }}">
@@ -206,15 +215,17 @@
 
             <div class="form-question-card">
                 <label for="solicitante_id" class="form-label">2. ID de quien solicita: <span class="required-asterisk">*</span></label>
-                <input type="text" id="solicitante_id" name="solicitante_id" class="form-control" 
-                        pattern="[0-9]{5}" maxlength="5" required 
-                        placeholder="Ej. 12345" value="{{ solicitante_id_val if solicitante_id_val is not none else '' }}">
+                <input type="number" id="solicitante_id" name="solicitante_id" class="form-control" 
+                         min="1" max="99999" pattern="[0-9]{5}" maxlength="5" required 
+                         placeholder="Ej. 12345" value="{{ solicitante_id_val if solicitante_id_val is not none else '' }}"
+                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                 <small class="form-text">Solo 5 dígitos numéricos.</small>
             </div>
 
-            <div class="form-question-card" id="refiladora_field_container">
+            {# --- CAMPO REFILADORA (AHORA SIEMPRE VISIBLE) --- #}
+            <div class="form-question-card" id="refiladora_field_container"> 
                 <label for="refiladora" class="form-label">3. Refiladora (Solo para Corte):</label>
-                <select id="refiladora" name="refiladora" class="form-select">
+                <select id="refiladora" name="refiladora" class="form-select"> {# Ya no 'required' aquí en HTML, es condicional en backend #}
                     <option value="">Selecciona una refiladora (opcional)</option>
                     <option value="RF03" {% if refiladora_val == 'RF03' %}selected{% endif %}>RF03</option>
                     <option value="RF04" {% if refiladora_val == 'RF04' %}selected{% endif %}>RF04</option>
@@ -234,12 +245,13 @@
                 </select>
                 <small class="form-text">Este campo es obligatorio solo si el área solicitante es 'Corte'.</small>
             </div>
+            {# --- FIN CAMPO REFILADORA --- #}
 
             <div class="form-question-card">
                 <label for="trabajo_ingresa" class="form-label">4. Trabajo ingresa: <span class="required-asterisk">*</span></label>
                 <input type="text" id="trabajo_ingresa" name="trabajo_ingresa" class="form-control" 
-                        maxlength="9" required 
-                        placeholder="Ej. FE000000" value="{{ trabajo_ingresa_val if trabajo_ingresa_val is not none else '' }}">
+                         maxlength="9" required 
+                         placeholder="Ej. FE000000" value="{{ trabajo_ingresa_val if trabajo_ingresa_val is not none else '' }}">
                 <small class="form-text">Máximo 9 caracteres (números y texto).</small>
             </div>
 
@@ -290,33 +302,22 @@
 {% block process_page_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // ... (Tu código JavaScript para toggleRefiladoraField y showNotification) ...
         const areaSolicitanteSelect = document.getElementById('area_solicitante');
-        const refiladoraFieldContainer = document.getElementById('refiladora_field_container');
-        const refiladoraSelect = document.getElementById('refiladora');
+        // const refiladoraFieldContainer = document.getElementById('refiladora_field_container'); // Ya no es necesaria si siempre es visible
+        // const refiladoraSelect = document.getElementById('refiladora'); // Solo si la usas directamente, no para toggle
 
-        // Función para mostrar/ocultar el campo de Refiladora y establecer su obligatoriedad
-        function toggleRefiladoraField() {
-            const selectedArea = areaSolicitanteSelect.value;
-            if (selectedArea === 'Corte') {
-                refiladoraFieldContainer.style.display = 'block';
-                refiladoraSelect.setAttribute('required', 'required');
-            } else {
-                refiladoraFieldContainer.style.display = 'none';
-                refiladoraSelect.removeAttribute('required');
-                refiladoraSelect.value = ''; // Limpiar la selección si no es obligatoria
-            }
-        }
+        // --- ELIMINADA FUNCIÓN toggleRefiladoraField y su lógica ---
+        // function toggleRefiladoraField() { ... }
+        // areaSolicitanteSelect.addEventListener('change', toggleRefiladoraField);
+        // toggleRefiladoraField(); 
+        // -------------------------------------------------------------
 
-        areaSolicitanteSelect.addEventListener('change', toggleRefiladoraField);
-        toggleRefiladoraField(); // Llamar al cargar para establecer el estado inicial
-
-        // --- Función para mostrar notificaciones flotantes (adaptada de tu código anterior) ---
+        // --- Función para mostrar notificaciones flotantes ---
         function showNotification(response) {
             const container = document.getElementById('notification-container');
             if (!container) return;
             
-            container.innerHTML = ''; // Limpiar notificaciones anteriores
+            container.innerHTML = '';
             
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${response.category} alert-dismissible fade show`;
@@ -327,18 +328,16 @@
                 icon = '<i class="fas fa-check-circle me-2"></i>';
             } else if (response.category === 'danger') {
                 icon = '<i class="fas fa-exclamation-circle me-2"></i>';
-            } else {
+            } else { // Asumimos 'warning' o 'info'
                 icon = '<i class="fas fa-info-circle me-2"></i>';
             }
             
             let messageDetails = '';
             if (response.errors && response.errors.length > 0) {
-                // Si hay una lista de errores (ej. de validación backend)
                 messageDetails = `<ul class="mt-2 mb-0" style="list-style: none; padding-left: 0;">` +
                                  response.errors.map(err => `<li><i class="fas fa-times-circle me-1"></i>${err}</li>`).join('') +
                                  `</ul>`;
             } else if (response.details) {
-                // Para detalles generales (ej. de éxito o error no de validación)
                 messageDetails = `<div class="small mt-1">${response.details}</div>`;
             }
 
@@ -354,8 +353,7 @@
             `;
             container.appendChild(alertDiv);
             
-            // Auto-eliminar después de 8 segundos si es de éxito
-            if (response.category === 'success') {
+            if (response.category === 'success' || response.category === 'warning') {
                 setTimeout(() => {
                     alertDiv.classList.remove('show');
                     alertDiv.addEventListener('transitionend', () => alertDiv.remove());
@@ -364,11 +362,11 @@
         }
 
         // --- Lógica AJAX para el envío del formulario ---
-        const form = document.getElementById('solicitudCoresForm'); // Asegúrate de que el ID del formulario en HTML sea este
+        const form = document.getElementById('solicitudCoresForm');
         if (form) {
             form.addEventListener('submit', async function(event) {
-                event.preventDefault(); // Evita el envío tradicional
-                event.stopImmediatePropagation(); // Detiene la propagación del evento
+                event.preventDefault();
+                event.stopImmediatePropagation();
 
                 const submitButton = form.querySelector('button[type="submit"]');
                 const originalButtonText = submitButton.innerHTML;
@@ -383,23 +381,31 @@
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest' // Para que Flask pueda detectar que es AJAX
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: JSON.stringify(data)
                     });
 
-                    const result = await response.json(); // Intentar parsear siempre como JSON
+                    const result = await response.json();
+
+                    if (result.redirect_url) {
+                        window.location.href = result.redirect_url;
+                        return;
+                    }
 
                     if (response.ok && result.success) {
                         showNotification(result);
-                        form.reset(); // Limpia el formulario si es exitoso
-                        document.querySelectorAll('select').forEach(s => s.selectedIndex = 0); // Reset selects
-                        // Volver a establecer el campo de refiladora si es necesario después del reset
-                        toggleRefiladoraField(); 
+                        form.reset();
+                        // Resetear selects a la primera opción si tienen un placeholder seleccionado (disabled selected)
+                        document.querySelectorAll('select').forEach(s => {
+                            if (s.querySelector('option[disabled][selected]')) {
+                                s.selectedIndex = 0;
+                            }
+                        });
+                        // Ya no se llama a toggleRefiladoraField() aquí
                     } else {
-                        // Si response.ok es false (error HTTP) o result.success es false (error de validación/lógica)
-                        // result ya contiene el mensaje y la categoría.
                         showNotification(result);
+                        // Ya no se llama a toggleRefiladoraField() aquí
                     }
                 } catch (error) {
                     console.error('Error en fetch:', error);
@@ -417,7 +423,12 @@
 
             // Prevenir envío con Enter
             form.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') e.preventDefault();
+                if (e.key === 'Enter') {
+                    const activeElement = document.activeElement;
+                    if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type !== 'submit') {
+                        e.preventDefault();
+                    }
+                }
             });
         }
     });

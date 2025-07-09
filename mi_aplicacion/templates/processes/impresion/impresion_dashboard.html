@@ -1,3 +1,4 @@
+{# d:\DocumentacionEmpaques\mi_aplicacion\templates\processes\impresion\impresion_dashboard.html #}
 {% extends "layouts/process_base.html" %}
 
 {% block process_title %}{{ nombre_proceso }}{% endblock %}
@@ -139,7 +140,7 @@
 {% block process_page_content %}
     {# Breadcrumb de navegación #}
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <a href="{{ url_for('home') }}">Inicio (Procesos)</a>
+        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a> {# <-- ¡CORREGIDO AQUÍ! #}
         <span class="separator">&raquo;</span>
         <span class="current-page">{{ nombre_proceso }}</span>
     </nav>
@@ -164,7 +165,7 @@
        pero lo mantenemos por si se prefiere tener ambas opciones o si el breadcrumb es muy sutil.
        Si decides quitarlo, elimina este div. #}
     <div class="main-back-button-container">
-        <a href="{{ url_for('home') }}" class="btn-main-back">
+        <a href="{{ url_for('main.home') }}" class="btn-main-back"> {# <-- ¡CORREGIDO AQUÍ! #}
             <i class="fas fa-arrow-left"></i> Volver al Inicio
         </a>
     </div>

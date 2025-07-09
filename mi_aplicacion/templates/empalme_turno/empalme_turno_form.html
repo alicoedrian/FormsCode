@@ -1,0 +1,489 @@
+{# d:\DocumentacionEmpaques\mi_aplicacion\templates\empalme_turno\empalme_turno_form.html #}
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}Checklist 5S - Empalme de Turno{% endblock %}
+
+{% block process_head_css %}
+<style>
+    /* Estilos para ocultar las flechas de los inputs tipo number y deshabilitar el scroll */
+    input[type="number"] {
+        -moz-appearance: textfield; /* Para Firefox, oculta flechas y desactiva scroll */
+        /* Para Chrome, Safari, Edge, etc. */
+        /* Oculta las flechas del spinner y desactiva el scroll */
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Para deshabilitar el scroll en la mayoría de los navegadores (IE/Edge Legacy y un fallback) */
+        -ms-overflow-style: none; /* Oculta la barra de desplazamiento en IE/Edge */
+        overflow: hidden; /* Evita cualquier scroll inesperado */
+    }
+
+    /* Estilos para el feedback de validación en tiempo real */
+    .validation-feedback {
+        margin-top: 5px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+    .validation-feedback.text-success {
+        color: #28a745; /* Bootstrap success green */
+    }
+    .validation-feedback.text-danger {
+        color: #dc3545; /* Bootstrap danger red */
+    }
+
+    /* Estilos base del formulario */
+    .page-title-empalme {
+        font-size: 1.8em;
+        color: #2C3E50;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+    }
+    .page-title-empalme i.fa-handshake { /* Ícono para Empalme de Turno */
+        margin-right: 12px;
+        color: #5D6D7E; /* Un color gris-azulado */
+    }
+    .breadcrumb-nav {
+        margin-bottom: 25px;
+        font-size: 0.9em;
+    }
+    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
+    .breadcrumb-nav a:hover { text-decoration: underline; }
+    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
+    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
+
+    /* Contenedor principal del formulario */
+    .form-container-empalme {
+        background-color: #f8fafd; /* Fondo ligeramente diferente para destacar */
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 800px; /* Ancho un poco más grande para el checklist */
+        margin: 0 auto;
+        border: 1px solid #e0e0e0;
+    }
+
+    .checklist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 2 columnas responsivas */
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .checklist-category {
+        background-color: #ffffff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .checklist-category h4 {
+        color: #2C3E50;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .checklist-item input[type="checkbox"] {
+        margin-right: 10px;
+        margin-top: 4px; /* Alinear el checkbox con el texto */
+        transform: scale(1.2); /* Hacer el checkbox un poco más grande */
+    }
+    .checklist-item label {
+        flex-grow: 1;
+        color: #34495E;
+        font-size: 0.95em;
+        line-height: 1.4;
+        font-weight: normal; /* Sobreescribir el font-weight de form-label */
+    }
+
+    .note-section {
+        background-color: #ffffff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .note-section h4 {
+        color: #2C3E50;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+    }
+    .note-section textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 10px 12px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 1em;
+        background-color: #f8fafd;
+        resize: vertical; /* Permitir redimensionar verticalmente */
+    }
+    .note-section textarea:focus {
+        border-color: #1a73e8;
+        outline: 0;
+        box-shadow: 0 0 0 1px #1a73e8;
+        background-color: #fff;
+    }
+
+    /* Botón de envío */
+    .btn-submit-empalme {
+        background-color: #18BC9C; /* Color verde/azul más amigable */
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+        box-sizing: border-box;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .btn-submit-empalme:hover {
+        background-color: #15A589;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+
+    /* Botón de volver */
+    .back-button-container {
+        margin-top: 25px;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        background-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95em;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .btn-back i { margin-right: 8px; }
+    .btn-back:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a>
+        {% if proceso_origen_nombre and url_volver_proceso %}
+            <span class="separator">&raquo;</span>
+            <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
+        {% endif %}
+        <span class="separator">&raquo;</span>
+        <span class="current-page">Checklist Empalme de Turno</span>
+    </nav>
+
+    <h1 class="page-title-empalme"><i class="fas fa-handshake"></i>Checklist 5S – Empalme de Turno</h1>
+    <p style="margin-bottom:20px;">Marca las casillas correspondientes y añade cualquier nota relevante.</p>
+
+    {# Mostrar mensajes flash (errores o éxito) #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages-container" style="max-width: 800px; margin: 0 auto 20px auto;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="form-container-empalme">
+        <form method="POST" action="{{ url_for('empalme_turno.empalme_turno_form', origen=request.args.get('origen')) }}">
+
+            {# ================= CAMPOS DE PROCESO/MÁQUINA/TURNO ================= #}
+            <div class="form-question-card mb-3">
+                <label for="proceso_seleccionado" class="form-label">Proceso: <span class="required-asterisk">*</span></label>
+                <select id="proceso_seleccionado" name="proceso_seleccionado" class="form-select" required>
+                    <option value="">Selecciona un proceso</option>
+                    <option value="EXTRUSION" {% if form_data.proceso_seleccionado == 'EXTRUSION' %}selected{% endif %}>EXTRUSIÓN</option>
+                    <option value="IMPRESION" {% if form_data.proceso_seleccionado == 'IMPRESION' %}selected{% endif %}>IMPRESIÓN</option>
+                    <option value="CORTE" {% if form_data.proceso_seleccionado == 'CORTE' %}selected{% endif %}>CORTE</option>
+                    <option value="LAMINACION" {% if form_data.proceso_seleccionado == 'LAMINACION' %}selected{% endif %}>LAMINACIÓN</option>
+                    <option value="SELLADO" {% if form_data.proceso_seleccionado == 'SELLADO' %}selected{% endif %}>SELLADO</option>
+                    <option value="INSERTADORAS" {% if form_data.proceso_seleccionado == 'INSERTADORAS' %}selected{% endif %}>INSERTADORAS</option>
+                    <option value="ADITAMENTOS" {% if form_data.proceso_seleccionado == 'ADITAMENTOS' %}selected{% endif %}>ADITAMENTOS</option>
+                    <option value="PROCESOS MANUALES" {% if form_data.proceso_seleccionado == 'PROCESOS MANUALES' %}selected{% endif %}>PROCESOS MANUALES</option>
+                </select>
+            </div>
+
+            <div class="form-question-card mb-3">
+                <label for="maquina_seleccionada" class="form-label">Máquina: <span class="required-asterisk">*</span></label>
+                <select id="maquina_seleccionada" name="maquina_seleccionada" class="form-select" required>
+                    <option value="">Selecciona una máquina</option>
+                    {# Las opciones se llenarán con JavaScript #}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="turno" class="form-label">Turno: <span class="required-asterisk">*</span></label>
+                <select class="form-select" id="turno" name="turno" required>
+                    <option value="" disabled selected>Selecciona un turno</option>
+                    <option value="TURNO 1 (9:30PM - 5:30AM)" {% if form_data.turno == 'TURNO 1 (9:30PM - 5:30AM)' %}selected{% endif %}>TURNO 1 (9:30PM - 5:30AM)</option>
+                    <option value="TURNO 2 (5:30AM - 1:30 PM)" {% if form_data.turno == 'TURNO 2 (5:30AM - 1:30 PM)' %}selected{% endif %}>TURNO 2 (5:30AM - 1:30 PM)</option>
+                    <option value="TURNO 3 (1:30 PM - 9:30 PM)" {% if form_data.turno == 'TURNO 3 (1:30 PM - 9:30 PM)' %}selected{% endif %}>TURNO 3 (1:30 PM - 9:30 PM)</option>
+                    <option value="TURNO L-J (DIURNO)" {% if form_data.turno == 'TURNO L-J (DIURNO)' %}selected{% endif %}>TURNO L-J (DIURNO)</option>
+                    <option value="TURNO L-J (NOCTURNO)" {% if form_data.turno == 'TURNO L-J (NOCTURNO)' %}selected{% endif %}>TURNO L-J (NOCTURNO)</option>
+                    <option value="TURNO V-D (DIURNO)" {% if form_data.turno == 'TURNO V-D (DIURNO)' %}selected{% endif %}>TURNO V-D (DIURNO)</option>
+                    <option value="TURNO V-D (NOCTURNO)" {% if form_data.turno == 'TURNO V-D (NOCTURNO)' %}selected{% endif %}>TURNO V-D (NOCTURNO)</option>
+                </select>
+            </div>
+
+            {# ================= CAMPO: ID que entregó máquina con validación AJAX ================= #}
+            <div class="form-question-card mb-4">
+                <label for="id_entrega_maquina" class="form-label">ID que entregó máquina: <span class="required-asterisk">*</span></label>
+                <input type="number"
+                       id="id_entrega_maquina"
+                       name="id_entrega_maquina"
+                       class="form-control"
+                       placeholder="Ej: 12345"
+                       required
+                       min="1"
+                       max="99999"
+                       oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                       maxlength="5"
+                       value="{{ form_data.id_entrega_maquina | default('') }}"
+                >
+                <div class="form-text text-muted validation-feedback" id="id_entrega_maquina_feedback">
+                    Ingresa el ID numérico de la máquina (máximo 5 dígitos).
+                </div>
+            </div>
+
+            {# ================= FIN DE CAMPOS ESPECÍFICOS DEL EMPALME ================= #}
+
+            <div class="checklist-grid">
+                <div class="checklist-category">
+                    <h4>1. CLASIFICAR (SEIRI)</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiri_elementos_inutiles" name="seiri_elementos_inutiles" {% if form_data.seiri_elementos_inutiles %}checked{% endif %}>
+                        <label for="seiri_elementos_inutiles">¿Se retiraron todos los elementos innecesarios del área de trabajo?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiri_residuos_empaques" name="seiri_residuos_empaques" {% if form_data.seiri_residuos_empaques %}checked{% endif %}>
+                        <label for="seiri_residuos_empaques">¿Se eliminaron residuos, empaques vacíos y materiales no utilizados?</label>
+                    </div>
+                </div>
+
+                <div class="checklist-category">
+                    <h4>2. ORDENAR (SEITON)</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiton_insumos_organizados" name="seiton_insumos_organizados" {% if form_data.seiton_insumos_organizados %}checked{% endif %}>
+                        <label for="seiton_insumos_organizados">¿Están todos los insumos organizados y en su lugar definido?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiton_herramientas_ubicacion" name="seiton_herramientas_ubicacion" {% if form_data.seiton_herramientas_ubicacion %}checked{% endif %}>
+                        <label for="seiton_herramientas_ubicacion">¿Herramientas o elementos compartidos están en su ubicación asignada, completos y organizados?</label>
+                    </div>
+                </div>
+
+                <div class="checklist-category">
+                    <h4>3. LIMPIAR (SEISO)</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiso_limpieza_area" name="seiso_limpieza_area" {% if form_data.seiso_limpieza_area %}checked{% endif %}>
+                        <label for="seiso_limpieza_area">¿Se realizó la limpieza del área de trabajo?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiso_libre_polvo_residuos" name="seiso_libre_polvo_residuos" {% if form_data.seiso_libre_polvo_residuos %}checked{% endif %}>
+                        <label for="seiso_libre_polvo_residuos">¿Se dejó libre de polvo, residuos o derrames?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiso_limpio_verifico_equipos" name="seiso_limpio_verifico_equipos" {% if form_data.seiso_limpio_verifico_equipos %}checked{% endif %}>
+                        <label for="seiso_limpio_verifico_equipos">¿Se limpió y verificó el estado de los equipos utilizados?</label>
+                    </div>
+                </div>
+
+                <div class="checklist-category">
+                    <h4>4. ESTANDARIZAR (SEIKETSU)</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiketsu_cumplio_rutina" name="seiketsu_cumplio_rutina" {% if form_data.seiketsu_cumplio_rutina %}checked{% endif %}>
+                        <label for="seiketsu_cumplio_rutina">¿Se cumplió con la rutina de limpieza y organización establecida?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="seiketsu_reciben_materiales" name="seiketsu_reciben_materiales" {% if form_data.seiketsu_reciben_materiales %}checked{% endif %}>
+                        <label for="seiketsu_reciben_materiales">¿Se reciben materiales en áreas asignadas para almacenaje?</label>
+                    </div>
+                </div>
+
+                <div class="checklist-category">
+                    <h4>5. DISCIPLINA (SHITSUKE)</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="shitsuke_novedades_documentadas" name="shitsuke_novedades_documentadas" {% if form_data.shitsuke_novedades_documentadas %}checked{% endif %}>
+                        <label for="shitsuke_novedades_documentadas">¿Se documentaron las novedades del turno saliente?</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="shitsuke_empalme_verbal" name="shitsuke_empalme_verbal" {% if form_data.shitsuke_empalme_verbal %}checked{% endif %}>
+                        <label for="shitsuke_empalme_verbal">¿Se realizó el empalme verbal con el turno entrante?</label>
+                    </div>
+                </div>
+
+                <div class="checklist-category note-section">
+                    <h4>NOTA:</h4>
+                    <textarea id="nota_adicional" name="nota_adicional" placeholder="Añade cualquier observación o comentario adicional.">{{ form_data.nota_adicional if form_data.nota_adicional is not none else '' }}</textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit-empalme">Registrar Empalme de Turno</button>
+        </form>
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_volver_proceso or url_for('main.home') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            {% if proceso_origen_nombre %}
+                Volver a Opciones de {{ proceso_origen_nombre }}
+            {% else %}
+                Volver
+            {% endif %}
+        </a>
+    </div>
+{% endblock %}
+
+{% block process_page_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const procesoSelect = document.getElementById('proceso_seleccionado');
+    const maquinaSelect = document.getElementById('maquina_seleccionada');
+    const turnoSelect = document.getElementById('turno');
+    const idEntregaMaquinaInput = document.getElementById('id_entrega_maquina');
+    const idEntregaMaquinaFeedback = document.getElementById('id_entrega_maquina_feedback');
+
+    // Definición de las máquinas por proceso (AHORA SE MANTIENE AQUÍ EN EL FRONTEND)
+    const maquinasPorProceso = {
+        "EXTRUSION": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
+        "IMPRESION": ["FL15", "FL16", "FL18", "FL20", "FL21", "FL22"],
+        "CORTE": ["RF01", "RF02", "RF03", "RF04", "RF05", "RF06", "RF07", "RF08", "RF09", "RF10", "RF11", "RF12", "RF13", "RF14", "RF15", "RF16", "RF17"],
+        "LAMINACION": ["LA02", "LA03", "LA04", "LA05", "LA06"],
+        "SELLADO": ["SE14", "SE15", "SE16", "SE18", "SE19", "SE20", "SE23", "SE25", "SE26", "SE30", "SE31", "SE34", "SE35", "SE38", "SE41", "SE42", "SE45", "SE46", "SE47", "SE50", "SE52", "SE55", "SE56"],
+        "INSERTADORAS": [],
+        "ADITAMENTOS": [],
+        "PROCESOS MANUALES": []
+    };
+
+    // Variables para almacenar los valores seleccionados si el formulario se repobló
+    const selectedMaquinaOnLoad = "{{ form_data.maquina_seleccionada | default('') }}";
+    const selectedTurnoOnLoad = "{{ form_data.turno | default('') }}";
+
+    function updateMaquinas() {
+        const selectedProceso = procesoSelect.value;
+        maquinaSelect.innerHTML = '<option value="">Selecciona una máquina</option>'; // Limpiar y añadir opción por defecto
+
+        if (selectedProceso && maquinasPorProceso[selectedProceso]) {
+            maquinasPorProceso[selectedProceso].forEach(maquina => {
+                const option = document.createElement('option');
+                option.value = maquina;
+                option.textContent = maquina;
+                if (maquina === selectedMaquinaOnLoad) {
+                    option.selected = true;
+                }
+                maquinaSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Escuchar cambios en el selector de Proceso
+    procesoSelect.addEventListener('change', updateMaquinas);
+
+    // Ejecutar la función al cargar la página para poblar las máquinas si ya hay un proceso seleccionado
+    updateMaquinas();
+
+    // Lógica para repoblar el campo 'Turno'
+    if (turnoSelect && selectedTurnoOnLoad) {
+        turnoSelect.value = selectedTurnoOnLoad;
+    }
+    
+    // --- Lógica para validación AJAX del ID de máquina ---
+    let validationTimeout; // Para retrasar la validación y evitar spam de requests
+
+    idEntregaMaquinaInput.addEventListener('input', function() {
+        // Limpiar cualquier feedback anterior al empezar a escribir
+        idEntregaMaquinaFeedback.textContent = 'Ingresa el ID numérico de la máquina (máximo 5 dígitos).';
+        idEntregaMaquinaFeedback.className = 'form-text text-muted validation-feedback'; // Resetear clases
+
+        clearTimeout(validationTimeout); // Limpiar el timeout anterior
+        const employeeId = this.value;
+
+        // Validar con regex simple del lado del cliente antes de enviar la petición
+        const idRegex = /^[0-9]{1,5}$/;
+        if (!idRegex.test(employeeId)) {
+            if (employeeId.length > 0) {
+                 idEntregaMaquinaFeedback.textContent = 'El ID debe ser numérico y tener entre 1 y 5 dígitos.';
+                 idEntregaMaquinaFeedback.className = 'form-text validation-feedback text-danger';
+            }
+            return; // No enviar la petición si el formato es incorrecto
+        }
+
+        if (employeeId) {
+            validationTimeout = setTimeout(() => {
+                idEntregaMaquinaFeedback.textContent = 'Validando ID...';
+                idEntregaMaquinaFeedback.className = 'form-text validation-feedback text-muted';
+
+                fetch('/empalme_turno/validar_id_maquina', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ employee_id: employeeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        idEntregaMaquinaFeedback.textContent = `ID válido: ${data.employee_name}`;
+                        idEntregaMaquinaFeedback.className = 'form-text validation-feedback text-success';
+                    } else {
+                        idEntregaMaquinaFeedback.textContent = `ID inválido: ${data.message}`;
+                        idEntregaMaquinaFeedback.className = 'form-text validation-feedback text-danger';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al validar ID de máquina:', error);
+                    idEntregaMaquinaFeedback.textContent = 'Error al validar el ID. Intenta de nuevo.';
+                    idEntregaMaquinaFeedback.className = 'form-text validation-feedback text-danger';
+                });
+            }, 500); // Pequeño retraso para no saturar con requests
+        }
+    });
+
+    // --- JavaScript para deshabilitar el scroll en campos numéricos ---
+    idEntregaMaquinaInput.addEventListener('wheel', function(e) {
+        // Previene la acción por defecto del evento de la rueda del ratón
+        // cuando el cursor está sobre este input.
+        e.preventDefault();
+        // Opcional: También puedes detener la propagación del evento si es necesario.
+        // e.stopPropagation();
+    });
+
+    // --- Lógica para repoblar checkboxes después de un error ---
+    const form = document.querySelector('form');
+    const formDataFromJinja = JSON.parse('{{ form_data | tojson | safe }}');
+
+    if (Object.keys(formDataFromJinja).length > 0) {
+        Object.keys(formDataFromJinja).forEach(key => {
+            const element = form.elements[key];
+            if (element && element.type === 'checkbox') {
+                element.checked = formDataFromJinja.hasOwnProperty(key);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
