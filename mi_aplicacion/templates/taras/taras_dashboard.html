@@ -1,0 +1,96 @@
+{% extends "layouts/process_base.html" %}
+
+{% block title %}Taras - Dashboard{% endblock %}
+
+{% block process_head_css %}
+{# Cargamos el CSS centralizado para dashboards #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_styles.css') }}">
+<style>
+    /* Estilos específicos para el dashboard de Taras */
+    .page-title i.fas.fa-warehouse {
+        background: linear-gradient(135deg, #00796b, #388e3c); /* Colores relacionados con Almacén */
+        box-shadow: 0 4px 10px rgba(0, 121, 107, 0.3);
+    }
+    .btn-main-back {
+        background: linear-gradient(135deg, #00796b, #388e3c);
+    }
+    .btn-main-back:hover {
+        background: linear-gradient(135deg, #388e3c, #00796b);
+    }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
+        <span class="current-page">{{ nombre_proceso }}</span>
+    </nav>
+
+    <div class="page-header fade-in-up">
+        <h1 class="page-title">
+            <i class="fas fa-warehouse"></i> {# Icono de almacén #}
+            <div>
+                <div>{{ nombre_proceso }}</div>
+                <div class="page-subtitle">Gestión y administración de taras en el almacén.</div>
+            </div>
+        </h1>
+    </div>
+
+    <div class="options-section">
+        <h2 class="section-title">
+            Opciones Disponibles
+        </h2>
+        
+        <div class="options-grid">
+            {# Ejemplo de opciones para Taras #}
+            <a href="{{ url_for('taras.gestion_taras') }}" class="option-card">
+                <div class="option-header">
+                    <div class="icon-container">
+                        <i class="fas fa-balance-scale"></i> {# Icono para pesar/medir #}
+                    </div>
+                    <div class="option-info">
+                        <h3>Gestión de Taras</h3>
+                        <div class="option-status">
+                            <span class="status-dot"></span>
+                            Activo
+                        </div>
+                    </div>
+                </div>
+                <p>Registrar, modificar y consultar información de taras.</p>
+                <span class="btn-access-option">Acceder</span>
+            </a>
+
+            <a href="#" class="option-card">
+                <div class="option-header">
+                    <div class="icon-container">
+                        <i class="fas fa-chart-bar"></i> {# Icono para reportes #}
+                    </div>
+                    <div class="option-info">
+                        <h3>Reportes y Análisis</h3>
+                        <div class="option-status">
+                            <span class="status-dot"></span>
+                            Próximamente
+                        </div>
+                    </div>
+                </div>
+                <p>Generar informes y analizar datos históricos de taras.</p>
+                <span class="btn-access-option">Acceder</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-back-button-container fade-in-up">
+        <a href="{{ url_for('taras.taras_logout') }}" class="btn-main-back" style="background: var(--danger);">
+            <i class="fas fa-sign-out-alt"></i>
+            Cerrar Sesión de Taras
+        </a>
+        <a href="{{ url_for('main.home') }}" class="btn-main-back">
+            <i class="fas fa-arrow-left"></i>
+            Volver al Panel Principal
+        </a>
+    </div>
+{% endblock %}

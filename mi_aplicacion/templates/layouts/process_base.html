@@ -6,6 +6,7 @@
 
 {# Bloque para añadir estilos CSS específicos de la página de proceso #}
 {% block head_css %}
+    {{ super() }} {# <--- ¡ESTA LÍNEA ES CRÍTICA Y DEBE IR AQUÍ! #}
 <style>
     /* Estilos globales para las páginas de proceso (afectan al body y header/main general) */
     body.process-page-body {
@@ -32,8 +33,12 @@
         z-index: 1000; /* Asegura que la cabecera esté siempre encima de otros elementos */
     }
     .process-header .logo-area img {
-        max-height: 40px; /* Tamaño del logo */
+        max-height: 40px; /* Esto es bueno, es un límite */
+        height: 40px;     /* ¡Asegura la altura fija! */
+        width: auto;      /* Permite que el ancho se ajuste automáticamente */
         vertical-align: middle;
+        /* Opcional: Si quieres que no se salga del contenedor padre y se ajuste si es muy ancha */
+        object-fit: contain; 
     }
     .process-header .user-info {
         font-size: 0.95em;
@@ -91,34 +96,18 @@
     </header>
 
     <main class="process-main-content">
-        {# Aquí se muestran los mensajes flash (notificaciones) de Flask #}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages-process">
-                {% for category, message in messages %}
-                    <li class="flash-{{ category }}">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+        {# Contenedor para las notificaciones flotantes (AJAX/JS) #}
+        <div id="notification-container"></div>
+
 
         {# ESTE ES EL BLOQUE PRINCIPAL DONDE SE INYECTARÁ EL CONTENIDO ESPECÍFICO DE CADA PÁGINA #}
-        {% block process_page_content %}{% endblock %} 
+        {% block process_page_content %}{% endblock %}
     </main>
-
-    {# Pie de página común a todas las páginas de proceso #}
-    <footer class="footer mt-auto py-3 bg-light">
-        <div class="container text-center">
-            <span>© 2025 Documentación Empaques. Todos los derechos reservados.</span>
-        </div>
-    </footer>
 {% endblock %}
 
 {# Este bloque 'scripts' es heredado de base_minimal.html y es donde se incluyen todos los scripts JS #}
 {% block scripts %}
-    {# ¡IMPORTANTE! Bootstrap Bundle JS debe cargarse antes de tus scripts personalizados #}
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    
+    {{ super() }} {# <--- También es recomendable aquí si base_minimal.html tiene scripts #}
     {# ESTE ES EL BLOQUE ESPECÍFICO PARA SCRIPTS DE LA PÁGINA INDIVIDUAL #}
     {# Las plantillas hijas como empalme_turno_form.html deben usar este bloque #}
     {% block process_page_scripts %}{% endblock %} 

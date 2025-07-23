@@ -3,208 +3,130 @@
 {% block title %}Dashboard - Planta Empaques{% endblock %}
 
 {% block head_css %}
-<style>
-    body.home-page-body { /* Clase específica para el body del home */
-        background-color: #f4f6f8;
-        margin: 0;
-        padding: 0;
-        font-family: 'Roboto', sans-serif;
-        padding-top: 65px; /* Espacio para el header fijo */
-    }
-
-    .home-header { /* Cabecera para home.html */
-        background-color: #2C3E50;
-        color: white;
-        padding: 0 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 65px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        position: fixed; /* Header fijo en la parte superior */
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-    }
-    .home-header .logo-area img {
-        max-height: 40px;
-        vertical-align: middle;
-    }
-    .home-header .user-info {
-        font-size: 0.95em;
-    }
-    .home-header .user-info span {
-        margin-right: 15px;
-    }
-    .home-header .user-info a {
-        color: #ECF0F1;
-        text-decoration: none;
-        font-weight: 500;
-        padding: 8px 12px;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-    }
-    .home-header .user-info a:hover {
-        background-color: #3f5870; /* Un poco más oscuro al pasar el mouse */
-    }
-
-    .home-main-content { /* Contenedor para el contenido principal del home */
-        padding: 30px;
-        max-width: 1200px; /* Opcional: limita el ancho en pantallas muy grandes */
-        margin: 0 auto; /* Centra el contenido si max-width está activo */
-    }
-
-    .welcome-banner { /* Banner de bienvenida */
-        background-color: #e9f7fd;
-        border-left: 5px solid #2196F3;
-        padding: 20px 25px;
-        margin-bottom: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .welcome-banner h1 { margin-top: 0; margin-bottom: 5px; font-size: 1.8em; color: #1A237E; }
-    .welcome-banner p { margin-bottom: 0; font-size: 1.05em; color: #333; }
-
-    .process-grid { /* Grid para las tarjetas de proceso */
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-    }
-    .process-card { /* Estilo de cada tarjeta de proceso */
-        background-color: #ffffff;
-        border-radius: 12px;
-        padding: 25px;
-        text-align: center;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        text-decoration: none;
-        color: inherit;
-    }
-    .process-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
-    }
-    .process-card .icon-container {
-        font-size: 3em;
-        margin-bottom: 15px;
-        /* El color del ícono se aplica en línea desde el bucle de Python */
-    }
-    .process-card h3 {
-        font-size: 1.3em;
-        margin-top: 0;
-        margin-bottom: 10px;
-        color: #2C3E50;
-    }
-    .process-card p {
-        font-size: 0.9em;
-        color: #555;
-        line-height: 1.4;
-        margin-bottom: 20px;
-        flex-grow: 1; /* Para que la descripción ocupe espacio si las alturas varían */
-    }
-    .process-card .btn-acceder {
-        display: inline-block;
-        background-color: #18BC9C;
-        color: white;
-        padding: 10px 25px;
-        border-radius: 20px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: background-color 0.2s ease;
-        margin-top: auto; /* Empuja el botón hacia abajo */
-    }
-    .process-card .btn-acceder:hover {
-        background-color: #15A589;
-    }
-
-    @media (max-width: 768px) { /* Ajuste para tablets y móviles más pequeños */
-        .process-grid {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-         .home-main-content { padding: 20px; }
-    }
-
-    @media (max-width: 600px) { /* Media query para pantallas pequeñas */
-        .process-grid {
-            grid-template-columns: 1fr; /* Una columna */
-        }
-        .process-card .icon-container { font-size: 2.5em; }
-        .process-card h3 { font-size: 1.15em; }
-        .home-header { padding: 0 15px; } /* Menos padding en header en móviles */
-        .home-header .user-info span { font-size: 0.85em; }
-        .home-header .user-info a { padding: 6px 10px; font-size:0.85em; }
-
-    }
-
-    /* Estilos para mensajes flash */
-    .flash-messages-home-simple {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 20px 0;
-    }
-    .flash-messages-home-simple li {
-        padding: 12px 18px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        font-size: 0.95em;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home_styles.css') }}">
 {% endblock %}
 
 {% block body_content %}
     <header class="home-header">
-        <div class="logo-area">
-            <a href="{{ url_for('main.home') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
-            </a>
+        <div class="logo-section">
+            <div class="logo-container">
+                <a href="{{ url_for('main.home') }}" class="logo-area">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
+                </a>
+            </div>
+            <div class="brand-info">
+                <h1>Planta Empaques</h1>
+            </div>
         </div>
-        <div class="user-info">
-            <span><i class="fas fa-user-circle"></i> {{ username }}</span>
-            <a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        <div class="user-section">
+            <div class="user-profile">
+                <div class="user-avatar">{{ username[0].upper() }}</div>
+                <div class="user-details">
+                    <div class="user-name">{{ username }}</div>
+                </div>
+            </div>
+            <a href="{{ url_for('main.logout') }}" class="logout-button">
+                <i class="fas fa-sign-out-alt"></i>
+                Salir
+            </a>
         </div>
     </header>
 
     <main class="home-main-content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages-home-simple">
-                {% for category, message in messages %}
-                    <li class="flash-{{ category }}">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-
-        <div class="welcome-banner">
-            <h1>¡Bienvenido, {{ username }}!</h1>
-            <p>Selecciona un proceso productivo para acceder a su documentación y formularios.</p>
+        <div class="welcome-container fade-in-up">
+            <h1 class="welcome-title">Hola, <strong>{{ username }}</strong></h1>
         </div>
 
-        <div class="process-grid">
-            {% for proceso in procesos %}
-            <a href="{{ proceso.url }}" class="process-card"> <div>
-                    <div class="icon-container" style="color: {{ proceso.color_icono }};"><i class="{{ proceso.icono }}"></i></div>
-                    <h3>{{ proceso.nombre }}</h3>
+        <div class="process-section">
+            <div class="section-header">
+                <h2 class="section-title">Procesos Disponibles</h2>
+                <span class="process-count">{{ procesos|length }} procesos</span>
+            </div>
+
+            <div class="process-grid">
+                {% for proceso in procesos %}
+                <a href="{{ proceso.url }}" class="process-card">
+                    <div class="process-header">
+                        <div class="icon-container" style="color: {{ proceso.color_icono }};">
+                            <i class="{{ proceso.icono }}"></i>
+                        </div>
+                        <div class="process-info">
+                            <h3>{{ proceso.nombre }}</h3>
+                            <div class="process-status">
+                                <span class="status-dot"></span>
+                                Activo
+                            </div>
+                        </div>
+                    </div>
                     <p>{{ proceso.descripcion }}</p>
-                </div>
-                <span class="btn-acceder">Acceder al Proceso</span>
-            </a>
-            {% endfor %}
+                    <span class="btn-acceder">Acceder al Proceso</span>
+                </a>
+                {% endfor %}
+            </div>
         </div>
     </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Añade una clase específica al body de la página de home
     document.body.classList.add('home-page-body');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth interactions to process cards
+        const processCards = document.querySelectorAll('.process-card');
+        processCards.forEach(function(card) {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px) scale(1.02)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-4px) scale(1)';
+            });
+            card.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(-2px) scale(0.98)';
+            });
+            card.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-4px) scale(1.02)';
+            });
+        });
+
+        // Add keyboard navigation (opcional)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.activeElement.blur();
+            }
+        });
+
+        // Animación de entrada de los cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!entry.target.classList.contains('animated')) {
+                         entry.target.classList.add('animated');
+                    }
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -20px 0px'
+        });
+
+        processCards.forEach(card => {
+            observer.observe(card);
+        });
+    });
+
+    // Process access tracking (opcional)
+    function trackProcessAccess(processName) {
+        console.log('Proceso accedido:', processName);
+        // Aquí podrías enviar datos de analytics al backend si quisieras
+    }
+
+    document.querySelectorAll('.process-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            const processName = this.querySelector('h3').textContent;
+            trackProcessAccess(processName);
+        });
+    });
 </script>
 {% endblock %}

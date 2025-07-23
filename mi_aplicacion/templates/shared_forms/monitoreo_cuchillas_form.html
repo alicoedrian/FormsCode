@@ -1,0 +1,442 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}Despeje de Línea – {{ nombre_proceso }}{% endblock %}
+
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoreo_cuchillas_form_styles.css') }}">
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        {% if proceso_origen_nombre and url_volver_proceso %}
+            <span class="separator">›</span>
+            <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
+        {% endif %}
+        <span class="separator">›</span>
+        <span class="current-page">Monitoreo de cuchillas</span>
+    </nav>
+
+    <h1 class="page-title-sub"><i class="fas fa-cogs"></i> {{ subseccion }}</h1>
+    <p class="mb-5 text-secondary">Registre el monitoreo de las cuchillas.</p>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <div class="custom-form-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form id="monitoreoCuchillasForm" method="POST" action="{{ url_for('monitoreo_cuchillas.monitoreo_cuchillas_form', origen=proceso_origen) }}">
+            <fieldset>
+                <legend>Datos del Monitoreo</legend>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="fecha" class="form-label">Fecha:</label>
+                            <input type="text" class="form-control" name="fecha" id="fecha" value="{{ fecha_actual }}" readonly>
+                        </div>
+                    </div>
+                    
+                    {# CAMBIADO: Campo de proceso principal ahora es un select #}
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="proceso_seleccionado" class="form-label">Proceso:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="proceso_seleccionado" name="proceso_seleccionado" required>
+                                <option value="">Seleccione un proceso</option>
+                                {# OPCIONES HARDCODEADAS DIRECTAMENTE EN HTML CON EL CASING CORRECTO #}
+                                <option value="Extrusion Empaques" {% if form_data.proceso_seleccionado == 'Extrusion Empaques' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Extrusion Empaques') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Extrusion Empaques</option>
+                                <option value="Impresion Empaques" {% if form_data.proceso_seleccionado == 'Impresion Empaques' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Impresion Empaques') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Impresion Empaques</option>
+                                <option value="Laminacion" {% if form_data.proceso_seleccionado == 'Laminacion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Laminacion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Laminacion</option>
+                                <option value="Corte" {% if form_data.proceso_seleccionado == 'Corte' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Corte') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Corte</option>
+                                <option value="Sellado" {% if form_data.proceso_seleccionado == 'Sellado' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Sellado') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Sellado</option>
+                                <option value="Insertadoras" {% if form_data.proceso_seleccionado == 'Insertadoras' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Insertadoras') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Insertadoras</option>
+                                <option value="Aditamentos" {% if form_data.proceso_seleccionado == 'Aditamentos' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Aditamentos') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Aditamentos</option>
+                                <option value="Procesos Manuales" {% if form_data.proceso_seleccionado == 'Procesos Manuales' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Procesos Manuales') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Procesos Manuales</option>
+                                {# Si tienes más procesos, añádelos aquí con su capitalización correcta #}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="maquina" class="form-label">Máquina:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="maquina" name="maquina" required>
+                                <option value="">Seleccione una máquina</option>
+                                {# Opciones se llenarán dinámicamente con JavaScript #}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="id_operario" class="form-label">ID Operario:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="5" class="form-control" id="id_operario" name="id_operario"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                onchange="consultarOperarioPorID()" 
+                                value="{{ form_data.id_operario if form_data.id_operario is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="nombre_operario" class="form-label">Nombre Operario:</label>
+                            <input type="text" class="form-control" id="nombre_operario" name="nombre_operario" 
+                                value="{{ form_data.nombre_operario if form_data.nombre_operario is not none else '' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="turno" class="form-label">Turno:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="turno" name="turno" required>
+                                <option value="">Seleccione un turno</option>
+                                <option value="TURNO 1 (9:30PM - 5:30AM)" {% if form_data.turno == 'TURNO 1 (9:30PM - 5:30AM)' %}selected{% endif %}>TURNO 1 (9:30PM - 5:30AM)</option>
+                                <option value="TURNO 2 (5:30AM - 1:30 PM)" {% if form_data.turno == 'TURNO 2 (5:30AM - 1:30 PM)' %}selected{% endif %}>TURNO 2 (5:30AM - 1:30 PM)</option>
+                                <option value="TURNO 3 (1:30 PM - 9:30 PM)" {% if form_data.turno == 'TURNO 3 (1:30 PM - 9:30 PM)' %}selected{% endif %}>TURNO 3 (1:30 PM - 9:30 PM)</option>
+                                <option value="TURNO L-J (DIURNO)" {% if form_data.turno == 'TURNO L-J (DIURNO)' %}selected{% endif %}>TURNO L-J (DIURNO)</option>
+                                <option value="TURNO L-J (NOCTURNO)" {% if form_data.turno == 'TURNO L-J (NOCTURNO)' %}selected{% endif %}>TURNO L-J (NOCTURNO)</option>
+                                <option value="TURNO V-D (DIURNO)" {% if form_data.turno == 'TURNO V-D (DIURNO)' %}selected{% endif %}>TURNO V-D (DIURNO)</option>
+                                <option value="TURNO V-D (NOCTURNO)" {% if form_data.turno == 'TURNO V-D (NOCTURNO)' %}selected{% endif %}>TURNO V-D (NOCTURNO)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="minora_cantidad" class="form-label">Minora (Cantidad):<span class="required-asterisk">*</span></label>
+                            <input type="number" min="0" class="form-control" id="minora_cantidad" name="minora_cantidad"
+                                value="{{ form_data.minora_cantidad if form_data.minora_cantidad is not none else '0' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="acerada_cantidad" class="form-label">Acerada (Cantidad):<span class="required-asterisk">*</span></label>
+                            <input type="number" min="0" class="form-control" id="acerada_cantidad" name="acerada_cantidad"
+                                value="{{ form_data.acerada_cantidad if form_data.acerada_cantidad is not none else '0' }}" required>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Estado de Cuchillas (Cantidad)</legend>
+                <div class="cuchillas-estado-grid">
+                    <table class="cuchillas-table">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Cantidad<span class="required-asterisk">*</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {# Loop para los estados de cuchilla #}
+                            {% set estados_cuchilla_fields = [
+                                ('cumple', 'Cumple'),
+                                ('caso_oxidacion', 'Caso de Oxido'),
+                                ('caso_perdida', 'Caso de Perdida'),
+                                ('fractura', 'Fractura')
+                            ] %}
+                            {% for campo_base, label_estado in estados_cuchilla_fields %}
+                            <tr>
+                                <td>{{ label_estado }}</td>
+                                <td>
+                                    <input type="number" min="0" class="form-control" 
+                                        name="estado_cuchilla_{{ campo_base }}_cantidad" 
+                                        id="estado_cuchilla_{{ campo_base }}_cantidad" 
+                                        value="{{ form_data['estado_cuchilla_' + campo_base + '_cantidad'] if form_data['estado_cuchilla_' + campo_base + '_cantidad'] is not none else '0' }}" required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Entrega de Cuchillas</legend>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="id_quien_recibe" class="form-label">ID Quien Recibe:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="5" class="form-control" id="id_quien_recibe" name="id_quien_recibe"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                onchange="consultarQuienRecibePorID()" 
+                                value="{{ form_data.id_quien_recibe if form_data.id_quien_recibe is not none else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="nombre_quien_recibe" class="form-label">Nombre Quien Recibe:</label>
+                            <input type="text" class="form-control" id="nombre_quien_recibe" name="nombre_quien_recibe" 
+                                value="{{ form_data.nombre_quien_recibe if form_data.nombre_quien_recibe is not none else '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            
+            <button type="submit" class="btn btn-success me-2">Registrar Monitoreo</button>
+        </form>
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_volver }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Volver a {{ nombre_proceso }}
+        </a>
+    </div>
+{% endblock %}
+
+{% block process_page_scripts %}
+<script id="form-data-json" type="application/json">
+    {{ form_data | tojson | safe }}
+</script>
+
+<script>
+const formDataSourceElement = document.getElementById('form-data-json');
+const currentFormData = formDataSourceElement ? JSON.parse(formDataSourceElement.textContent) : {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('monitoreoCuchillasForm');
+    const notify = document.getElementById('notification-container');
+    const procesoSeleccionadoSelect = document.getElementById('proceso_seleccionado');
+    const maquinaSelect = document.getElementById('maquina');
+    const idOperarioInput = document.getElementById('id_operario');
+    const nombreOperarioInput = document.getElementById('nombre_operario');
+    const idQuienRecibeInput = document.getElementById('id_quien_recibe');
+    const nombreQuienRecibeInput = document.getElementById('nombre_quien_recibe');
+
+    if (!form || !notify || !procesoSeleccionadoSelect || !maquinaSelect || !idOperarioInput || !nombreOperarioInput || !idQuienRecibeInput || !nombreQuienRecibeInput) {
+        console.error("Faltan elementos HTML esenciales para el script.");
+        return;
+    }
+
+    // --- Máquinas por proceso ---
+    const MAQUINAS_POR_PROCESO_JS = {
+        "Extrusion Empaques": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
+        "Impresion Empaques": ["FL15", "FL16", "FL18", "FL20", "FL21", "FL22"],
+        "Laminacion": ["LA02", "LA03", "LA04", "LA05", "LA06"],
+        "Corte": ["RF01", "RF02", "RF03", "RF04", "RF05", "RF06", "RF07", "RF08", "RF09", "RF10", "RF11", "RF12", "RF13", "RF14", "RF15", "RF16", "RF17"],
+        "Sellado": ["SE14", "SE15", "SE16", "SE18", "SE19", "SE20", "SE23", "SE25", "SE26", "SE30", "SE31", "SE34", "SE35", "SE38", "SE41", "SE42", "SE45", "SE46", "SE47", "SE50", "SE52", "SE55", "SE56"],
+        "Insertadoras": [],
+        "Aditamentos": [],
+        "Procesos Manuales": []
+    };
+
+    // --- Helpers globales ---
+    window.updateMaquinasDropdown = function() {
+        const selectedProcessName = procesoSeleccionadoSelect.value;
+        maquinaSelect.innerHTML = '<option value="">Seleccione una máquina</option>';
+
+        if (selectedProcessName && MAQUINAS_POR_PROCESO_JS[selectedProcessName]) {
+            const maquinas = MAQUINAS_POR_PROCESO_JS[selectedProcessName];
+            maquinas.forEach(maquina => {
+                const option = document.createElement('option');
+                option.value = maquina;
+                option.textContent = maquina;
+                if (currentFormData.maquina === maquina) {
+                    option.selected = true;
+                }
+                maquinaSelect.appendChild(option);
+            });
+        }
+    };
+
+    window.consultarOperarioPorID = async function() {
+        const id = idOperarioInput.value;
+        if (!id) {
+            nombreOperarioInput.value = "";
+            return;
+        }
+        try {
+            const response = await fetch(`/shared/api/empleado?id=${id}`);
+            const data = await response.json();
+            if (response.ok && data.success) {
+                nombreOperarioInput.value = data.nombre || 'No encontrado';
+            } else {
+                nombreOperarioInput.value = data.nombre || 'No encontrado';
+            }
+        } catch (error) {
+            console.error("Error al consultar el ID Operario:", error);
+            nombreOperarioInput.value = "Error en la consulta";
+        }
+    };
+
+    window.consultarQuienRecibePorID = async function() {
+        const id = idQuienRecibeInput.value;
+        if (!id) {
+            nombreQuienRecibeInput.value = "";
+            return;
+        }
+        try {
+            const response = await fetch(`/shared/api/empleado?id=${id}`);
+            const data = await response.json();
+            if (response.ok && data.success) {
+                nombreQuienRecibeInput.value = data.nombre || 'No encontrado';
+            } else {
+                nombreQuienRecibeInput.value = data.nombre || 'No encontrado';
+            }
+        } catch (error) {
+            console.error("Error al consultar el ID Quien Recibe:", error);
+            nombreQuienRecibeInput.value = "Error en la consulta";
+        }
+    };
+
+    // --- NOTIFICACIÓN CON SCROLL AL TOPE ---
+    function showNotification(response) {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${response.category || 'info'} alert-dismissible`;
+        let icon = '';
+        if (response.category === 'success') {
+            icon = '<i class="fas fa-check-circle me-2"></i>';
+        } else if (response.category === 'danger') {
+            icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+        } else if (response.category === 'warning') {
+            icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+        } else {
+            icon = '<i class="fas fa-info-circle me-2"></i>';
+        }
+        let detailsHtml = '';
+        if (response.details) {
+            detailsHtml = `<div class="small mt-1">${response.details}</div>`;
+        }
+        alert.innerHTML = `
+            <div class="d-flex align-items-center">
+                ${icon}
+                <div>
+                    <strong>${response.message}</strong>
+                    ${detailsHtml}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        container.appendChild(alert);
+
+        alert.querySelector('.btn-close').onclick = () => alert.remove();
+
+        // --- SCROLL AL TOPE AL MOSTRAR NOTIFICACIÓN ---
+        setTimeout(function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100); // Espera 100ms para que el alert esté en el DOM y el scroll funcione
+
+        // Auto-hide después de 8s (solo success/warning)
+        if (['success', 'warning'].includes(response.category)) {
+            setTimeout(() => { if (alert.parentNode) alert.remove(); }, 8000);
+        }
+    }
+
+    // --- Listeners del formulario ---
+    procesoSeleccionadoSelect.addEventListener('change', window.updateMaquinasDropdown);
+    idOperarioInput.addEventListener('change', window.consultarOperarioPorID);
+    idQuienRecibeInput.addEventListener('change', window.consultarQuienRecibePorID);
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const btn = form.querySelector('button[type="submit"]');
+        const origText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Enviando...`;
+
+        const payload = {};
+        new FormData(form).forEach((value, key) => {
+            if (key.endsWith('_cantidad') || key === 'id_operario' || key === 'id_quien_recibe') {
+                payload[key] = value === '' || isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
+            } else {
+                payload[key] = value;
+            }
+        });
+
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            showNotification(result);
+
+            if (res.ok && result.success) {
+                form.reset();
+                nombreOperarioInput.value = "";
+                nombreQuienRecibeInput.value = "";
+                procesoSeleccionadoSelect.value = "{{ proceso_origen|capitalize }}";
+                window.updateMaquinasDropdown();
+            } else {
+                if (result.form_data) {
+                    for (const key in result.form_data) {
+                        const input = document.getElementById(key);
+                        if (input) {
+                            input.value = result.form_data[key];
+                        } else {
+                            const select = document.querySelector(`select[name="${key}"]`);
+                            if (select) {
+                                select.value = result.form_data[key];
+                            }
+                        }
+                    }
+                    procesoSeleccionadoSelect.value = currentFormData.proceso_seleccionado || "{{ proceso_origen|capitalize }}";
+                    window.updateMaquinasDropdown();
+                    if (currentFormData.maquina) {
+                        maquinaSelect.value = currentFormData.maquina;
+                    }
+                    if (idOperarioInput.value) await consultarOperarioPorID();
+                    if (idQuienRecibeInput.value) await consultarQuienRecibePorID();
+                }
+            }
+        } catch (err) {
+            console.error('AJAX error:', err);
+            showNotification({
+                category: 'danger',
+                message: 'Error de red o servidor.',
+                details: 'Por favor, verifica tu conexión a internet e inténtalo de nuevo.'
+            });
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    });
+
+    form.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'submit') {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('wheel', e => e.preventDefault());
+    });
+
+    // --- Inicialización ---
+    const initialProcessValue = currentFormData.proceso_seleccionado || "{{ proceso_origen|capitalize }}";
+    procesoSeleccionadoSelect.value = initialProcessValue;
+    window.updateMaquinasDropdown();
+    if (currentFormData.maquina) {
+        maquinaSelect.value = currentFormData.maquina;
+    }
+    if (idOperarioInput.value) consultarOperarioPorID();
+    if (idQuienRecibeInput.value) consultarQuienRecibePorID();
+});
+</script>
+
+{% endblock %}

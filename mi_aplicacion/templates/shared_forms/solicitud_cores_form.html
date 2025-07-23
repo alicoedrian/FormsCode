@@ -4,203 +4,38 @@
 {% block process_title %}FO-MN-034 Solicitud de Cores V.1{% endblock %}
 
 {% block process_head_css %}
-<style>
-    /* Estilos base del formulario */
-    .page-title-sub {
-        font-size: 1.8em;
-        color: #2C3E50;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e0e0e0;
-        display: flex;
-        align-items: center;
-    }
-    .page-title-sub i.fa-tape { /* Ícono para Solicitud de Cores */
-        margin-right: 12px;
-        color: #795548; /* Un color marrón podría ser adecuado para cores/rollos */
-    }
-    .breadcrumb-nav {
-        margin-bottom: 25px;
-        font-size: 0.9em;
-    }
-    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
-    .breadcrumb-nav a:hover { text-decoration: underline; }
-    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
-    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
-
-    /* Contenedor del formulario */
-    .form-container {
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        max-width: 600px; /* Ancho máximo para el formulario */
-        margin: 0 auto; /* Centrar el formulario */
-        border: 1px solid #e0e0e0; /* Añadido para coincidir con el diseño de mezcla */
-    }
-
-    /* Estilo para cada pregunta individual (similar a Google Forms) */
-    .form-question-card {
-        background-color: #fff;
-        border: 1px solid #dadce0;
-        border-radius: 8px;
-        padding: 24px;
-        margin-bottom: 20px; /* Espacio entre cada pregunta */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-    .form-question-card:hover {
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        border-color: #c9ccd0;
-    }
-
-    /* Estilo para el asterisco de requerido */
-    .form-label .required-asterisk {
-        color: #dc3545;
-        margin-left: 4px;
-        font-weight: normal;
-    }
-
-    /* Ajustes para inputs y selects para simetría y uniformidad */
-    .form-label {
-        font-weight: 400;
-        color: #202124;
-        font-size: 1em;
-        margin-bottom: 12px;
-        display: block;
-    }
-    .form-control, .form-select {
-        width: 100%; /* Asegurar que ocupen todo el ancho */
-        padding: 10px 12px;
-        border: 1px solid #dadce0;
-        border-radius: 4px;
-        font-size: 1em;
-        box-sizing: border-box; /* Incluir padding y border en el ancho total */
-        min-height: 40px;
-        background-color: #f8fafd;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #1a73e8;
-        outline: 0;
-        box-shadow: 0 0 0 1px #1a73e8;
-        background-color: #fff;
-    }
-    .form-text { 
-        font-size: 0.85em; 
-        color: #5f6368; 
-        margin-top: 5px; 
-    }
-
-    /* Botones de envío */
-    .btn-submit {
-        background-color: #28a745; /* Verde para el botón de enviar */
-        color: white;
-        padding: 12px 25px;
-        border: none;
-        border-radius: 5px;
-        font-size: 1.1em;
-        cursor: pointer;
-        transition: background-color 0.2s ease, box-shadow 0.2s ease;
-        width: 100%;
-        box-sizing: border-box;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra añadida */
-    }
-    .btn-submit:hover {
-        background-color: #218838;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
-    .btn-submit:disabled {
-        background-color: #a0a0a0;
-        border-color: #a0a0a0;
-        cursor: not-allowed;
-    }
-
-    /* Estilos para mensajes flash / notificaciones flotantes */
-    #notification-container {
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        z-index: 1050; /* Por encima de la mayoría de los elementos */
-        width: 350px;
-    }
-    .alert {
-        padding: 15px;
-        margin-bottom: 10px; /* Margen entre alertas en el contenedor */
-        border: 1px solid transparent;
-        border-radius: 4px;
-        font-weight: 500;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .alert-success {
-        color: #155724;
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-    }
-    .alert-danger {
-        color: #721c24;
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-    }
-    .alert-warning {
-        color: #856404;
-        background-color: #fff3cd;
-        border-color: #ffeeba;
-    }
-
-    /* Botón de volver */
-    .back-button-container {
-        margin-top: 25px;
-        margin-bottom: 20px;
-        text-align: left;
-    }
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        background-color: #6c757d;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.95em;
-        transition: background-color 0.2s ease, box-shadow 0.2s ease;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    }
-    .btn-back i { margin-right: 8px; }
-    .btn-back:hover {
-        background-color: #5a6268;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
-    }
-
-    /* === ESTILO ELIMINADO: Ya no ocultamos la refiladora por defecto con CSS === */
-    /* #refiladora_field_container { display: none; } */
-    /* ======================================================================= */
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/solicitud_cores_form_styles.css') }}"> {# Enlace al nuevo CSS #}
 {% endblock %}
 
 {% block process_page_content %}
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a>
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
         {% if proceso_origen_nombre and url_volver_proceso %}
-            <span class="separator">&raquo;</span>
+            <span class="separator">›</span>
             <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
         {% endif %}
-        <span class="separator">&raquo;</span>
+        <span class="separator">›</span>
         <span class="current-page">Solicitud de Cores</span>
     </nav>
 
-    <h1 class="page-title-sub"><i class="fas fa-tape"></i>FO-MN-034 Solicitud de Cores V.1</h1>
-    <p style="margin-bottom:20px;">Llena cada uno de los campos de información para hacer tu solicitud de cores.</p>
+    <div class="page-title-sub">
+        <i class="fas fa-tape"></i>
+        <div>
+            <div>FO-MN-034 Solicitud de Cores V.1</div>
+        </div>
+    </div>
+
+    <p class="page-description">Llena cada uno de los campos de información para hacer tu solicitud de cores.</p>
 
     {# Contenedor para las notificaciones flotantes (toasts) #}
     <div id="notification-container"></div>
 
     <div class="form-container">
         <form id="solicitudCoresForm" method="POST" action="{{ url_for('shared_forms.solicitud_cores_form', origen=request.args.get('origen')) }}">
-
             <div class="form-question-card">
                 <label for="area_solicitante" class="form-label">1. Área que solicita: <span class="required-asterisk">*</span></label>
                 <select id="area_solicitante" name="area_solicitante" class="form-select" required>
@@ -215,42 +50,28 @@
 
             <div class="form-question-card">
                 <label for="solicitante_id" class="form-label">2. ID de quien solicita: <span class="required-asterisk">*</span></label>
-                <input type="number" id="solicitante_id" name="solicitante_id" class="form-control" 
-                         min="1" max="99999" pattern="[0-9]{5}" maxlength="5" required 
+                <input type="text" id="solicitante_id" name="solicitante_id" class="form-control"
+                         pattern="[0-9]{5}" maxlength="5" required
                          placeholder="Ej. 12345" value="{{ solicitante_id_val if solicitante_id_val is not none else '' }}"
                          oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                 <small class="form-text">Solo 5 dígitos numéricos.</small>
             </div>
 
-            {# --- CAMPO REFILADORA (AHORA SIEMPRE VISIBLE) --- #}
-            <div class="form-question-card" id="refiladora_field_container"> 
-                <label for="refiladora" class="form-label">3. Refiladora (Solo para Corte):</label>
-                <select id="refiladora" name="refiladora" class="form-select"> {# Ya no 'required' aquí en HTML, es condicional en backend #}
-                    <option value="">Selecciona una refiladora (opcional)</option>
-                    <option value="RF03" {% if refiladora_val == 'RF03' %}selected{% endif %}>RF03</option>
-                    <option value="RF04" {% if refiladora_val == 'RF04' %}selected{% endif %}>RF04</option>
-                    <option value="RF05" {% if refiladora_val == 'RF05' %}selected{% endif %}>RF05</option>
-                    <option value="RF06" {% if refiladora_val == 'RF06' %}selected{% endif %}>RF06</option>
-                    <option value="RF07" {% if refiladora_val == 'RF07' %}selected{% endif %}>RF07</option>
-                    <option value="RF08" {% if refiladora_val == 'RF08' %}selected{% endif %}>RF08</option>
-                    <option value="RF09" {% if refiladora_val == 'RF09' %}selected{% endif %}>RF09</option>
-                    <option value="RF10" {% if refiladora_val == 'RF10' %}selected{% endif %}>RF10</option>
-                    <option value="RF11" {% if refiladora_val == 'RF11' %}selected{% endif %}>RF11</option>
-                    <option value="RF12" {% if refiladora_val == 'RF12' %}selected{% endif %}>RF12</option>
-                    <option value="RF13" {% if refiladora_val == 'RF13' %}selected{% endif %}>RF13</option>
-                    <option value="RF14" {% if refiladora_val == 'RF14' %}selected{% endif %}>RF14</option>
-                    <option value="RF15" {% if refiladora_val == 'RF15' %}selected{% endif %}>RF15</option>
-                    <option value="RF16" {% if refiladora_val == 'RF16' %}selected{% endif %}>RF16</option>
-                    <option value="RF17" {% if refiladora_val == 'RF17' %}selected{% endif %}>RF17</option>
+            {# --- CAMPO MÁQUINA / REFILADORA (AHORA CASCADA Y SIEMPRE VISIBLE) --- #}
+            <div class="form-question-card" id="maquina_field_container">
+                <label for="maquina_refiladora" class="form-label">3. Máquina:</label>
+                <select id="maquina_refiladora" name="maquina_refiladora" class="form-select">
+                    <option value="">Selecciona una máquina</option>
+                    {# Opciones se llenarán dinámicamente con JavaScript #}
                 </select>
-                <small class="form-text">Este campo es obligatorio solo si el área solicitante es 'Corte'.</small>
+                <small class="form-text">Máquina que pertenece al proceso.</small>
             </div>
-            {# --- FIN CAMPO REFILADORA --- #}
+            {# --- FIN CAMPO MÁQUINA / REFILADORA --- #}
 
             <div class="form-question-card">
                 <label for="trabajo_ingresa" class="form-label">4. Trabajo ingresa: <span class="required-asterisk">*</span></label>
-                <input type="text" id="trabajo_ingresa" name="trabajo_ingresa" class="form-control" 
-                         maxlength="9" required 
+                <input type="text" id="trabajo_ingresa" name="trabajo_ingresa" class="form-control"
+                         maxlength="9" required
                          placeholder="Ej. FE000000" value="{{ trabajo_ingresa_val if trabajo_ingresa_val is not none else '' }}">
                 <small class="form-text">Máximo 9 caracteres (números y texto).</small>
             </div>
@@ -303,40 +124,71 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const areaSolicitanteSelect = document.getElementById('area_solicitante');
-        // const refiladoraFieldContainer = document.getElementById('refiladora_field_container'); // Ya no es necesaria si siempre es visible
-        // const refiladoraSelect = document.getElementById('refiladora'); // Solo si la usas directamente, no para toggle
+        const maquinaRefiladoraSelect = document.getElementById('maquina_refiladora');
 
-        // --- ELIMINADA FUNCIÓN toggleRefiladoraField y su lógica ---
-        // function toggleRefiladoraField() { ... }
-        // areaSolicitanteSelect.addEventListener('change', toggleRefiladoraField);
-        // toggleRefiladoraField(); 
-        // -------------------------------------------------------------
+        // Definición de las máquinas por proceso (pasa desde el backend o hardcodea aquí si no viene de Jinja)
+        // Usar JSON.parse para convertir la cadena JSON de Jinja a un objeto JavaScript
+        const maquinasPorProceso = JSON.parse('{{ maquinas_por_proceso_json | tojson | safe }}'); // <-- ¡AQUÍ ESTÁ EL CAMBIO!
 
-        // --- Función para mostrar notificaciones flotantes ---
+        // Variable para almacenar la máquina seleccionada si el formulario se repobló (después de un error)
+        const selectedMaquinaRefiladoraOnLoad = "{{ maquina_refiladora_val | default('') }}";
+
+        // Función para poblar dinámicamente el selector de Máquinas/Refiladoras
+        function updateMaquinasRefiladoras() {
+            const selectedArea = areaSolicitanteSelect.value;
+            maquinaRefiladoraSelect.innerHTML = '<option value="">Selecciona una máquina</option>'; // Limpiar y añadir opción por defecto
+
+            if (selectedArea && maquinasPorProceso[selectedArea]) {
+                const maquinas = maquinasPorProceso[selectedArea];
+                maquinas.forEach(maquina => {
+                    const option = document.createElement('option');
+                    option.value = maquina;
+                    option.textContent = maquina;
+                    // Repoblar si hay un valor guardado (después de un error de validación, por ejemplo)
+                    if (maquina === selectedMaquinaRefiladoraOnLoad) {
+                        option.selected = true;
+                    }
+                    maquinaRefiladoraSelect.appendChild(option);
+                });
+                // Si el área tiene máquinas, el campo es requerido en el frontend
+                maquinaRefiladoraSelect.setAttribute('required', 'required');
+            } else {
+                // Si el área no tiene máquinas o no se seleccionó un área, el campo no es requerido
+                maquinaRefiladoraSelect.removeAttribute('required');
+            }
+        }
+
+        // Escuchar cambios en el selector de Área solicitante
+        areaSolicitanteSelect.addEventListener('change', updateMaquinasRefiladoras);
+
+        // Ejecutar la función al cargar la página para poblar las máquinas si ya hay un área seleccionada
+        updateMaquinasRefiladoras();
+
+        // --- Función para mostrar notificaciones flotantes (adaptada de tu código anterior) ---
         function showNotification(response) {
             const container = document.getElementById('notification-container');
             if (!container) return;
-            
+                        
             container.innerHTML = '';
-            
+                        
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${response.category} alert-dismissible fade show`;
             alertDiv.setAttribute('role', 'alert');
-            
+                        
             let icon = '';
             if (response.category === 'success') {
                 icon = '<i class="fas fa-check-circle me-2"></i>';
             } else if (response.category === 'danger') {
                 icon = '<i class="fas fa-exclamation-circle me-2"></i>';
-            } else { // Asumimos 'warning' o 'info'
+            } else {
                 icon = '<i class="fas fa-info-circle me-2"></i>';
             }
-            
+                        
             let messageDetails = '';
             if (response.errors && response.errors.length > 0) {
                 messageDetails = `<ul class="mt-2 mb-0" style="list-style: none; padding-left: 0;">` +
-                                 response.errors.map(err => `<li><i class="fas fa-times-circle me-1"></i>${err}</li>`).join('') +
-                                 `</ul>`;
+                                response.errors.map(err => `<li><i class="fas fa-times-circle me-1"></i>${err}</li>`).join('') +
+                                `</ul>`;
             } else if (response.details) {
                 messageDetails = `<div class="small mt-1">${response.details}</div>`;
             }
@@ -351,8 +203,18 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
+
             container.appendChild(alertDiv);
-            
+
+            // === DESPLAZAMIENTO SUAVE HACIA ARRIBA CUANDO HAY NOTIFICACIÓN ===
+            setTimeout(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 100); // pequeño delay para asegurar que la notificación ya esté en el DOM
+
+            // --- El resto igual que antes
             if (response.category === 'success' || response.category === 'warning') {
                 setTimeout(() => {
                     alertDiv.classList.remove('show');
@@ -360,6 +222,7 @@
                 }, 8000);
             }
         }
+
 
         // --- Lógica AJAX para el envío del formulario ---
         const form = document.getElementById('solicitudCoresForm');
@@ -379,8 +242,8 @@
                 try {
                     const response = await fetch(form.action, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
+                        headers: {
+                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: JSON.stringify(data)
@@ -396,17 +259,16 @@
                     if (response.ok && result.success) {
                         showNotification(result);
                         form.reset();
-                        // Resetear selects a la primera opción si tienen un placeholder seleccionado (disabled selected)
                         document.querySelectorAll('select').forEach(s => {
                             if (s.querySelector('option[disabled][selected]')) {
                                 s.selectedIndex = 0;
                             }
                         });
-                        // Ya no se llama a toggleRefiladoraField() aquí
-                    } else {
+                        updateMaquinasRefiladoras();
+                     } else {
                         showNotification(result);
-                        // Ya no se llama a toggleRefiladoraField() aquí
-                    }
+                        updateMaquinasRefiladoras();
+                     }
                 } catch (error) {
                     console.error('Error en fetch:', error);
                     showNotification({

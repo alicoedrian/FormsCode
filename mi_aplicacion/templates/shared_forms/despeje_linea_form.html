@@ -1,0 +1,566 @@
+{% extends "layouts/process_base.html" %}
+
+{# Define el título de la página #}
+{% block process_title %}Despeje de Línea – {{ nombre_proceso }}{% endblock %}
+
+{# Define el CSS específico para esta sección con mejoras de interfaz #}
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/despeje_linea_form_styles.css') }}"> {# Enlace al nuevo CSS #}
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        {% if proceso_origen_nombre and url_volver_proceso %}
+            <span class="separator">›</span>
+            <a href="{{ url_volver_proceso }}">{{ proceso_origen_nombre }}</a>
+        {% endif %}
+        <span class="separator">›</span>
+        <span class="current-page">Despeje de linea</span>
+    </nav>
+
+
+    <h1 class="page-title-sub"><i class="fas fa-broom"></i> {{ subseccion }}</h1>
+    <p class="mb-5 text-secondary">Complete este formulario para registrar un despeje de línea.</p>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <div class="custom-form-container">
+
+        <form id="despejeLineaForm" method="POST" action="{{ url_for('despeje_linea.despeje_linea_form', origen=proceso_origen) }}">
+            <fieldset>
+                <legend>Datos del Despeje</legend>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="fecha" class="form-label">Fecha:</label>
+                            <input type="text" class="form-control" name="fecha" id="fecha" value="{{ fecha_actual }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="proceso_form" class="form-label">Proceso de Origen:<span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" name="proceso_form" id="proceso_form" 
+                                value="{{ proceso_origen|capitalize }}" readonly required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="id_empleado" class="form-label">ID Operario:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="5" class="form-control" id="id_empleado" name="id_empleado"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                onchange="consultarEmpleadoPorID()" 
+                                value="{{ form_data.id_empleado if form_data.id_empleado is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="nombre_empleado" class="form-label">Nombre Operario:</label>
+                            <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado" 
+                                value="{{ form_data.nombre_empleado if form_data.nombre_empleado is not none else '' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="trabajo" class="form-label">Número de Trabajo:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="8" pattern="^[A-Za-z0-9]{1,8}$"
+                                class="form-control" id="trabajo" name="trabajo"
+                                oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'');"
+                                onchange="consultarDatosTrabajo()" 
+                                value="{{ form_data.trabajo if form_data.trabajo is not none else '' }}" required>
+                        </div>
+                    </div> 
+                    
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="parte" class="form-label">Parte del Trabajo:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="7" class="form-control" name="parte" id="parte" readonly 
+                                value="{{ form_data.parte if form_data.parte is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    {# Nuevo campo: Tipo de Despeje #}
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="tipo_despeje" class="form-label">Tipo de Despeje:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="tipo_despeje" name="tipo_despeje" required>
+                                <option value="">Seleccione el tipo de despeje</option>
+                                <option value="Apertura de línea" {% if form_data.tipo_despeje == 'Apertura de línea' %}selected{% endif %}>Apertura de línea</option>
+                                <option value="Cambio de Trabajo" {% if form_data.tipo_despeje == 'Cambio de Trabajo' %}selected{% endif %}>Cambio de Trabajo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Aspectos a Revisar</legend>
+                <div class="row">
+                    {# Definimos los aspectos a revisar #}
+                    {% set aspectos = [
+                        ('prod_anterior_estibado', 'Producto anterior estibado, paletizado e identificado correctamente.'), 
+                        ('unidades_ausentes', 'Unidades del producto anterior ausentes de la línea.'), 
+                        ('materia_prima_ausente', 'Materias primas e insumos del producto anterior ausentes de la línea.'),
+                        ('orden_entregada_coordinador', 'Orden de producción anterior entregada al Coordinador de Producción.'),
+                        ('area_limpia_ordenada', 'Se encuentra limpia y ordenada el área de trabajo, maquinaria y superficies. (Puntos a revisar).'),
+                        ('nuevo_material_etiquetado', 'Nuevo material o materia prima etiquetada y coincide con la orden de trabajo.'),
+                        ('documentacion_requerida', 'Se encuentra en el area la documentación requerida para iniciar proceso (orden de Confirmación de línea despejada).')
+                    ] %}
+
+                    {% for campo_base, label_aspecto in aspectos %}
+                    <div class="col-md-12">
+                        <div class="form-question-card aspect-question-card">
+                            <p class="aspect-label">{{ loop.index }}. {{ label_aspecto }}<span class="required-asterisk">*</span></p>
+                            <div class="response-buttons-group" id="{{ campo_base }}_snna_group"> 
+                                <label class="response-button">
+                                    <input type="radio" name="{{ campo_base }}" value="SI" 
+                                    {% if form_data[campo_base] == 'SI' %}checked{% endif %} required 
+                                    onchange="window.toggleObservation('{{ campo_base }}', this.value)">
+                                    <span>SI</span>
+                                </label>
+                                <label class="response-button">
+                                    <input type="radio" name="{{ campo_base }}" value="NO" 
+                                    {% if form_data[campo_base] == 'NO' %}checked{% endif %} required 
+                                    onchange="window.toggleObservation('{{ campo_base }}', this.value)">
+                                    <span>NO</span>
+                                </label>
+                                <label class="response-button">
+                                    <input type="radio" name="{{ campo_base }}" value="N/A" 
+                                    {% if form_data[campo_base] == 'N/A' %}checked{% endif %} required 
+                                    onchange="window.toggleObservation('{{ campo_base }}', this.value)">
+                                    <span>N/A</span>
+                                </label>
+                            </div>
+                            <div id="{{ campo_base }}_observaciones_container" class="observation-input-container"> 
+                                <textarea name="{{ campo_base }}_observaciones" placeholder="Observaciones para este aspecto (obligatorio si NO)" 
+                                    rows="1">{{ form_data[campo_base + '_observaciones'] if form_data[campo_base + '_observaciones'] is not none else '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Autorización y Observaciones Finales</legend>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-question-card carnet-input-container"> 
+                            <label for="autorizado_por_carnet" class="form-label">ID Carnet Autorizador:<span class="required-asterisk">*</span></label>
+                            {# Campo de carnet: type="password" y oninput para solo números. onkeyup para el escaneo #}
+                            <input type="password" maxlength="10" class="form-control" id="autorizado_por_carnet" name="autorizado_por_carnet" 
+                                placeholder="Escanee el carnet aquí"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');" {# Limita a solo números #}
+                                onkeyup="handleCarnetScan(event)" {# Nuevo: Dispara la función de detección de escáner #}
+                                value="{{ form_data.autorizado_por_carnet if form_data.autorizado_por_carnet is not none else '' }}" required
+                                autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="nombre_autorizado" class="form-label">Nombre Autorizador:</label>
+                            <input type="text" class="form-control" id="nombre_autorizado" name="nombre_autorizado" 
+                                value="{{ form_data.nombre_autorizado if form_data.nombre_autorizado is not none else '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="cargo_autorizado" class="form-label">Cargo Autorizador:<span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="cargo_autorizado" name="cargo_autorizado" 
+                                value="{{ form_data.cargo_autorizado if form_data.cargo_autorizado is not none else '' }}" readonly required>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-question-card">
+                            <label for="observaciones" class="form-label">Observaciones Generales (Opcional):</label>
+                            <textarea class="form-control" id="observaciones" name="observaciones" rows="3">{{ form_data.observaciones if form_data.observaciones is not none else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            
+            <button type="submit" class="btn-submit">Registrar Despeje</button>
+        </form>
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_volver }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Volver a {{ nombre_proceso }}
+        </a>
+    </div>
+{% endblock %}
+
+{% block process_page_scripts %}
+<script id="form-data-json" type="application/json">
+    {{ form_data | tojson | safe }}
+</script>
+
+<script>
+    const formDataSourceElement = document.getElementById('form-data-json');
+    const currentFormData = formDataSourceElement ? JSON.parse(formDataSourceElement.textContent) : {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('despejeLineaForm');
+        const notify = document.getElementById('notification-container');
+        const carnetInput = document.getElementById('autorizado_por_carnet');
+        
+        // --- Variables para la detección de escáner ---
+        let carnetScanBuffer = ''; // Acumula caracteres del carnet
+        let scanTimer; // Temporizador para detectar "silencio"
+        const SCAN_TIMEOUT_MS = 150; // milisegundos: tiempo de inactividad para considerar que el escaneo terminó
+
+        if (!form || !notify || !carnetInput) return;
+
+        // --- Lógica del campo Carnet (Detección de escáner y búsqueda automática por "tap") ---
+
+        // Evento keyup: Dispara la lógica cuando la tecla se suelta
+        carnetInput.addEventListener('keyup', function(e) {
+            // Limpiar cualquier temporizador pendiente
+            clearTimeout(scanTimer);
+
+            // Permitir Backspace y Delete para borrar caracteres
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                // El navegador ya maneja la eliminación de caracteres.
+                // Aquí, simplemente aseguramos que el buffer refleje el valor actual del input.
+                carnetScanBuffer = this.value;
+                return; // No disparamos búsqueda al borrar
+            }
+
+            // Si es la tecla Enter, disparamos la búsqueda inmediatamente
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Evitar submit del formulario si no es el botón de submit
+                if (this.value.length > 0) {
+                    // El valor final del carnet ya está en this.value debido al evento input/oninput
+                    window.consultarAutorizadorPorCarnet();
+                    // Opcional: limpiar el campo carnetInput para el siguiente escaneo
+                    // carnetInput.value = ''; 
+                }
+                carnetScanBuffer = ''; // Limpiar buffer después de la lectura completa (Enter)
+                return;
+            }
+
+            // Si es un dígito, o cualquier otro carácter que el oninput ya filtró,
+            // actualizamos el buffer con el valor actual del campo.
+            // oninput="this.value=this.value.replace(/[^0-9]/g,'');" ya limpia non-numéricos
+            carnetScanBuffer = this.value; 
+
+            // Si no fue Enter, iniciar un temporizador. Si expira, la lectura ha terminado.
+            scanTimer = setTimeout(() => {
+                if (carnetScanBuffer.length > 0) {
+                    window.consultarAutorizadorPorCarnet(); // Disparar la búsqueda
+                    // Opcional: limpiar el campo carnetInput para el siguiente escaneo
+                    // carnetInput.value = ''; 
+                }
+                carnetScanBuffer = ''; // Limpiar buffer después de un 'silencio' (fin de escaneo sin Enter)
+            }, SCAN_TIMEOUT_MS);
+        });
+
+        // Asegurarse de que el input de carnet tenga el foco al cargar la página si está vacío
+        // Eliminamos esta línea para que no desplace el foco. Dejamos que el usuario o el navegador decida.
+        // carnetInput.focus(); 
+
+
+        // --- Funciones auxiliares globales ---
+
+        window.toggleObservation = function(aspectoBase, selectedValue) {
+            const container = document.getElementById(aspectoBase + '_observaciones_container');
+            const textarea = container ? container.querySelector('textarea') : null;
+            
+            if (container && textarea) {
+                if (selectedValue === 'NO') {
+                    container.style.display = 'block';
+                    textarea.required = true; 
+                } else {
+                    container.style.display = 'none';
+                    textarea.value = ''; 
+                    textarea.required = false;
+                }
+            }
+        };
+
+        window.consultarAutorizadorPorCarnet = async function() {
+            const carnetId = carnetInput.value; 
+            const nombreAutorizadorInput = document.getElementById("nombre_autorizado");
+            const cargoAutorizadorInput = document.getElementById("cargo_autorizado");
+
+            if (!carnetId) {
+                nombreAutorizadorInput.value = "";
+                cargoAutorizadorInput.value = "";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/shared/api/carnet/${carnetId}`);
+                const data = await response.json();
+
+                if (data && data.success) {
+                    nombreAutorizadorInput.value = data.nombre || 'No encontrado';
+                    cargoAutorizadorInput.value = data.area || 'No encontrado';
+                } else {
+                    nombreAutorizadorInput.value = data.error || 'No encontrado'; 
+                    cargoAutorizadorInput.value = data.error || 'No encontrado';
+                }
+            } catch (error) {
+                console.error("Error al consultar el carnet:", error);
+                nombreAutorizadorInput.value = "Error en la consulta";
+                cargoAutorizadorInput.value = "Error en la consulta";
+            }
+        };
+
+
+        window.consultarDatosTrabajo = async function() {
+            const trabajoInput = document.getElementById("trabajo");
+            const trabajo = trabajoInput.value;
+            const parteInput = document.getElementById("parte");
+
+            if (!trabajo) {
+                parteInput.value = "";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/shared/api/trabajo/${trabajo}`); 
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Error desconocido al consultar trabajo.");
+                }
+
+                parteInput.value = data.parte || "";
+
+            } catch (error) {
+                console.error("Error al consultar el trabajo:", error);
+                alert(`Error al consultar el trabajo: ${error.message || 'No se encontró el trabajo o hubo un problema de conexión.'}`);
+                parteInput.value = "";
+            }
+        };
+
+        window.consultarEmpleadoPorID = async function() { 
+            const idInput = document.getElementById("id_empleado");
+            const id = idInput.value;
+            const nombreEmpleadoInput = document.getElementById("nombre_empleado");
+
+            if (!id) {
+                nombreEmpleadoInput.value = "";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/shared/api/empleado?id=${id}`);
+                const data = await response.json(); 
+
+                if (data && data.success) {
+                    nombreEmpleadoInput.value = data.nombre || 'No encontrado';
+                } else {
+                    nombreEmpleadoInput.value = data.nombre || 'No encontrado'; 
+                }
+            } catch (error) {
+                console.error("Error al consultar el empleado:", error);
+                nombreEmpleadoInput.value = "Error en la consulta";
+            }
+        };
+
+        function showNotification(response) {
+            notify.innerHTML = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${response.category} alert-dismissible fade show`;
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.style.pointerEvents = "auto"; // Asegura que los botones cierren el banner
+
+            let icon = '';
+            if (response.category === 'success') {
+                icon = '<i class="fas fa-check-circle me-2"></i>';
+            } else if (response.category === 'danger') {
+                icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+            } else if (response.category === 'warning') {
+                icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+            } else {
+                icon = '<i class="fas fa-info-circle me-2"></i>';
+            }
+
+            let messageDetails = '';
+            if (response.details) {
+                messageDetails = `<div class="small mt-1">${response.details}</div>`;
+            }
+
+            alertDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    ${icon}
+                    <div>
+                        <strong>${response.message}</strong>
+                        ${messageDetails}
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="pointer-events:auto"></button>
+            `;
+            notify.appendChild(alertDiv);
+
+            // Hacer scroll al top para que el usuario vea la notificación
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Autocierre después de 8s
+            if (['success', 'warning'].includes(response.category)) {
+                setTimeout(() => {
+                    if (alertDiv && alertDiv.parentNode) {
+                        alertDiv.classList.remove('show');
+                        alertDiv.addEventListener('transitionend', () => {
+                            alertDiv.remove();
+                        });
+                    }
+                }, 8000);
+            }
+        }
+
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            e.stopImmediatePropagation();
+
+            const btn = form.querySelector('button[type="submit"]');
+            const origText = btn.innerHTML; 
+            btn.disabled = true; 
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Enviando...`; 
+
+            const payload = {};
+            new FormData(form).forEach((value, key) => {
+                payload[key] = value;
+            });
+
+            console.log('▶️ JSON preparado para el envío:', payload); 
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' 
+                    },
+                    body: JSON.stringify(payload) 
+                });
+                const result = await res.json(); 
+                showNotification(result); 
+
+                if (res.ok && result.success) {
+                    form.reset(); 
+                    document.getElementById('nombre_empleado').value = "";
+                    document.getElementById('parte').value = "";
+                    document.getElementById('proceso_form').value = "{{ proceso_origen|capitalize }}"; 
+                    document.getElementById('nombre_autorizado').value = ""; 
+                    document.getElementById('cargo_autorizado').value = ""; 
+                    carnetInput.value = ""; // Limpiar el campo carnet al éxito
+                    carnetInput.focus(); // Enfocar para el siguiente escaneo
+                    
+                    document.querySelectorAll('.response-buttons-group input[type="radio"]').forEach(radio => {
+                        radio.checked = false;
+                    });
+                    document.querySelectorAll('.observation-input-container').forEach(container => {
+                        container.style.display = 'none';
+                        container.querySelector('textarea').value = '';
+                        container.querySelector('textarea').required = false;
+                    });
+
+                } else {
+                    if (result.form_data) {
+                        for (const key in result.form_data) {
+                            const input = document.getElementById(key); 
+                            if (input) {
+                                input.value = result.form_data[key];
+                            } else {
+                                const radio = document.querySelector(`input[name="${key}"][value="${result.form_data[key]}"]`);
+                                if (radio) {
+                                    radio.checked = true;
+                                    if (radio.value === 'NO') {
+                                        window.toggleObservation(key, 'NO');
+                                    } else {
+                                        window.toggleObservation(key, radio.value);
+                                    }
+                                }
+                                const obsTextarea = document.querySelector(`textarea[name="${key}_observaciones"]`);
+                                if (obsTextarea && result.form_data[key + '_observaciones']) {
+                                    obsTextarea.value = result.form_data[key + '_observaciones'];
+                                }
+                            }
+                        }
+                        if (document.getElementById('id_empleado').value) await consultarEmpleadoPorID();
+                        if (document.getElementById('trabajo').value) await consultarDatosTrabajo();
+                        if (document.getElementById('autorizado_por_carnet').value) {
+                             consultarAutorizadorPorCarnet();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('AJAX error:', err);
+                showNotification({
+                    category: 'danger',
+                    message: 'Error de red o servidor.',
+                    details: 'Por favor, verifica tu conexión a internet e inténtalo de nuevo.'
+                });
+            } finally {
+                btn.disabled = false; 
+                btn.innerHTML = origText; 
+            }
+        });
+
+        form.addEventListener('keydown', function(e) {
+            // Evitar que la tecla Enter envíe el formulario si el foco está en un input.
+            // Para carnet, onchange ya se dispara con Enter, y no queremos submit.
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'submit') {
+                e.preventDefault();
+            }
+        });
+
+        document.querySelectorAll('input[inputmode="numeric"], input[inputmode="decimal"]').forEach(input => {
+            input.addEventListener('wheel', e => e.preventDefault());
+        });
+
+        // --- Lógica de inicialización al cargar la página ---
+        if (document.getElementById('id_empleado').value) consultarEmpleadoPorID();
+        if (document.getElementById('trabajo').value) consultarDatosTrabajo();
+        
+        // Inicializar para el campo de carnet: Cargar el valor real si existe y consultar.
+        if (currentFormData.autorizado_por_carnet) { 
+            carnetInput.value = currentFormData.autorizado_por_carnet;
+            consultarAutorizadorPorCarnet(); 
+        } 
+        // No enfocar automáticamente el carnetInput si ya hay un valor.
+        // Si no hay valor, lo enfocará por defecto al cargar.
+        
+        const aspectosDefinidos = [
+            'prod_anterior_estibado', 'unidades_ausentes', 'materia_prima_ausente',
+            'orden_entregada_coordinador', 'area_limpia_ordenada',
+            'nuevo_material_etiquetado', 'documentacion_requerida'
+        ];
+
+        aspectosDefinidos.forEach(campoBase => {
+            if (currentFormData[campoBase]) { 
+                const radio = document.querySelector(`input[name="${campoBase}"][value="${currentFormData[campoBase]}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    window.toggleObservation(campoBase, currentFormData[campoBase]);
+                }
+            }
+            if (currentFormData[campoBase + '_observaciones']) { 
+                const obsTextarea = document.querySelector(`textarea[name="${campoBase}_observaciones"]`);
+                if (obsTextarea) {
+                    obsTextarea.value = currentFormData[campoBase + '_observaciones'];
+                }
+            }
+
+            document.querySelectorAll(`input[name="${campoBase}"]`).forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    window.toggleObservation(campoBase, event.target.value);
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

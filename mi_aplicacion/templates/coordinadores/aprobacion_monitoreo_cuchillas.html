@@ -1,0 +1,261 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}{{ nombre_proceso }} - {{ subseccion }}{% endblock %}
+
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aprobacion_cuchillas_table_styles.css') }}">
+{% endblock %}
+
+{% block process_page_content %}
+    {# BREADCRUMB - COMO ELEMENTO DE NAVEGACIÓN #}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
+        <a href="{{ url_for('coordinadores.coordinadores_dashboard') }}">
+             Coordinadores de Verificación
+        </a>
+        <span class="separator">›</span>
+        <span class="current-page">Aprobación Cuchillas</span>
+    </nav>
+
+    {# CONTENEDOR SOLO PARA EL FILTRO #}
+    <div class="filter-section-container fade-in-up">
+        <div class="filter-section">
+            <label for="procesoFilter">Filtrar por Proceso:</label>
+            <select id="procesoFilter" class="form-control form-control-sm">
+                <option value="">Todos los Procesos</option>
+                {% set unique_procesos = [] %}
+                {% for item in data %}
+                    {% if item.proceso not in unique_procesos %}
+                        {% set _ = unique_procesos.append(item.proceso) %}
+                        <option value="{{ item.proceso }}">{{ item.proceso }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    {# TABLA DE DATOS #}
+    <div class="aprobacion-table-wrapper fade-in-up">
+        <table class="aprobacion-table table-bordered table-striped" id="aprobacionTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Proceso</th>
+                    <th>Máquina</th>
+                    <th>Operario</th>
+                    <th>Minora Cant.</th>
+                    <th>Acerada Cant.</th>
+                    <th>Cumple</th>
+                    <th>Oxidación</th>
+                    <th>Pérdida</th>
+                    <th>Fractura</th>
+                    <th>Quien Recibe</th>
+                    <th>Cant. Verificada</th>
+                    <th>Verificación</th>
+                    <th>Responsable Verificación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data %}
+                <tr data-proceso="{{ item.proceso }}">
+                    <td>{{ item.id_monitoreo }}</td>
+                    <td>{{ item.fecha }}</td>
+                    <td>{{ item.proceso }}</td>
+                    <td>{{ item.maquina }}</td>
+                    <td>{{ item.id_operario }} - {{ item.nombre_operario }}</td>
+                    <td>{{ item.minora_cantidad }}</td>
+                    <td>{{ item.acerada_cantidad }}</td>
+                    <td>{{ item.estado_cuchilla_cumple_cantidad }}</td>
+                    <td>{{ item.estado_cuchilla_oxidacion_cantidad }}</td>
+                    <td>{{ item.estado_cuchilla_perdida_cantidad }}</td>
+                    <td>{{ item.estado_cuchilla_fractura_cantidad }}</td>
+                    <td>{{ item.id_quien_recibe }} - {{ item.nombre_quien_recibe }}</td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" name="cantidad_verificada_{{ item.id_monitoreo }}" value="{{ item.cantidad_verificada if item.cantidad_verificada is not none else '' }}">
+                    </td>
+                    <td>
+                        <select class="form-control form-control-sm" name="verificacion_{{ item.id_monitoreo }}">
+                            <option value="">Seleccionar</option>
+                            <option value="Aprobado" {% if item.verificacion == 'Aprobado' %}selected{% endif %}>Aprobado</option>
+                            <option value="Rechazado" {% if item.verificacion == 'Rechazado' %}selected{% endif %}>Rechazado</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm" name="responsable_verificacion_{{ item.id_monitoreo }}" value="{{ nombre_coordinador }}" readonly>
+                        <input type="hidden" name="id_responsable_verificacion_{{ item.id_monitoreo }}" value="{{ id_coordinador }}">
+                        <input type="hidden" name="nombre_responsable_verificacion_{{ item.id_monitoreo }}" value="{{ nombre_coordinador }}">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm aprobar-btn" data-id="{{ item.id_monitoreo }}">Aprobar</button>
+                    </td>
+                </tr>
+                {% else %}
+                {# Este mensaje se mostrará si 'data' está vacío al cargar la página #}
+                <tr class="initial-no-records-row">
+                    <td colspan="16" class="no-records-message">No hay registros de monitoreo de cuchillas pendientes de aprobación.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block process_page_scripts %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const idCoordinador = "{{ id_coordinador }}";
+        const nombreCoordinador = "{{ nombre_coordinador }}";
+
+        console.log("DOMContentLoaded cargado.");
+        console.log("ID Coordinador:", idCoordinador);
+        console.log("Nombre Coordinador:", nombreCoordinador);
+
+        document.querySelectorAll('input[name^="responsable_verificacion_"]').forEach(input => {
+            input.value = nombreCoordinador; // Solo mostrar el nombre
+        });
+        document.querySelectorAll('input[name^="id_responsable_verificacion_"]').forEach(input => {
+            input.value = idCoordinador;
+        });
+        document.querySelectorAll('input[name^="nombre_responsable_verificacion_"]').forEach(input => {
+            input.value = nombreCoordinador;
+        });
+
+        document.querySelectorAll('.aprobar-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.dataset.id;
+                const row = this.closest('tr');
+                const cantidadVerificadaInput = row.querySelector(`input[name="cantidad_verificada_${itemId}"]`);
+                const verificacionSelect = row.querySelector(`select[name="verificacion_${itemId}"]`);
+
+                const cantidadVerificada = cantidadVerificadaInput.value;
+                const verificacion = verificacionSelect.value;
+
+                const idResponsableVerificacion = row.querySelector(`input[name="id_responsable_verificacion_${itemId}"]`).value;
+                const nombreResponsableVerificacion = row.querySelector(`input[name="nombre_responsable_verificacion_${itemId}"]`).value;
+
+                console.log(`Intentando aprobar ID: ${itemId}`);
+                console.log(`Cantidad Verificada: ${cantidadVerificada}, Verificación: ${verificacion}`);
+                console.log(`Responsable: ${nombreResponsableVerificacion}`);
+
+                if (!cantidadVerificada || cantidadVerificada.trim() === '' || isNaN(cantidadVerificada)) {
+                    alert('Por favor, ingrese una Cantidad Verificada numérica válida.');
+                    return;
+                }
+                if (!verificacion || verificacion === "") {
+                    alert('Por favor, seleccione una opción de Verificación.');
+                    return;
+                }
+
+                const payload = {
+                    id: itemId,
+                    cantidad_verificada: cantidadVerificada,
+                    verificacion: verificacion,
+                    responsable_verificacion: nombreResponsableVerificacion 
+                };
+
+                fetch('/coordinadores/validar_monitoreo_cuchillas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => {
+                    // Verificar si la respuesta fue una redirección HTTP.
+                    // Si Flask redirige con un flash, response.redirected será true.
+                    if (response.redirected) {
+                        window.location.href = response.url; // Sigue la redirección para cargar la página con el flash
+                        return; // Detiene el procesamiento posterior
+                    }
+                    // Si no fue una redirección, intentamos parsear el JSON (podría ser un error del servidor que no redirigió)
+                    return response.json();
+                })
+                .then(data => {
+                    // Este .then() solo se ejecutará si la respuesta NO fue una redirección HTTP.
+                    // Esto significa que hubo un error y el backend devolvió un JSON de error.
+                    if (data && !data.success) {
+                        alert('Error al registrar la aprobación: ' + (data.message || 'Error desconocido.'));
+                    } else if (data && data.success) {
+                        // En un caso ideal, esto no debería ejecutarse si hay redirección,
+                        // pero es un fallback por si la redirección no se detecta correctamente
+                        // o el backend se comporta de forma inesperada.
+                        console.warn("Backend retornó JSON de éxito sin redirección esperada. Recargando página.");
+                        window.location.reload(); 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la solicitud Fetch:', error);
+                    alert('Ocurrió un error de red o interno al intentar aprobar.');
+                });
+            });
+        });
+
+        const procesoFilter = document.getElementById('procesoFilter');
+        const aprobacionTableBody = document.querySelector('#aprobacionTable tbody');
+
+        function filterTableByProceso() {
+            console.log("--- filterTableByProceso() llamada ---");
+            const selectedProceso = procesoFilter.value;
+            console.log("Filtro aplicado. Proceso seleccionado:", selectedProceso);
+            let rowsVisibleCount = 0;
+
+            document.querySelectorAll('.no-records-message').forEach(el => el.remove());
+            console.log("Mensajes de 'no-records-message' previos eliminados.");
+
+            const currentDataRows = Array.from(aprobacionTableBody.querySelectorAll('tr[data-proceso]'));
+            console.log("Número de filas de datos actuales en el DOM:", currentDataRows.length);
+
+            if (currentDataRows.length === 0 && selectedProceso === '') {
+                console.log("No hay filas de datos para filtrar.");
+            } else {
+                currentDataRows.forEach(row => {
+                    const rowProceso = row.dataset.proceso;
+                    console.log(`Evaluando fila. data-proceso: "${rowProceso}", filtro: "${selectedProceso}"`);
+                    if (selectedProceso === '' || rowProceso === selectedProceso) {
+                        row.style.display = 'table-row';
+                        rowsVisibleCount++;
+                        console.log(`    -> Mostrando fila para proceso: ${rowProceso}`);
+                    } else {
+                        row.style.display = 'none';
+                        console.log(`    -> Ocultando fila para proceso: ${rowProceso}`);
+                    }
+                });
+            }
+
+            console.log("Filas visibles después del filtrado:", rowsVisibleCount);
+
+            if (rowsVisibleCount === 0) {
+                const noMessageRow = document.createElement('tr');
+                const messageCell = document.createElement('td');
+                messageCell.colSpan = 16;
+                messageCell.classList.add('no-records-message');
+
+                if (currentDataRows.length === 0) {
+                    messageCell.textContent = 'No hay registros de monitoreo de cuchillas pendientes de aprobación.';
+                    console.log("Mostrando mensaje: 'No hay registros de monitoreo de cuchillas pendientes de aprobación.'");
+                } else {
+                    messageCell.textContent = 'No hay registros que coincidan con el filtro.';
+                    console.log("Mostrando mensaje: 'No hay registros que coincidan con el filtro.'");
+                }
+                noMessageRow.appendChild(messageCell);
+                aprobacionTableBody.appendChild(noMessageRow);
+            }
+        }
+
+        // Llamar a la función de filtrado al cargar la página
+        filterTableByProceso();
+
+        // Adjuntar el event listener para el filtro
+        procesoFilter.addEventListener('change', filterTableByProceso);
+    });
+</script>
+{% endblock %}

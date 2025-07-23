@@ -1,151 +1,57 @@
-    {% extends "layouts/process_base.html" %}
+{% extends "layouts/process_base.html" %}
 
 {% block process_title %}{{ nombre_proceso }}{% endblock %}
 
 {% block process_head_css %}
-<style>
-    .page-title {
-        font-size: 2em;
-        color: #2C3E50;
-        margin-bottom: 10px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e0e0e0;
-        display: flex;
-        align-items: center;
-    }
-    .page-title i.fa-box-open { /* Ícono específico para Sellado */
-        margin-right: 15px;
-        color: #2ECC71; /* Color del ícono de Sellado (verde) */
-    }
-
-    .breadcrumb-nav {
-        margin-bottom: 25px;
-        font-size: 0.9em;
-        padding: 8px 0;
-    }
-    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
-    .breadcrumb-nav a:hover { text-decoration: underline; }
-    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
-    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
-
-    .options-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    .option-card {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        text-decoration: none;
-        color: inherit;
-        border-left: 5px solid #2ECC71; /* Color del proceso Sellado */
-    }
-    .option-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-    .option-card .icon-container {
-        font-size: 2.5em;
-        margin-bottom: 15px;
-        color: #2ECC71; /* Color del proceso Sellado */
-    }
-    .option-card h3 {
-        font-size: 1.2em;
-        margin-top: 0;
-        margin-bottom: 8px;
-        color: #2C3E50;
-    }
-    .option-card p {
-        font-size: 0.85em;
-        color: #555;
-        line-height: 1.4;
-        margin-bottom: 15px;
-        flex-grow: 1;
-    }
-    .option-card .btn-access-option {
-        display: inline-block;
-        background-color: #5D6D7E;
-        color: white;
-        padding: 8px 20px;
-        border-radius: 18px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9em;
-        transition: background-color 0.2s ease;
-        margin-top: auto;
-    }
-    .option-card .btn-access-option:hover {
-        background-color: #4A5568;
-    }
-
-    .main-back-button-container {
-        margin-top: 30px;
-        padding-top: 25px;
-        border-top: 1px solid #e9ecef;
-        text-align: center;
-    }
-    .btn-main-back {
-        display: inline-flex;
-        align-items: center;
-        background-color: #18BC9C; /* Mantenemos el botón de volver general con el acento verde azulado */
-        color: white;
-        padding: 12px 28px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 1em;
-        transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.07);
-    }
-    .btn-main-back i { margin-right: 10px; }
-    .btn-main-back:hover {
-        background-color: #15A589;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transform: translateY(-2px);
-    }
-    .btn-main-back:active {
-        transform: translateY(0px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.07);
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
 {% endblock %}
 
 {% block process_page_content %}
-    <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a>
-        <span class="separator">&raquo;</span>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
         <span class="current-page">{{ nombre_proceso }}</span>
     </nav>
 
-    <h1 class="page-title"><i class="fas fa-box-open"></i>Proceso de {{ nombre_proceso }}</h1>
-    <p style="margin-bottom: 30px; font-size: 1.05em;">Selecciona una opción para ver la documentación o formularios correspondientes.</p>
-
-    <div class="options-grid">
-        {% for opcion in opciones %}
-        <a href="{{ opcion.url }}" class="option-card">
+    <div class="page-header fade-in-up">
+        <h1 class="page-title">
+            <i class="fas fa-layer-group"></i>
             <div>
-                <div class="icon-container"><i class="{{ opcion.icono }}"></i></div>
-                <h3>{{ opcion.nombre }}</h3>
-                <p>{{ opcion.descripcion }}</p>
+                <div>{{ nombre_proceso }}</div>
+                <div class="page-subtitle">Gestión y documentación del proceso productivo</div>
             </div>
-            <span class="btn-access-option">Acceder</span>
-        </a>
-        {% endfor %}
+        </h1>
+    </div>
+    <div class="options-section">
+        <h2 class="section-title">
+            Opciones Disponibles
+        </h2>
+        
+        <div class="options-grid">
+            {% for opcion in opciones %}
+            <a href="{{ opcion.url }}" class="option-card">
+                <div class="option-header">
+                    <div class="icon-container">
+                        <i class="{{ opcion.icono }}"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>{{ opcion.nombre }}</h3>
+                        <div class="option-status">
+                            <span class="status-dot"></span>
+                            Disponible
+                        </div>
+                    </div>
+                </div>
+                <p>{{ opcion.descripcion }}</p>
+                <span class="btn-access-option">Acceder</span>
+            </a>
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="main-back-button-container">
-        <a href="{{ url_for('main.home') }}" class="btn-main-back">
-            <i class="fas fa-arrow-left"></i> Volver al Inicio (Procesos)
-        </a>
-    </div>
+
 {% endblock %}

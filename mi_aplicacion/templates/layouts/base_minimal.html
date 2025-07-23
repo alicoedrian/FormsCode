@@ -4,24 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Planta Plásticos{% endblock %}</title>
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
-    
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
+    <!-- Tu CSS global -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    {% block head_css %}{% endblock %} {# Bloque para CSS específico de páginas hijas #}
+    {% block head_css %}{% endblock %}
+
+    <style>
+    /* ========== BANNER DE NOTIFICACIONES ========== */
+    #notification-banner {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      z-index: 2000;
+      min-width: 280px;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      pointer-events: none;
+    }
+    .notification-banner-item {
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+      padding: 18px 28px 18px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      background: #43a047;
+      opacity: 0.96;
+      pointer-events: all;
+      animation: slideInLeft 0.8s cubic-bezier(.62,-0.32,.42,1.28);
+      transition: opacity 0.5s;
+      border-left: 7px solid #2e7d32;
+    }
+    .banner-success {
+      background: #43a047;
+      border-left-color: #1b5e20;
+    }
+    .banner-danger {
+      background: #d32f2f;
+      border-left-color: #7f1717;
+    }
+    .banner-info {
+      background: #0288d1;
+      border-left-color: #01579b;
+    }
+    .banner-warning {
+      background: #ffa726;
+      color: #594006;
+      border-left-color: #b26a00;
+    }
+    @keyframes slideInLeft {
+      0% { transform: translateX(-60px); opacity: 0;}
+      80% { transform: translateX(6px); opacity: 1;}
+      100% { transform: translateX(0); opacity: 1;}
+    }
+    /* ===================== */
+    </style>
 </head>
 <body>
-    {# El contenido del body se define en plantillas hijas #}
-    {% block body_content %}{% endblock %} 
+    {# Banner NOTIFICATIONS para toda la app #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="notification-banner">
+          {% for category, message in messages %}
+            <div class="notification-banner-item banner-{{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-    {# Scripts JavaScript #}
+    {% block body_content %}{% endblock %}
+
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    
-    {# <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script> #}
-
-    {% block scripts %}{% endblock %} {# Bloque para scripts específicos de páginas hijas #}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.notification-banner-item').forEach(function(el, idx) {
+        setTimeout(function() {
+          el.style.opacity = '0';
+          setTimeout(function(){ el.remove(); }, 600);
+        }, 4000 + idx*700);
+      });
+    });
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,53 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}{{ nombre_proceso }}{% endblock %}
+
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
+        <span class="current-page">{{ nombre_proceso }}</span>
+    </nav>
+
+    <div class="page-header fade-in-up">
+        <h1 class="page-title">
+            <i class="fas fa-cogs"></i>
+            <div>
+                <div>{{ nombre_proceso }}</div>
+                <div class="page-subtitle">Panel de control y herramientas para coordinadores</div>
+            </div>
+        </h1>
+    </div>
+
+    <div class="options-section">
+        
+        <div class="options-grid">
+            {% for opcion in opciones %}
+            <a href="{{ opcion.url }}" class="option-card">
+                <div class="option-header">
+                    <div class="icon-container">
+                        <i class="{{ opcion.icono }}"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>{{ opcion.nombre }}</h3>
+                        <div class="option-status">
+                            <span class="status-dot"></span>
+                            Disponible
+                        </div>
+                    </div>
+                </div>
+                <p>{{ opcion.descripcion }}</p>
+                <span class="btn-access-option">Acceder</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

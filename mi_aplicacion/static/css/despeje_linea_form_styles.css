@@ -1,0 +1,1583 @@
+/* Variables CSS (Consistente con los otros formularios) */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --dark: #0f172a;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --white: #ffffff;
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Estilos generales del body */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--gray-800);
+    line-height: 1.6;
+}
+
+/* Animaciones (reutilizadas de otros formularios) */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutSlideLeft {
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+/* Page Header (Consistente con otros page-title-X) */
+.page-title-se30-se47-despeje { /* Nombre específico para evitar conflictos */
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.page-title-se30-se47-despeje::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--secondary), var(--primary)); 
+}
+
+.page-title-se30-se47-despeje {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    line-height: 1.2;
+}
+
+.page-title-se30-se47-despeje i.fas.fa-broom { /* Mantenemos el icono de escoba */
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary)); 
+    color: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.page-description { /* Descripción debajo del título, consistente */
+    font-size: 1.125rem;
+    color: var(--gray-600);
+    margin: 1.5rem 0;
+    text-align: center;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* Breadcrumb Navigation (estilo consistente) */
+.breadcrumb-nav {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.breadcrumb-nav a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.breadcrumb-nav a:hover {
+    background: var(--gray-100);
+    color: var(--primary-dark);
+}
+
+.breadcrumb-nav .separator {
+    color: var(--gray-400);
+    font-weight: 300;
+}
+
+.breadcrumb-nav .current-page {
+    color: var(--gray-700);
+    font-weight: 600;
+    background: var(--gray-100);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+}
+
+
+/* Contenedor principal del formulario (estilo consistente y compacto) */
+.form-container-se30-se47-despeje { /* Nombre específico */
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem; /* Compacto, igual que Registro Mezcla */
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    position: relative;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.form-container-se30-se47-despeje::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 20px 20px 0 0;
+}
+
+/* Fieldset y Legend como secciones (estilo consistente) */
+.form-container-se30-se47-despeje fieldset {
+    border: none;
+    padding: 0;
+    margin-bottom: 1.5rem; /* Compacto, igual que Registro Mezcla */
+    position: relative;
+}
+
+.form-container-se30-se47-despeje legend {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 1rem; /* Compacto, igual que Registro Mezcla */
+    padding-bottom: 0.5rem; /* Compacto, igual que Registro Mezcla */
+    border-bottom: 2px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.form-container-se30-se47-despeje legend::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+    margin-right: 0.5rem;
+}
+
+/* Estilos para cada tarjeta de pregunta (estilo consistente y compacto) */
+.form-question-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 1.25rem; /* Compacto, igual que Registro Mezcla */
+    margin-bottom: 1rem; /* Compacto, igual que Registro Mezcla */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.form-question-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.form-question-card:hover {
+    background: var(--white);
+    border-color: var(--gray-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.form-question-card:focus-within {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-question-card:focus-within::before {
+    transform: scaleY(1);
+}
+
+/* Estilos de labels y asteriscos (estilo consistente y compacto) */
+.form-label {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 1rem;
+    margin-bottom: 0.5rem; /* Compacto, igual que Registro Mezcla */
+    display: block;
+    line-height: 1.4;
+}
+
+.form-label .required-asterisk {
+    color: var(--danger);
+    margin-left: 0.25rem;
+    font-weight: 700;
+}
+
+/* Estilos de inputs y selects (estilo consistente y compacto) */
+.form-control,
+.form-select,
+.observation-input-container textarea { /* Aseguramos que el textarea también tenga este estilo */
+    width: 100%;
+    padding: 0.75rem 1rem; /* Compacto, igual que Registro Mezcla */
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--white);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    min-height: 44px; /* Compacto, igual que Registro Mezcla */
+}
+
+.form-control:focus,
+.form-select:focus,
+.observation-input-container textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: var(--white);
+}
+
+.form-control:hover,
+.form-select:hover,
+.observation-input-container textarea:hover {
+    border-color: var(--gray-300);
+}
+
+.form-control::placeholder,
+.observation-input-container textarea::placeholder {
+    color: var(--gray-400);
+    font-weight: 400;
+}
+
+/* Estilos para ocultar las flechas de los inputs tipo number y deshabilitar el scroll (consistente) */
+input[type="number"], input[type="text"][inputmode="numeric"] { /* También para inputmode="numeric" */
+    -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button,
+input[type="text"][inputmode="numeric"]::-webkit-outer-spin-button,
+input[type="text"][inputmode="numeric"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"], input[type="text"][inputmode="numeric"] {
+    -ms-overflow-style: none;
+    overflow: hidden;
+}
+
+/* Estilos para el feedback de validación en tiempo real (consistente) */
+.validation-feedback {
+    margin-top: 0.25rem; /* Compacto, igual que Registro Mezcla */
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.validation-feedback.text-success {
+    color: var(--success);
+}
+.validation-feedback.text-danger {
+    color: var(--danger);
+}
+.validation-feedback.text-muted {
+    color: var(--gray-500);
+}
+.validation-feedback.text-muted::before {
+    content: 'ℹ';
+    color: var(--info);
+    font-weight: 600;
+}
+
+
+/* Grid para los campos del formulario (reutilizando estilo y compacto) */
+/* El .row de Bootstrap añade un margen negativo, hay que ajustarlo */
+.form-container-se30-se47-despeje .row {
+    margin-left: -0.5rem; /* Ajustar el margen negativo para que coincida con el gap */
+    margin-right: -0.5rem;
+    gap: 1rem; /* Reducido de 1.5rem, aplicado aquí a la fila */
+}
+
+/* Columna individual dentro de la fila */
+.form-container-se30-se47-despeje .row > [class*="col-"] {
+    padding-left: 0.5rem; /* Ajustar el padding para que coincida con el margen negativo */
+    padding-right: 0.5rem;
+    /* Eliminar el margen inferior que el .col de Bootstrap a veces añade,
+       porque form-question-card ya maneja su propio margin-bottom */
+    margin-bottom: 0;
+}
+
+
+/* Botones (estilo consistente y compacto) */
+.btn-submit {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    margin-top: 1.5rem; /* Compacto, igual que Registro Mezcla */
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.35s both;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #059669, var(--success));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-submit:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-sm);
+    opacity: 0.7;
+}
+
+.btn-submit:disabled::before {
+    display: none;
+}
+
+.back-button-container {
+    margin: 1.5rem auto; /* Compacto, igual que Registro Mezcla */
+    text-align: center;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--gray-700);
+    color: var(--white);
+    padding: 0.875rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-back:hover {
+    background: var(--gray-800);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.btn-back i {
+    font-size: 1rem;
+}
+
+/* Notificaciones flotantes (estilo consistente) */
+.notification-container {
+    position: fixed;
+    top: 100px;
+    right: 2rem;
+    z-index: 1050;
+    width: 400px;
+    max-width: calc(100vw - 4rem);
+}
+
+.alert {
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 16px;
+    font-weight: 500;
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideInRight 0.4s ease-out forwards;
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: currentColor;
+}
+
+.alert-success {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.alert-danger {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-warning {
+    color: var(--warning);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.alert-info {
+    color: var(--info);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.alert .btn-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: currentColor;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.alert .btn-close:hover {:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6; /* Defined --info variable */
+    --dark: #0f172a;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --white: #ffffff;
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Universal box-sizing for consistent layout */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: var(--gray-800);
+    line-height: 1.6;
+}
+
+/* Estilos para ocultar las flechas de los inputs tipo number y deshabilitar el scroll */
+input[type="number"] {
+    -moz-appearance: textfield; /* Para Firefox, oculta flechas y desactiva scroll */
+    /* Para Chrome, Safari, Edge, etc. */
+    /* Oculta las flechas del spinner y desactiva el scroll */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Para deshabilitar el scroll en la mayoría de los navegadores (IE/Edge Legacy y un fallback) */
+    -ms-overflow-style: none; /* Oculta la barra de desplazamiento en IE/Edge */
+    overflow: hidden; /* Evita cualquier scroll inesperado */
+}
+
+/* Estilos para el feedback de validación en tiempo real */
+.validation-feedback {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.validation-feedback.text-success {
+    color: var(--success);
+}
+
+.validation-feedback.text-success::before {
+    content: '✓';
+    font-weight: bold;
+}
+
+.validation-feedback.text-danger {
+    color: var(--danger);
+}
+
+.validation-feedback.text-danger::before {
+    content: '⚠';
+    font-weight: bold;
+}
+
+.validation-feedback.text-muted {
+    color: var(--gray-500);
+}
+
+.validation-feedback.text-muted::before {
+    content: 'ℹ';
+    color: var(--info); /* Use the --info variable */
+    font-weight: 600;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out forwards; /* 'forwards' keeps the final state */
+}
+
+.breadcrumb-nav a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.breadcrumb-nav a:hover {
+    background: var(--gray-100);
+    color: var(--primary-dark);
+}
+
+.breadcrumb-nav .separator {
+    color: var(--gray-400);
+    font-weight: 300;
+}
+
+.breadcrumb-nav .current-page {
+    color: var(--gray-700);
+    font-weight: 600;
+    background: var(--gray-100);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+}
+
+/* Page Header */
+.page-title-empalme {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.1s both; /* 'both' applies styles from first and last keyframe */
+}
+
+.page-title-empalme::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #5D6D7E, #85929e); /* Specific gradient for this header */
+}
+
+.page-title-empalme {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    line-height: 1.2;
+}
+
+.page-title-empalme i.fa-handshake {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #5D6D7E, #85929e); /* Specific gradient for icon */
+    color: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.page-description {
+    font-size: 1.125rem;
+    color: var(--gray-600);
+    margin: 1.5rem 0;
+    text-align: center;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* Messages Container */
+.messages-container {
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.25s both;
+}
+
+.alert {
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    display: flex; /* Added for icon/content alignment */
+    align-items: center; /* Added for vertical centering */
+    gap: 0.75rem; /* Added spacing between icon and text */
+    /* Initial state for individual message animation */
+    opacity: 0;
+    transform: translateX(30px);
+    animation: slideInRight 0.4s ease-out forwards; /* Applies on load, 'forwards' keeps final state */
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: currentColor; /* Uses the current text color of the alert */
+}
+
+.alert-success {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.alert-danger {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-warning {
+    color: var(--warning);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Specific icons for alerts */
+.alert-success::before { content: '✓'; font-weight: bold; }
+.alert-danger::before { content: '⚠'; font-weight: bold; }
+.alert-warning::before { content: '⚠'; font-weight: bold; } /* Using warning icon */
+.alert-info::before { content: 'ℹ'; font-weight: bold; font-style: italic; color: var(--info); }
+
+
+/* Form Container */
+.form-container-empalme {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    position: relative;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.form-container-empalme::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 20px 20px 0 0;
+}
+
+/* Form Question Cards */
+.form-question-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    /* Initial state for animation */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease-out forwards; /* Applies on load, 'forwards' keeps final state */
+}
+
+.form-question-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.form-question-card:hover {
+    background: var(--white);
+    border-color: var(--gray-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.form-question-card:hover::before {
+    transform: scaleY(1);
+}
+
+.form-question-card:focus-within {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-question-card:focus-within::before {
+    transform: scaleY(1);
+}
+
+/* Form Labels */
+.form-label {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    line-height: 1.4;
+}
+
+.form-label .required-asterisk {
+    color: var(--danger);
+    margin-left: 0.25rem;
+    font-weight: 700;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--white);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    min-height: 48px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: var(--white);
+}
+
+.form-control:hover, .form-select:hover {
+    border-color: var(--gray-300);
+}
+
+.form-control::placeholder {
+    color: var(--gray-400);
+    font-weight: 400;
+}
+
+/* Checklist Grid */
+.checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.checklist-category {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    /* Initial state for animation */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease-out forwards; /* Applies on load, 'forwards' keeps final state */
+}
+
+.checklist-category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.checklist-category:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--gray-300);
+}
+
+.checklist-category:hover::before {
+    transform: scaleX(1);
+}
+
+.checklist-category h4 {
+    color: var(--gray-900);
+    margin-bottom: 1.25rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checklist-category h4::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.checklist-item:hover {
+    background: var(--gray-50);
+}
+
+.checklist-item input[type="checkbox"] {
+    margin-right: 0.75rem;
+    margin-top: 0.125rem;
+    transform: scale(1.3);
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.checklist-item label {
+    flex-grow: 1;
+    color: var(--gray-700);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-weight: 400;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.checklist-item:hover label {
+    color: var(--gray-800);
+}
+
+/* Note Section */
+.note-section {
+    grid-column: 1 / -1; /* Spans across all columns in the grid */
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-300);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+
+.note-section:hover {
+    background: var(--white);
+    border-color: var(--primary);
+    border-style: solid; /* Changes to solid border on hover */
+}
+
+.note-section h4 {
+    color: var(--gray-800);
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-section h4::before {
+    content: '📝'; /* Emoji for note icon */
+    font-size: 1.25rem;
+}
+
+.note-section textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--white);
+    resize: vertical; /* Allows vertical resizing */
+    transition: all 0.3s ease;
+    line-height: 1.6;
+}
+
+.note-section textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.note-section textarea::placeholder {
+    color: var(--gray-400);
+    font-style: italic;
+}
+
+/* Submit Button */
+.btn-submit-empalme {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.35s both; /* Slightly delayed from form-container */
+}
+
+.btn-submit-empalme::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-submit-empalme:hover {
+    background: linear-gradient(135deg, #059669, var(--success));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-submit-empalme:hover::before {
+    left: 100%;
+}
+
+.btn-submit-empalme:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
+/* Back Button */
+.back-button-container {
+    margin: 2rem auto;
+    text-align: center;
+    /* Initial state for animation to prevent flicker */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--gray-700);
+    color: var(--white);
+    padding: 0.875rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-back:hover {
+    background: var(--gray-800);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.btn-back i {
+    font-size: 1rem;
+}
+
+/* Animations Definitions */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutSlideLeft { /* New animation for auto-hiding messages */
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+/* Staggered Loading Animation for Form Elements */
+/* These target the elements by their nth-child order within their parent */
+.form-question-card:nth-child(1) { animation-delay: 0.1s; } /* Proceso */
+.form-question-card:nth-child(2) { animation-delay: 0.2s; } /* Máquina */
+.form-question-card:nth-child(3) { animation-delay: 0.3s; } /* Turno */
+.form-question-card:nth-child(4) { animation-delay: 0.4s; } /* ID que entregó máquina */
+
+.checklist-category:nth-child(1) { animation-delay: 0.5s; } /* Clasificar (SEIRI) */
+.checklist-category:nth-child(2) { animation-delay: 0.6s; } /* Ordenar (SEITON) */
+.checklist-category:nth-child(3) { animation-delay: 0.7s; } /* Limpiar (SEISO) */
+.checklist-category:nth-child(4) { animation-delay: 0.8s; } /* Estandarizar (SEIKETSU) */
+.checklist-category:nth-child(5) { animation-delay: 0.9s; } /* Disciplina (SHITSUKE) */
+.checklist-category:nth-child(6) { animation-delay: 1.0s; } /* NOTA section (assuming it's the 6th .checklist-category sibling) */
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container-empalme {
+        padding: 1.5rem;
+        margin: 0 1rem 2rem;
+        border-radius: 16px;
+    }
+
+    .form-question-card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .page-title-empalme {
+        padding: 1.5rem;
+        font-size: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .page-title-empalme i.fa-handshake {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+
+    .breadcrumb-nav {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .checklist-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .checklist-category {
+        padding: 1.25rem;
+    }
+
+    .note-section {
+        padding: 1.5rem;
+    }
+
+    .btn-submit-empalme {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title-empalme {
+        font-size: 1.25rem;
+    }
+
+    .form-container-empalme {
+        padding: 1rem;
+    }
+
+    .form-question-card {
+        padding: 1rem;
+    }
+
+    .checklist-category {
+        padding: 1rem;
+    }
+
+    .form-control, .form-select {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .checklist-item {
+        padding: 0.5rem;
+    }
+
+    .checklist-item input[type="checkbox"] {
+        transform: scale(1.2);
+    }
+}
+
+/* Focus states for accessibility (important for keyboard navigation) */
+.form-control:focus, .form-select:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn-submit-empalme:focus {
+    outline: 2px solid var(--success);
+    outline-offset: 2px;
+}
+
+.btn-back:focus {
+    outline: 2px solid var(--gray-700);
+    outline-offset: 2px;
+}
+
+.checklist-item input[type="checkbox"]:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Additional utility classes (if needed elsewhere for spacing) */
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+    opacity: 1;
+}
+
+/* Spinner for loading state */
+.spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    vertical-align: text-bottom;
+    border: 0.125em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-width: 0.125em;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Staggered Loading Animation for Form Elements */
+/* Ajustado para el número total de form-question-cards dentro de cada fieldset */
+/* Fieldset 1: Datos de Registro */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(1) { animation-delay: 0.1s; } /* Fecha */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(2) { animation-delay: 0.2s; } /* Proceso de Origen */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(3) { animation-delay: 0.3s; } /* ID Operario */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(4) { animation-delay: 0.4s; } /* Nombre Operario */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(5) { animation-delay: 0.5s; } /* Número de Trabajo */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(6) { animation-delay: 0.6s; } /* Parte del Trabajo */
+.form-container-se30-se47-despeje fieldset:nth-of-type(1) .form-question-card:nth-child(7) { animation-delay: 0.7s; } /* Tipo de Despeje */
+
+
+/* Fieldset 2: Aspectos a Revisar (para los aspectos SI/NO/N/A) */
+/* Estos son los que necesitan un retraso progresivo después del primer fieldset */
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(1) { animation-delay: 0.8s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(2) { animation-delay: 0.9s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(3) { animation-delay: 1.0s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(4) { animation-delay: 1.1s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(5) { animation-delay: 1.2s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(6) { animation-delay: 1.3s; }
+.form-container-se30-se47-despeje fieldset:nth-of-type(2) .form-question-card:nth-child(7) { animation-delay: 1.4s; }
+
+
+/* Fieldset 3: Autorización y Observaciones Finales */
+.form-container-se30-se47-despeje fieldset:nth-of-type(3) .form-question-card:nth-child(1) { animation-delay: 1.5s; } /* ID Carnet Autorizador */
+.form-container-se30-se47-despeje fieldset:nth-of-type(3) .form-question-card:nth-child(2) { animation-delay: 1.6s; } /* Nombre Autorizador */
+.form-container-se30-se47-despeje fieldset:nth-of-type(3) .form-question-card:nth-child(3) { animation-delay: 1.7s; } /* Cargo Autorizador */
+.form-container-se30-se47-despeje fieldset:nth-of-type(3) .form-question-card:nth-child(4) { animation-delay: 1.8s; } /* Observaciones Generales */
+
+
+/* Estilos para los botones de SI/NO/N/A y el campo de observación */
+.aspect-question-card {
+    /* Mantiene los paddings y márgenes compactos del form-question-card */
+    padding: 1.25rem; 
+    margin-bottom: 1rem; 
+}
+
+.aspect-label {
+    font-weight: 600; /* Hace la pregunta más destacada */
+    color: var(--gray-800);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    line-height: 1.4;
+}
+
+.response-buttons-group {
+    display: flex;
+    gap: 0.5rem; /* Menos espacio entre los botones */
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.5rem; /* Menos margen debajo del grupo de botones */
+}
+
+.response-button {
+    flex-grow: 1; /* Permite que los botones crezcan y llenen el espacio */
+    padding: 0.6rem 0.8rem; /* Padding más compacto */
+    border: 2px solid var(--gray-300); /* Borde más visible */
+    border-radius: 8px; /* Bordes redondeados */
+    background-color: var(--gray-100); /* Fondo suave */
+    color: var(--gray-700); /* Color de texto */
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    position: relative;
+    line-height: 1.2;
+    min-width: 60px; /* Ancho mínimo para mantener uniformidad */
+    font-weight: 500;
+}
+
+.response-button:hover {
+    background-color: var(--gray-200);
+    border-color: var(--gray-400);
+    transform: translateY(-1px); /* Ligero efecto de elevación al pasar el mouse */
+}
+
+.response-button input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    z-index: 2; /* Asegura que el radio button sea clickeable */
+}
+
+.response-button input[type="radio"]:checked + span {
+    background-color: var(--primary); /* Color primario al seleccionar */
+    color: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Sombra suave para el estado checked */
+}
+.response-button input[type="radio"]:checked + span:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.response-button span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    pointer-events: none; /* Permite que el clic "pase a través" al radio button oculto */
+    transition: all 0.2s ease;
+}
+
+.observation-input-container {
+    margin-top: 0.75rem; /* Margen más compacto */
+    display: none; /* Controlado por JS */
+}
+.observation-input-container textarea {
+    min-height: 60px; /* Altura mínima adecuada para una línea de texto */
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+/* Estilos para el campo de carnet simplificado */
+.carnet-input-container {
+    position: relative;
+}
+/* No es estándar, pero si funciona en algunos navegadores para el placeholder */
+.carnet-input-container input[type="password"]::placeholder {
+    -webkit-text-security: disc; /* Safari, Chrome */
+    text-security: disc; /* Firefox */
+}
+/* Oculta los mensajes de advertencia si no se usan */
+.carnet-warning {
+    display: none !important; 
+}
+
+
+/* Responsive adjustments (consistente con otros formularios y ahora más compacto) */
+@media (max-width: 992px) { /* Añadimos un breakpoint para tablets si es necesario */
+    .form-container-se30-se47-despeje .row {
+        gap: 0.75rem; /* Menos espacio entre columnas en tablets */
+    }
+    .form-container-se30-se47-despeje .row > [class*="col-"] {
+        padding-left: 0.375rem;
+        padding-right: 0.375rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-container-se30-se47-despeje {
+        padding: 1.25rem; /* Compacto, igual que Registro Mezcla */
+        margin: 0 1rem 1.5rem; /* Compacto, igual que Registro Mezcla */
+        border-radius: 16px;
+    }
+    .page-title-se30-se47-despeje {
+        padding: 1.5rem;
+        font-size: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    .page-title-se30-se47-despeje i.fas.fa-broom {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+    .breadcrumb-nav {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+    }
+    .notification-container {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        top: 80px;
+    }
+    .alert {
+        padding: 1rem 1.25rem;
+    }
+    .form-container-se30-se47-despeje legend {
+        font-size: 1.25rem;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+    /* En móviles, las columnas de Bootstrap se apilan. El gap y padding se aplica al form-question-card */
+    .form-question-card {
+        padding: 1rem; /* Compacto, igual que Registro Mezcla */
+        margin-bottom: 0.75rem; /* Compacto, igual que Registro Mezcla */
+    }
+    .form-label {
+        margin-bottom: 0.25rem;
+    }
+    .form-control, .form-select, .observation-input-container textarea {
+        padding: 0.625rem 1rem;
+        min-height: 40px;
+    }
+    .btn-submit {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+    .btn-back {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+    }
+    /* Módulos de temperatura en 1 columna en móvil (si los hubiera en este form) */
+    .form-container-se30-se47-despeje .col-md-3 { /* Se aplica si existen .col-md-3 en tu HTML */
+        width: 100%; /* Forzar 1 columna en móviles */
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title-se30-se47-despeje {
+        font-size: 1.25rem;
+    }
+    .form-container-se30-se47-despeje {
+        padding: 0.75rem;
+    }
+    .form-question-card {
+        padding: 0.75rem;
+    }
+    .form-control, .form-select, .observation-input-container textarea {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    .form-container-se30-se47-despeje legend {
+        font-size: 1.1rem;
+    }
+}

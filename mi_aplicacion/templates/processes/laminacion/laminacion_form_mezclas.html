@@ -1,210 +1,103 @@
-{# d:\DocumentacionEmpaques\mi_aplicacion\templates\processes\laminacion\laminacion_form_mezclas.html #}
 {% extends "layouts/process_base.html" %}
 
 {% block process_title %}Registro Relación de Mezcla{% endblock %}
 
 {% block process_head_css %}
-<style>
-    /* Estilos para ocultar las flechas de los inputs tipo number y deshabilitar el scroll */
-    input[type="number"] {
-        -moz-appearance: textfield; /* Para Firefox, oculta flechas y desactiva scroll */
-        /* Para Chrome, Safari, Edge, etc. */
-        /* Oculta las flechas del spinner y desactiva el scroll */
-        &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        /* Para deshabilitar el scroll en la mayoría de los navegadores (IE/Edge Legacy y un fallback) */
-        -ms-overflow-style: none; /* Oculta la barra de desplazamiento en IE/Edge */
-        overflow: hidden; /* Evita cualquier scroll inesperado */
-    }
-
-    /* Estilos para el feedback de validación en tiempo real (si aplica en este form) */
-    .validation-feedback {
-        margin-top: 5px;
-        font-size: 0.85em;
-        font-weight: 500;
-    }
-    .validation-feedback.text-success {
-        color: #28a745; /* Bootstrap success green */
-    }
-    .validation-feedback.text-danger {
-        color: #dc3545; /* Bootstrap danger red */
-    }
-
-    /* Estilos específicos para este formulario */
-    .breadcrumb-nav {
-        margin-bottom: 25px;
-        font-size: 0.9em;
-    }
-    .breadcrumb-nav a { color: #007bff; text-decoration: none; }
-    .breadcrumb-nav a:hover { text-decoration: underline; }
-    .breadcrumb-nav .separator { margin: 0 8px; color: #6c757d; }
-    .breadcrumb-nav .current-page { color: #495057; font-weight: 500; }
-
-    .container.mt-4 {
-        max-width: 600px; /* Ancho del formulario */
-        background-color: #f8fafd;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
-    }
-
-    h1 {
-        font-size: 1.8em;
-        color: #2C3E50;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: #34495E;
-    }
-
-    .btn-primary {
-        background-color: #18BC9C; /* Color verde/azul más amigable */
-        border-color: #18BC9C;
-        padding: 10px 20px;
-        font-size: 1.05em;
-        font-weight: bold;
-        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-primary:hover {
-        background-color: #15A589;
-        border-color: #15A589;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .btn-primary:disabled {
-        background-color: #a0a0a0;
-        border-color: #a0a0a0;
-        cursor: not-allowed;
-    }
-
-    /* Estilos para el contenedor de notificaciones flotantes */
-    #notification-container {
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        z-index: 1050; /* Por encima de la mayoría de los elementos */
-        width: 350px;
-    }
-    .alert {
-        margin-bottom: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registro_mezcla_form_styles.css') }}">
 {% endblock %}
+
 {% block process_page_content %}
+    {# Breadcrumb - Ajustado para apuntar correctamente al blueprint de sellado #}
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <a href="{{ url_for('main.home') }}">Inicio (Procesos)</a>
-        <span class="separator">&raquo;</span>
+ <a href="{{ url_for('laminacion.proceso_laminacion_dashboard') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i> {# Añadido icono de home #}
+            Inicio
+        </a>
+        <span class="separator">›</span> {# Cambiado de &raquo; #}
         <a href="{{ url_for('laminacion.proceso_laminacion_dashboard') }}">{{ nombre_proceso }}</a>
-        <span class="separator">&raquo;</span>
+        <span class="separator">›</span> {# Cambiado de &raquo; #}
         <span class="current-page">{{ subseccion }}</span>
     </nav>
 
-    <div class="container mt-4">
-        <h1>Registro relación de mezcla</h1>
-        <p class="mb-4 text-secondary">Ingrese la información del proceso.</p>
+    <h1 class="page-title-sub"><i class="fas fa-cogs"></i> {{ subseccion }}</h1>
+    <p class="mb-5 text-secondary" style="animation: fadeInUp 0.6s ease-out forwards; animation-delay: 0.15s; opacity: 0;">Ingrese la información del proceso.</p>
 
-        {# Contenedor para las notificaciones flotantes (toasts) #}
-        <div id="notification-container"></div>
+    <div id="notification-container" class="notification-container"></div>
+
+    <div class="custom-form-container">
+        {# Contenedor para las notificaciones flash de Flask #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <form id="relacionMezclasForm" method="POST" action="{{ url_for('laminacion.proceso_laminacion_form_mezclas') }}">
-            
-            <div class="mb-3">
-                <label for="maquina" class="form-label">Máquina <span style="color:red;">*</span></label>
-                <select class="form-select" id="maquina" name="maquina" required>
-                    <option value="" disabled selected>Selecciona una máquina</option>
-                    <option value="LA02 - ITALAM" {% if form_data.maquina == 'LA02 - ITALAM' %}selected{% endif %}>LA02 - ITALAM</option>
-                    <option value="LA03 - DUAL 1" {% if form_data.maquina == 'LA03 - DUAL 1' %}selected{% endif %}>LA03 - DUAL 1</option>
-                    <option value="LA04 - EVO 1" {% if form_data.maquina == 'LA04 - EVO 1' %}selected{% endif %}>LA04 - EVO 1</option>
-                    <option value="LA05 - DUAL 2" {% if form_data.maquina == 'LA05 - DUAL 2' %}selected{% endif %}>LA05 - DUAL 2</option>
-                    <option value="LA06 - EVO 2" {% if form_data.maquina == 'LA06 - EVO 2' %}selected{% endif %}>LA06 - EVO 2</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="turno" class="form-label">Turno <span style="color:red;">*</span></label>
-                <select class="form-select" id="turno" name="turno" required>
-                    <option value="" disabled selected>Selecciona un turno</option>
-                    <option value="TURNO 1 (9:30PM - 5:30AM)" {% if form_data.turno == 'TURNO 1 (9:30PM - 5:30AM)' %}selected{% endif %}>TURNO 1 (9:30PM - 5:30AM)</option>
-                    <option value="TURNO 2 (5:30AM - 1:30 PM)" {% if form_data.turno == 'TURNO 2 (5:30AM - 1:30 PM)' %}selected{% endif %}>TURNO 2 (5:30AM - 1:30 PM)</option>
-                    <option value="TURNO 3 (1:30 PM - 9:30 PM)" {% if form_data.turno == 'TURNO 3 (1:30 PM - 9:30 PM)' %}selected{% endif %}>TURNO 3 (1:30 PM - 9:30 PM)</option>
-                    <option value="TURNO L-J (DIURNO)" {% if form_data.turno == 'TURNO L-J (DIURNO)' %}selected{% endif %}>TURNO L-J (DIURNO)</option>
-                    <option value="TURNO L-J (NOCTURNO)" {% if form_data.turno == 'TURNO L-J (NOCTURNO)' %}selected{% endif %}>TURNO L-J (NOCTURNO)</option>
-                    <option value="TURNO V-D (DIURNO)" {% if form_data.turno == 'TURNO V-D (DIURNO)' %}selected{% endif %}>TURNO V-D (DIURNO)</option>
-                    <option value="TURNO V-D (NOCTURNO)" {% if form_data.turno == 'TURNO V-D (NOCTURNO)' %}selected{% endif %}>TURNO V-D (NOCTURNO)</option>
-                </select>
-            </div>
+            <fieldset>
+                <legend>Datos de la Mezcla</legend>
+                <div class="form-fields-grid">
+                    <div class="form-question-card">
+                        <label for="maquina" class="form-label">Máquina <span class="required-asterisk">*</span></label>
+                        <select class="form-select" id="maquina" name="maquina" required>
+                            <option value="" disabled selected>Selecciona una máquina</option>
+                            <option value="LA02 - ITALAM" {% if form_data.maquina == 'LA02 - ITALAM' %}selected{% endif %}>LA02 - ITALAM</option>
+                            <option value="LA03 - DUAL 1" {% if form_data.maquina == 'LA03 - DUAL 1' %}selected{% endif %}>LA03 - DUAL 1</option>
+                            <option value="LA04 - EVO 1" {% if form_data.maquina == 'LA04 - EVO 1' %}selected{% endif %}>LA04 - EVO 1</option>
+                            <option value="LA05 - DUAL 2" {% if form_data.maquina == 'LA05 - DUAL 2' %}selected{% endif %}>LA05 - DUAL 2</option>
+                            <option value="LA06 - EVO 2" {% if form_data.maquina == 'LA06 - EVO 2' %}selected{% endif %}>LA06 - EVO 2</option>
+                        </select>
+                    </div>
+                    <div class="form-question-card">
+                        <label for="turno" class="form-label">Turno <span class="required-asterisk">*</span></label>
+                        <select class="form-select" id="turno" name="turno" required>
+                            <option value="" disabled selected>Selecciona un turno</option>
+                            <option value="TURNO 1 (9:30PM - 5:30AM)" {% if form_data.turno == 'TURNO 1 (9:30PM - 5:30AM)' %}selected{% endif %}>TURNO 1 (9:30PM - 5:30AM)</option>
+                            <option value="TURNO 2 (5:30AM - 1:30 PM)" {% if form_data.turno == 'TURNO 2 (5:30AM - 1:30 PM)' %}selected{% endif %}>TURNO 2 (5:30AM - 1:30 PM)</option>
+                            <option value="TURNO 3 (1:30 PM - 9:30 PM)" {% if form_data.turno == 'TURNO 3 (1:30 PM - 9:30 PM)' %}selected{% endif %}>TURNO 3 (1:30 PM - 9:30 PM)</option>
+                            <option value="TURNO L-J (DIURNO)" {% if form_data.turno == 'TURNO L-J (DIURNO)' %}selected{% endif %}>TURNO L-J (DIURNO)</option>
+                            <option value="TURNO L-J (NOCTURNO)" {% if form_data.turno == 'TURNO L-J (NOCTURNO)' %}selected{% endif %}>TURNO L-J (NOCTURNO)</option>
+                            <option value="TURNO V-D (DIURNO)" {% if form_data.turno == 'TURNO V-D (DIURNO)' %}selected{% endif %}>TURNO V-D (DIURNO)</option>
+                            <option value="TURNO V-D (NOCTURNO)" {% if form_data.turno == 'TURNO V-D (NOCTURNO)' %}selected{% endif %}>TURNO V-D (NOCTURNO)</option>
+                        </select>
+                    </div>
+                    {# --- NUEVO CAMPO: Referencia de Adhesivo --- #}
+                    <div class="form-question-card">
+                        <label for="referencia_adhesivo" class="form-label">Referencia de adhesivo <span class="required-asterisk">*</span></label>
+                        <select class="form-select" id="referencia_adhesivo" name="referencia_adhesivo" required>
+                            {# Por ahora, solo una opción predeterminada. Puedes agregar más aquí en el futuro. #}
+                            <option value="HENKEL LIOFOL LA 3824 DR" selected>HENKEL LIOFOL LA 3824 DR</option>
+                        </select>
+                    </div>
+                    {# --- FIN NUEVO CAMPO --- #}
+                    <div class="form-question-card">
+                        <label for="peso_adhesivo" class="form-label">Peso adhesivo (kg) <span class="required-asterisk">*</span></label>
+                        <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 10.50" value="{{ form_data.peso_adhesivo | default('') }}">
+                    </div>
+                    <div class="form-question-card">
+                        <label for="peso_correactante" class="form-label">Peso correactante (kg) <span class="required-asterisk">*</span></label>
+                        <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 1.23" value="{{ form_data.peso_correactante | default('') }}">
+                    </div>
+                    <div class="form-question-card">
+                        <label for="relacion_mezcla" class="form-label">Relación de mezcla <span class="required-asterisk">*</span></label>
+                        <input type="number" step="0.01" class="form-control" id="relacion_mezcla" name="relacion_mezcla" required placeholder="Ej. 5.67" value="{{ form_data.relacion_mezcla | default('') }}">
+                    </div>
+                </div>
+            </fieldset>
 
-            <div class="mb-3">
-                <label for="operario_responsable" class="form-label">Operario responsable <span style="color:red;">*</span></label>
-                <select class="form-select" id="operario_responsable" name="operario_responsable" required>
-                    <option value="" disabled selected>Selecciona un operario</option>
-                    <option value="ALEXIS RIVERA MUÑOZ" {% if form_data.operario_responsable == 'ALEXIS RIVERA MUÑOZ' %}selected{% endif %}>ALEXIS RIVERA MUÑOZ</option>
-                    <option value="ALVARO ANDRES GAVIRIA TABARES" {% if form_data.operario_responsable == 'ALVARO ANDRES GAVIRIA TABARES' %}selected{% endif %}>ALVARO ANDRES GAVIRIA TABARES</option>
-                    <option value="CAMILO HENAO MONSALVE" {% if form_data.operario_responsable == 'CAMILO HENAO MONSALVE' %}selected{% endif %}>CAMILO HENAO MONSALVE</option>
-                    <option value="CARLOS ANDRÉS LUNA TOBON" {% if form_data.operario_responsable == 'CARLOS ANDRÉS LUNA TOBON' %}selected{% endif %}>CARLOS ANDRÉS LUNA TOBON</option>
-                    <option value="CARLOS MARIO CANO QUINTERO" {% if form_data.operario_responsable == 'CARLOS MARIO CANO QUINTERO' %}selected{% endif %}>CARLOS MARIO CANO QUINTERO</option>
-                    <option value="CARLOS YERLIN GÓMEZ MONTOYA" {% if form_data.operario_responsable == 'CARLOS YERLIN GÓMEZ MONTOYA' %}selected{% endif %}>CARLOS YERLIN GÓMEZ MONTOYA</option>
-                    <option value="CÉSAR AUGUSTO RAMÍREZ LÓPEZ" {% if form_data.operario_responsable == 'CÉSAR AUGUSTO RAMÍREZ LÓPEZ' %}selected{% endif %}>CÉSAR AUGUSTO RAMÍREZ LÓPEZ</option>
-                    <option value="DAIRON VILLA TORRES" {% if form_data.operario_responsable == 'DAIRON VILLA TORRES' %}selected{% endif %}>DAIRON VILLA TORRES</option>
-                    <option value="DANIEL VELASQUEZ" {% if form_data.operario_responsable == 'DANIEL VELASQUEZ' %}selected{% endif %}>DANIEL VELASQUEZ</option>
-                    <option value="DUVAN ALEXIS MARTÍNEZ HOYOS" {% if form_data.operario_responsable == 'DUVAN ALEXIS MARTÍNEZ HOYOS' %}selected{% endif %}>DUVAN ALEXIS MARTÍNEZ HOYOS</option>
-                    <option value="FABIAN ALONSO VARELA" {% if form_data.operario_responsable == 'FABIAN ALONSO VARELA' %}selected{% endif %}>FABIAN ALONSO VARELA</option>
-                    <option value="FAUSTO ELÍAS RÍOS" {% if form_data.operario_responsable == 'FAUSTO ELÍAS RÍOS' %}selected{% endif %}>FAUSTO ELÍAS RÍOS</option>
-                    <option value="FRANCISCO JAVIER ARANGO" {% if form_data.operario_responsable == 'FRANCISCO JAVIER ARANGO' %}selected{% endif %}>FRANCISCO JAVIER ARANGO</option>
-                    <option value="GERSAIN NIETO TABORDA" {% if form_data.operario_responsable == 'GERSAIN NIETO TABORDA' %}selected{% endif %}>GERSAIN NIETO TABORDA</option>
-                    <option value="HUGO ARMANDO ARAQUE" {% if form_data.operario_responsable == 'HUGO ARMANDO ARAQUE' %}selected{% endif %}>HUGO ARMANDO ARAQUE</option>
-                    <option value="JEISSON ALZATE RAMIREZ" {% if form_data.operario_responsable == 'JEISSON ALZATE RAMIREZ' %}selected{% endif %}>JEISSON ALZATE RAMIREZ</option>
-                    <option value="JHON FREDY VANEGAS TAMAYO" {% if form_data.operario_responsable == 'JHON FREDY VANEGAS TAMAYO' %}selected{% endif %}>JHON FREDY VANEGAS TAMAYO</option>
-                    <option value="JHON JAIRO SUAREZ CORRECHA" {% if form_data.operario_responsable == 'JHON JAIRO SUAREZ CORRECHA' %}selected{% endif %}>JHON JAIRO SUAREZ CORRECHA</option>
-                    <option value="JHON JEISSON PÉREZ MARTÍNEZ" {% if form_data.operario_responsable == 'JHON JEISSON PÉREZ MARTÍNEZ' %}selected{% endif %}>JHON JEISSON PÉREZ MARTÍNEZ</option>
-                    <option value="JHON REINOSO YOTAGRI" {% if form_data.operario_responsable == 'JHON REINOSO YOTAGRI' %}selected{% endif %}>JHON REINOSO YOTAGRI</option>
-                    <option value="JOHAN MOLINA" {% if form_data.operario_responsable == 'JOHAN MOLINA' %}selected{% endif %}>JOHAN MOLINA</option>
-                    <option value="JUAN FELIPE SUAREZ" {% if form_data.operario_responsable == 'JUAN FELIPE SUAREZ' %}selected{% endif %}>JUAN FELIPE SUAREZ</option>
-                    <option value="JULIAN ESPINOZA" {% if form_data.operario_responsable == 'JULIAN ESPINOZA' %}selected{% endif %}>JULIAN ESPINOZA</option>
-                    <option value="JULIAN STIVEN GALEANO" {% if form_data.operario_responsable == 'JULIAN STIVEN GALEANO' %}selected{% endif %}>JULIAN STIVEN GALEANO</option>
-                    <option value="MILTON ALEJANDRO VÉLEZ ORTIZ" {% if form_data.operario_responsable == 'MILTON ALEJANDRO VÉLEZ ORTIZ' %}selected{% endif %}>MILTON ALEJANDRO VÉLEZ ORTIZ</option>
-                    <option value="NILTON MESA MARULANDA" {% if form_data.operario_responsable == 'NILTON MESA MARULANDA' %}selected{% endif %}>NILTON MESA MARULANDA</option>
-                    <option value="RICARDO ALONSO MAZO" {% if form_data.operario_responsable == 'RICARDO ALONSO MAZO' %}selected{% endif %}>RICARDO ALONSO MAZO</option>
-                    <option value="SANTIAGO GONZALEZ" {% if form_data.operario_responsable == 'SANTIAGO GONZALEZ' %}selected{% endif %}>SANTIAGO GONZALEZ</option>
-                    <option value="SEBASTIAN VELEZ" {% if form_data.operario_responsable == 'SEBASTIAN VELEZ' %}selected{% endif %}>SEBASTIAN VELEZ</option>
-                    <option value="STIVEN ZAPATA CORREA" {% if form_data.operario_responsable == 'STIVEN ZAPATA CORREA' %}selected{% endif %}>STIVEN ZAPATA CORREA</option>
-                    <option value="YEREMITH WILCHES" {% if form_data.operario_responsable == 'YEREMITH WILCHES' %}selected{% endif %}>YEREMITH WILCHES</option>
-                </select>
-            </div>
-
-            {# --- NUEVO CAMPO: Referencia de Adhesivo --- #}
-            <div class="mb-3">
-                <label for="referencia_adhesivo" class="form-label">Referencia de adhesivo <span style="color:red;">*</span></label>
-                <select class="form-select" id="referencia_adhesivo" name="referencia_adhesivo" required>
-                    {# Por ahora, solo una opción predeterminada. Puedes agregar más aquí en el futuro. #}
-                    <option value="HENKEL LIOFOL LA 3824 DR" selected>HENKEL LIOFOL LA 3824 DR</option>
-                </select>
-            </div>
-            {# --- FIN NUEVO CAMPO --- #}
-
-            <div class="mb-3">
-                <label for="peso_adhesivo" class="form-label">Peso adhesivo (kg) <span style="color:red;">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 10.50" value="{{ form_data.peso_adhesivo | default('') }}">
-            </div>
-            <div class="mb-3">
-                <label for="peso_correactante" class="form-label">Peso correactante (kg) <span style="color:red;">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 1.23" value="{{ form_data.peso_correactante | default('') }}">
-            </div>
-            <div class="mb-3">
-                <label for="relacion_mezcla" class="form-label">Relación de mezcla <span style="color:red;">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="relacion_mezcla" name="relacion_mezcla" required placeholder="Ej. 5.67" value="{{ form_data.relacion_mezcla | default('') }}">
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Enviar Registro</button>
+            <button type="submit" class="btn-submit mt-4">Enviar Registro</button>
         </form>
+    </div>
+
+    <div class="back-button-container">
+        <a href="{{ url_for('laminacion.proceso_laminacion_dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Volver a {{ nombre_proceso }}
+        </a>
     </div>
 {% endblock %}
 
@@ -214,69 +107,71 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('relacionMezclasForm');
     if (!form) return;
 
-    // Función mejorada para mostrar notificaciones (similar a empalme_turno_form)
-    function showNotification(response) {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        
-        container.innerHTML = ''; // Limpiar notificaciones anteriores
-        
-        const alert = document.createElement('div');
-        // Usar response.category directamente para alert-success, alert-danger, alert-warning
-        alert.className = `alert alert-${response.category} alert-dismissible fade show`;
-        alert.role = 'alert';
-        
-        let icon = '';
-        if (response.category === 'success') {
-            icon = '<i class="fas fa-check-circle me-2"></i>';
-        } else if (response.category === 'danger') {
-            icon = '<i class="fas fa-exclamation-circle me-2"></i>';
-        } else if (response.category === 'warning') { // Nuevo icono para advertencias
-            icon = '<i class="fas fa-exclamation-triangle me-2"></i>'; 
-        } else {
-            icon = '<i class="fas fa-info-circle me-2"></i>';
-        }
-        
-        // Construir contenido de la notificación
-        let detailsHtml = '';
-        if (response.details) {
-            // Manejar detalles que pueden contener HTML (como <br>)
-            detailsHtml = `<div class="small mt-1">${response.details}</div>`;
-        } else if (response.data && response.data.relacion_calculada) {
-            // Mensaje específico para éxito de mezcla si no hay 'details'
-            detailsHtml = `<div class="small mt-1">Relación calculada: ${response.data.relacion_calculada}</div>`; 
-            if (response.data.id_registro_webhook) {
-                detailsHtml += `<div class="small mt-1">ID de registro: ${response.data.id_registro_webhook}</div>`;
-            }
-        }
+            // Función mejorada para mostrar notificaciones (similar a empalme_turno_form)
+            function showNotification(response) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
 
-        let content = `
-            <div class="d-flex align-items-center">
-                ${icon}
-                <div>
-                    <strong>${response.message}</strong>
-                    ${detailsHtml}
-                </div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        
-        alert.innerHTML = content;
-        container.appendChild(alert);
-        
-        // Auto-eliminar después de 8 segundos para notificaciones de éxito y advertencia
-        if (response.category === 'success' || response.category === 'warning') {
-            setTimeout(() => {
-                alert.remove();
-            }, 8000);
-        }
-    }
+                container.innerHTML = '';
+
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${response.category} alert-dismissible`;
+
+                let icon = '';
+                if (response.category === 'success') {
+                    icon = '<i class="fas fa-check-circle me-2"></i>';
+                } else if (response.category === 'danger') {
+                    icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+                } else if (response.category === 'warning') {
+                    icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+                } else {
+                    icon = '<i class="fas fa-info-circle me-2"></i>';
+                }
+
+                let detailsHtml = '';
+                if (response.details) {
+                    detailsHtml = `<div class="small mt-1">${response.details}</div>`;
+                } else if (response.data && response.data.relacion_calculada) {
+                    detailsHtml = `<div class="small mt-1">Relación calculada: ${response.data.relacion_calculada}</div>`;
+                    if (response.data.id_registro_webhook) {
+                        detailsHtml += `<div class="small mt-1">ID de registro: ${response.data.id_registro_webhook}</div>`;
+                    }
+                }
+
+                alert.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        ${icon}
+                        <div>
+                            <strong>${response.message}</strong>
+                            ${detailsHtml}
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                container.appendChild(alert);
+
+                // --- Scroll automático para que el usuario vea el mensaje ---
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                alert.querySelector('.btn-close').onclick = () => alert.remove();
+
+                if (response.category === 'success' || response.category === 'warning') {
+                    setTimeout(() => {
+                        if (alert && alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 8000);
+                }
+            }
+
+
 
     // --- Repoblación de datos del formulario (para errores de validación) ---
     const form_data = JSON.parse('{{ form_data | tojson | safe }}');
     if (Object.keys(form_data).length > 0) {
         // Seleccionar los campos 'select' y establecer su valor
-        const selectFields = ['maquina', 'turno', 'operario_responsable', 'referencia_adhesivo']; // Añadido referencia_adhesivo
+        const selectFields = ['maquina', 'turno', 'referencia_adhesivo']; // Añadido referencia_adhesivo
         selectFields.forEach(field => {
             const selectElement = document.getElementById(field);
             if (selectElement && form_data[field]) {
@@ -290,16 +185,16 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault(); // Detener el envío tradicional del formulario
         e.stopImmediatePropagation(); // Detener cualquier otro listener de submit
-        
+
         const submitButton = form.querySelector('button[type="submit"]');
         const originalText = submitButton.innerHTML;
-        
+
         submitButton.disabled = true; // Deshabilitar botón para evitar envíos duplicados
         submitButton.innerHTML = `
             <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
             Enviando datos...
         `;
-        
+
         try {
             const formData = new FormData(form);
             // Convertir FormData a un objeto plano para JSON
@@ -307,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let [key, value] of formData.entries()) {
                 data[key] = value;
             }
-            
+
             const response = await fetch(form.action, {
                 method: 'POST',
                 headers: {
@@ -316,9 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(data) // Enviar los datos como JSON
             });
-            
+
             const result = await response.json(); // Siempre esperamos un JSON
-            
+
             if (response.ok) { // Si la respuesta HTTP fue 2xx (200, 201, etc.)
                 if (result.success) {
                     form.reset(); // Resetear el formulario
@@ -329,9 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             s.selectedIndex = 0;
                         }
                     });
-                    
+
                     showNotification(result); // Mostrar notificación de éxito o advertencia
-                    
+
                     setTimeout(() => document.querySelector('select').focus(), 100);
                 } else {
                     // Si response.ok es true, pero result.success es false (ej. errores de validación 400)
@@ -341,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Si el backend envía 400/500 con JSON de error
                 showNotification(result);
             }
-            
+
         } catch (error) {
             console.error('Error en el envío del formulario:', error);
             showNotification({
