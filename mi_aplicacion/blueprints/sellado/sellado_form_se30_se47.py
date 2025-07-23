@@ -196,9 +196,10 @@ def sellado_form_se30_se47():
                 url_volver=url_for('sellado.proceso_sellado_dashboard')
             ), 400
 
-        # === Aquí SIEMPRE la fecha/hora es generada por el backend, en Bogotá ===
-        now_colombia = get_colombia_now()
-        ts = now_colombia.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+        tz = pytz.timezone(current_app.config.get('TIMEZONE','America/Bogota'))
+        ts = datetime.now(tz).strftime("%Y-%m-%dT%H:%M:%S%z")
+        # Siempre formatea así: 2025-07-23T11:05:00-0500
 
         payload = {
             "fecha": ts,
