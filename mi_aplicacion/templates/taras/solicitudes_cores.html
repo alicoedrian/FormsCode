@@ -1,0 +1,150 @@
+{% extends 'layouts/process_base.html' %}
+
+{% block process_title %}{{ nombre_proceso }} - {{ subseccion }}{% endblock %}
+
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
+{# Aquí importamos el CSS con los estilos para la tabla que quieres usar #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/solicitud_cores_aprobacion.css') }}">
+
+<style>
+    /* Ocultamos el page-header que contiene el título principal por defecto en process_base */
+    .page-header {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
+        <a href="{{ url_for('taras.taras_entry') }}">
+            {{ nombre_proceso }}
+        </a>
+        <span class="separator">›</span>
+        <span class="current-page">{{ subseccion }}</span>
+    </nav>
+
+    <div class="aprobacion-table-wrapper fade-in-up">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages" style="margin: 10px;">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% if solicitudes %}
+        <div class="table-responsive">
+            <table class="aprobacion-table">
+                <thead>
+                    <tr>
+                        {# Esto genera los encabezados dinámicamente si los datos son diccionarios #}
+                        {# Asegúrate de que las claves en 'solicitudes' coincidan con los nombres de columna que quieres mostrar #}
+                        {% for key in solicitudes[0].keys() %}
+                        <th>{{ key.replace('_', ' ').title() }}</th>
+                        {% endfor %}
+                        <th>Acciones</th> {# Columna para botones de acción #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        {% for value in solicitud.values() %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                        <td class="actions">
+                            <button class="btn-action btn-approve" data-id="{{ solicitud.get('id') }}">Aprobar</button>
+                            <button class="btn-action btn-reject" data-id="{{ solicitud.get('id') }}">Rechazar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-records-message">No hay solicitudes de cores pendientes.</p>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block process_page_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Página de Solicitudes de Cores cargada con nuevos estilos.");
+
+        // Lógica de botones de acción
+        document.querySelectorAll('.btn-approve').forEach(button => {
+            button.addEventListener('click', function() {
+                const solicitudId = this.dataset.id;
+                alert('Aprobar solicitud ID: ' + solicitudId);
+                // Aquí iría la lógica para enviar la aprobación al backend vía fetch()
+                // Una vez procesado, podrías recargar la página o eliminar la fila de la tabla
+            });
+        });
+
+        document.querySelectorAll('.btn-reject').forEach(button => {
+            button.addEventListener('click', function() {
+                const solicitudId = this.dataset.id;
+                alert('Rechazar solicitud ID: ' + solicitudId);
+                // Aquí iría la lógica para enviar el rechazo al backend vía fetch()
+            });
+        });
+
+        // Lógica de redimensionamiento de columnas
+        const table = document.querySelector('.aprobacion-table');
+        const headers = table.querySelectorAll('th');
+        let currentResizableColumn = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        // Añadir resizers a cada columna (excepto la última, que no necesita un borde derecho para arrastrar)
+        headers.forEach((header, index) => {
+            if (index < headers.length - 1) { // No añadir resizer a la última columna
+                const resizer = document.createElement('div');
+                resizer.classList.add('column-resizer');
+                header.appendChild(resizer);
+
+                resizer.addEventListener('mousedown', (e) => {
+                    currentResizableColumn = header;
+                    startX = e.clientX;
+                    startWidth = header.offsetWidth;
+
+                    // Añadir listeners al documento para capturar el mousemove y mouseup globalmente
+                    document.addEventListener('mousemove', doDrag);
+                    document.addEventListener('mouseup', stopDrag);
+
+                    // Prevenir la selección de texto durante el arrastre
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'col-resize';
+                });
+            }
+        });
+
+        function doDrag(e) {
+            if (currentResizableColumn) {
+                const diffX = e.clientX - startX;
+                const newWidth = startWidth + diffX;
+                // Asegurar un ancho mínimo para la columna
+                currentResizableColumn.style.width = Math.max(50, newWidth) + 'px';
+            }
+        }
+
+        function stopDrag() {
+            currentResizableColumn = null;
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+        }
+    });
+</script>
+{% endblock %}

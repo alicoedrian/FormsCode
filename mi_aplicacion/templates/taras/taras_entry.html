@@ -1,0 +1,134 @@
+{% extends "layouts/process_base.html" %}
+
+{% block process_title %}{{ nombre_proceso }} - {{ subseccion }}{% endblock %}
+
+{% block process_head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
+<style>
+    .entry-form-container {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 3rem;
+        margin: 2rem auto; /* Centrar y darle espacio */
+        max-width: 500px; /* Ancho máximo para el formulario */
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+        text-align: center;
+    }
+    .entry-form-container h2 {
+        font-size: 1.8rem;
+        color: var(--primary-dark);
+        margin-bottom: 1.5rem;
+    }
+    .entry-form-container label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        text-align: left; /* Alinea el texto de la etiqueta a la izquierda */
+    }
+    /* CAMBIO AQUÍ: Ahora aplicamos estilos a input[type="password"] */
+    .entry-form-container input[type="password"] { /* CAMBIO DE type="text" A type="password" */
+        width: calc(100% - 2rem); /* Ajusta el ancho para padding */
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        font-size: 1.1rem;
+        box-shadow: var(--shadow-xs);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    /* CAMBIO AQUÍ: Ahora aplicamos estilos a input[type="password"]:focus */
+    .entry-form-container input[type="password"]:focus { /* CAMBIO DE type="text" A type="password" */
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        outline: none;
+    }
+    .entry-form-container button {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .entry-form-container button:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    .entry-form-container button i {
+        font-size: 1.2em;
+    }
+    /* Estilos para mensajes flash dentro de este contexto */
+    .flash-messages {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px 0;
+        width: 100%;
+    }
+    .flash-messages li {
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
+        box-shadow: var(--shadow-xs);
+    }
+    .flash-messages .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .flash-messages .danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .flash-messages .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .flash-messages .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+</style>
+{% endblock %}
+
+{% block process_page_content %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+        <a href="{{ url_for('main.home') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+            Inicio
+        </a>
+        <span class="separator">›</span>
+        <span class="current-page">{{ nombre_proceso }}</span>
+    </nav>
+
+    <div class="page-header fade-in-up">
+        <h1 class="page-title">
+            <i class="fas fa-key"></i> {# Icono para entrada/acceso #}
+            <div>
+                <div>{{ nombre_proceso }}</div>
+                <div class="page-subtitle">Acceso al módulo de gestión de Taras</div>
+            </div>
+        </h1>
+    </div>
+
+    <div class="entry-form-container fade-in-up">
+        <h2>Ingresa tu Carnet</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('taras.taras_entry', next=request.args.get('next')) }}">
+            <label for="employee_id">Número de Carnet:</label>
+            {# CAMBIO AQUÍ: type="password" para ocultar la entrada #}
+            <input type="password" id="employee_id" name="employee_id" required autofocus> 
+            <button type="submit"><i class="fas fa-sign-in-alt"></i> Acceder al Módulo</button>
+        </form>
+    </div>
+
+{% endblock %}

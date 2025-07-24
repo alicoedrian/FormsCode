@@ -88,7 +88,6 @@ def monitoreo_cuchillas_form():
             'turno': "Turno",
             'minora_cantidad': "Minora (Cantidad)",
             'acerada_cantidad': "Acerada (Cantidad)",
-            'id_quien_recibe': "ID Quien Recibe"
         }
         for f, label in required_fields.items():
             val = datos.get(f)

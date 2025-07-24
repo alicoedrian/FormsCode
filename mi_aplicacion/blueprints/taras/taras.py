@@ -1,135 +1,140 @@
-# d:\DocumentacionEmpaques\mi_aplicacion\blueprints\almacen_taras\almacen_taras.py
+# mi_aplicacion/blueprints/taras/taras.py
 
 from flask import (
-    Blueprint, render_template, request, redirect, url_for,
-    session, flash, current_app, jsonify
+    Blueprint, render_template, request, jsonify,
+    session, current_app, url_for, redirect, flash
 )
-import psycopg2 # Para la conexión a PostgreSQL
-from werkzeug.security import generate_password_hash, check_password_hash # Para hashing de contraseñas
-import os # Para acceder a variables de entorno
+from datetime import datetime
+import pytz
+import os
+import json
+from functools import wraps
+# Ya no importamos requests aquí directamente, se hace en taras_api.py
 
-# --- Blueprint Setup ---
-almacen_taras_bp = Blueprint('almacen_taras', __name__,
-                             template_folder='../../../templates', # Subir hasta mi_aplicacion/templates
-                             static_folder='../../../static',     # Subir hasta mi_aplicacion/static
-                             url_prefix='/almacen')
+# --- CAMBIO AQUÍ: Importar desde el mismo paquete (directorio) ---
+from .taras_api import get_solicitudes_cores # CAmbio de '...utils.taras_api' a '.taras_api'
 
-# --- Helper function for DB connection ---
-def get_db_connection():
-    """
-    Establece y devuelve una conexión a la base de datos PostgreSQL.
-    Las credenciales se obtienen de las variables de entorno.
-    """
-    try:
-        conn = psycopg2.connect(
-            dbname=os.getenv('PG_DBNAME'),
-            user=os.getenv('PG_USER'),
-            password=os.getenv('PG_PASSWORD'),
-            host=os.getenv('PG_HOST'),
-            port=os.getenv('PG_PORT')
-        )
-        return conn
-    except Exception as e:
-        current_app.logger.error(f"Error al conectar con la base de datos PostgreSQL: {e}", exc_info=True)
-        return None
+# Importaciones de la API de Epicor (descomenta si las necesitas y verifica la ruta)
+# from ...utils.epicor_api import get_employee_name_from_id, get_job_data, get_part_data
 
-# --- Decorador para proteger rutas del módulo Almacén Taras ---
-def login_required_almacen(f):
-    """
-    Decorador que asegura que el usuario ha iniciado sesión en el módulo de Almacén Taras.
-    Redirige a la página de login de Almacén si no está autenticado.
-    """
-    from functools import wraps
+taras_bp = Blueprint(
+    'taras', __name__,
+    template_folder='../../templates',
+    static_folder='../../static',
+    url_prefix='/taras'
+)
+
+# --- Configuración del Webhook (estas variables ya no son necesarias aquí si están en taras_api.py) ---
+# WEBHOOK_URL = "https://apps.alico-sa.com/webhook-test/49f744d6-8deb-4111-b3f2-5419143c40f4"
+# WEBHOOK_AUTH = "Basic YWRtaW46SG0xMTkxOTI5"
+
+# --- Función auxiliar para limpiar la sesión del módulo de Taras ---
+def _clear_taras_session():
+    """Limpia todas las variables de sesión relacionadas con el módulo de Taras."""
+    session.pop('taras_access_validated', None)
+    session.pop('taras_role', None)
+    session.pop('taras_user_id', None)
+    session.pop('taras_employee_id', None)
+    session.pop('taras_username', None)
+    session.permanent = False
+
+# --- Decorador para asegurar validación al entrar al módulo de Taras ---
+def validation_required_taras(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'almacen_logged_in' not in session or not session['almacen_logged_in']:
-            flash('Acceso denegado. Por favor, inicia sesión en Almacén Taras.', 'danger')
-            return redirect(url_for('almacen_taras.almacen_login', next=request.url))
+        if not session.get('taras_access_validated'):
+            flash('Debes validar tu carnet para acceder a este módulo.', 'warning')
+            return redirect(url_for('taras.taras_entry', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
-# --- Rutas para el Módulo Almacén Taras ---
+# --- Rutas para el Módulo de Taras ---
 
-@almacen_taras_bp.route('/login', methods=['GET', 'POST'])
-def almacen_login():
-    """
-    Maneja el inicio de sesión para el módulo de Almacén Taras (usuario y contraseña).
-    """
-    if 'almacen_logged_in' in session and session['almacen_logged_in']:
-        # Si ya está logueado, redirige al dashboard o a la URL 'next'
-        next_url = request.args.get('next') or url_for('almacen_taras.almacen_dashboard')
-        return redirect(next_url)
+@taras_bp.route('/entry', methods=['GET', 'POST'])
+def taras_entry():
+    if request.method == 'GET':
+        if session.get('taras_access_validated'):
+            _clear_taras_session()
 
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        next_url = request.form.get('next') # Campo oculto en el formulario para redirigir después del login
+        carnet_id = request.form.get('employee_id')
+        next_url = request.form.get('next')
 
-        if not username or not password:
-            flash('Usuario y contraseña son requeridos.', 'warning')
-            return render_template('almacen_taras/almacen_login.html', next=next_url)
+        if not carnet_id:
+            flash('El número de carnet es requerido.', 'warning')
+            return render_template('taras/taras_entry.html',
+                                   nombre_proceso="Taras",
+                                   subseccion="Acceso al Módulo",
+                                   next=next_url)
 
-        conn = get_db_connection()
-        if conn is None:
-            flash('Error de conexión a la base de datos.', 'danger')
-            return render_template('almacen_taras/almacen_login.html', next=next_url)
+        json_file_path = os.path.join(taras_bp.root_path, 'allowed_carnets_taras.json')
 
         try:
-            with conn.cursor() as cur:
-                # Busca el usuario por nombre de usuario
-                cur.execute("SELECT id, username, password_hash FROM almacen_users WHERE username = %s", (username,))
-                user = cur.fetchone()
-            
-            # Verifica si el usuario existe y si la contraseña coincide con el hash almacenado
-            if user and check_password_hash(user[2], password): # user[2] es password_hash
-                session['almacen_logged_in'] = True # Marca la sesión como autenticada para Almacén
-                session['almacen_user_id'] = user[0] # Guarda el ID del usuario de Almacén
-                session['almacen_username'] = user[1] # Guarda el nombre de usuario de Almacén
-                flash(f'Bienvenido al módulo de Almacén Taras, {user[1]}!', 'success')
-                return redirect(next_url or url_for('almacen_taras.almacen_dashboard'))
+            with open(json_file_path, 'r', encoding='utf-8') as f:
+                allowed_carnets_data = json.load(f)
+
+            allowed_carnets_list = allowed_carnets_data.get('allowed_carnets', [])
+            carnet_str = str(carnet_id)
+
+            if carnet_str in allowed_carnets_list:
+                session['taras_access_validated'] = True
+                session['taras_role'] = 'taras_user'
+
+                session['taras_user_id'] = session.get('user_id', carnet_str)
+                session['taras_username'] = session.get('user_name', 'Usuario Taras')
+                session['taras_employee_id'] = carnet_str
+
+                session.permanent = False
+
+                return redirect(next_url or url_for('taras.solicitudes_cores_view'))
             else:
-                flash('Usuario o contraseña incorrectos.', 'danger')
+                flash('Carnet no autorizado para este módulo.', 'danger')
+                _clear_taras_session()
+                current_app.logger.warning(f"Intento de validación fallido para carnet: {carnet_str}. No autorizado en allowed_carnets_taras.json")
+
+        except FileNotFoundError:
+            flash('Error de configuración: El archivo de carnets autorizados para Taras no se encontró. Contacta a soporte.', 'danger')
+            current_app.logger.error(f"Archivo JSON de carnets para Taras no encontrado en: {json_file_path}")
+            _clear_taras_session()
+        except json.JSONDecodeError:
+            flash('Error de configuración: El archivo de carnets autorizados para Taras no es un JSON válido. Contacta a soporte.', 'danger')
+            current_app.logger.error(f"Error al decodificar JSON en: {json_file_path}")
+            _clear_taras_session()
         except Exception as e:
-            current_app.logger.error(f"Error durante el login de Almacén Taras para el usuario {username}: {e}", exc_info=True)
-            flash('Ocurrió un error al intentar iniciar sesión.', 'danger')
-        finally:
-            if conn:
-                conn.close() # Asegura que la conexión a la DB se cierre
+            flash('Ocurrió un error inesperado al validar el carnet. Intenta de nuevo o contacta a soporte.', 'danger')
+            current_app.logger.error(f"Error general al validar carnet para Taras con JSON: {e}", exc_info=True)
+            _clear_taras_session()
 
-    # Renderiza la plantilla del formulario de login
-    return render_template('almacen_taras/almacen_login.html', next=request.args.get('next'))
+    return render_template('taras/taras_entry.html',
+                           nombre_proceso="Taras",
+                           subseccion="Acceso al Módulo",
+                           next=request.args.get('next'))
 
 
-@almacen_taras_bp.route('/dashboard')
-@login_required_almacen # Protege esta ruta con el decorador
-def almacen_dashboard():
+@taras_bp.route('/solicitudes_cores')
+@validation_required_taras
+def solicitudes_cores_view():
     """
-    Página principal del módulo de Almacén Taras (protegida).
+    Muestra el listado y la gestión de solicitudes de cores, cargando datos desde un webhook
+    a través de taras_api.py.
     """
-    return render_template('almacen_taras/almacen_dashboard.html',
-                           username_almacen=session.get('almacen_username'),
-                           nombre_proceso="Almacén Taras",
-                           subseccion="Dashboard")
+    # Llamar a la función del módulo taras_api en el mismo directorio
+    solicitudes, error_message = get_solicitudes_cores()
 
-@almacen_taras_bp.route('/logout')
-def almacen_logout():
-    """
-    Cierra la sesión específica del módulo de Almacén Taras.
-    """
-    session.pop('almacen_logged_in', None)
-    session.pop('almacen_user_id', None)
-    session.pop('almacen_username', None)
-    flash('Has cerrado sesión del módulo de Almacén Taras.', 'info')
-    return redirect(url_for('almacen_taras.almacen_login'))
+    if error_message:
+        flash(error_message, 'danger')
 
-# Ejemplo de ruta protegida dentro de Almacén Taras
-@almacen_taras_bp.route('/gestion_taras')
-@login_required_almacen # Esta ruta también requiere autenticación de Almacén
-def gestion_taras():
-    """
-    Página de gestión de taras dentro del módulo de Almacén (protegida).
-    """
-    return render_template('almacen_taras/gestion_taras.html',
-                           username_almacen=session.get('almacen_username'),
-                           nombre_proceso="Almacén Taras",
-                           subseccion="Gestión de Taras")
+    return render_template(
+        'taras/solicitudes_cores.html',
+        nombre_proceso="Taras",
+        subseccion="Gestión de Solicitudes de Cores",
+        username=session.get('taras_username', 'Usuario Taras'),
+        url_volver=url_for('taras.taras_entry'),
+        solicitudes=solicitudes
+    )
+
+@taras_bp.route('/exit_module')
+def taras_exit_module():
+    _clear_taras_session()
+    flash('Has salido del módulo de Taras.', 'info')
+    return redirect(url_for('main.login'))

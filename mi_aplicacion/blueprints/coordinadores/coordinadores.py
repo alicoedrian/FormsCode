@@ -180,6 +180,7 @@ def aprobacion_monitoreo_cuchillas():
 @validation_required_coordinador
 @role_required_coordinador(['coordinator', 'admin'])
 def validar_monitoreo_cuchillas():
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     data = request.get_json()
     item_id = data.get('id')
     cantidad_verificada = data.get('cantidad_verificada')
@@ -188,27 +189,35 @@ def validar_monitoreo_cuchillas():
 
     # Validación inicial de datos
     if not item_id or cantidad_verificada is None or not verificacion or not responsable_verificacion_full:
-        flash('Datos incompletos para la validación.', 'danger')
-        # Redirige para mostrar el flash message
+        message = 'Datos incompletos para la validación.'
+        if is_ajax:
+            return jsonify(success=False, message=message, category="danger"), 400
+        flash(message, 'danger')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
 
     try:
         cantidad_verificada = int(cantidad_verificada)
     except ValueError:
-        flash('La cantidad verificada debe ser un número entero válido.', 'danger')
-        # Redirige para mostrar el flash message
+        message = 'La cantidad verificada debe ser un número entero válido.'
+        if is_ajax:
+            return jsonify(success=False, message=message, category="danger"), 400
+        flash(message, 'danger')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
 
     # Llama a la función de la API para actualizar el registro
     result = update_monitoreo_cuchillas_record(item_id, cantidad_verificada, verificacion, responsable_verificacion_full)
 
     if result['success']:
-        flash('Registro aprobado con éxito.', 'success') # <-- Mensaje de éxito para el usuario
-        # Redirige a la misma página. El navegador la recargará y mostrará el flash message.
+        message = 'Registro aprobado con éxito.'
+        if is_ajax:
+            return jsonify(success=True, message=message, category="success"), 200
+        flash(message, 'success')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
     else:
-        # En caso de error de la API
-        flash(f"Error al actualizar el registro: {result['message']}", 'danger') # <-- Mensaje de error para el usuario
+        message = f"Error al actualizar el registro: {result['message']}"
+        if is_ajax:
+            return jsonify(success=False, message=message, category="danger"), 400
+        flash(message, 'danger')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
 
 

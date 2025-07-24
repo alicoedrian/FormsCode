@@ -91,10 +91,7 @@ def despeje_linea_form():
     elif proceso_origen == 'sellado':
         proceso_origen_nombre_breadcrumb = "Sellado"
         url_volver_proceso_breadcrumb = url_for('sellado.proceso_sellado_dashboard')
-    # Añade más 'elif' para otros orígenes si los tienes
-    
-    # Fallback para el botón "Volver" si el origen no está en el mapeo o es 'General'
-    # Esta 'url_volver' se usa en el botón final del formulario
+
     url_volver_fallback_button = url_volver_proceso_breadcrumb if url_volver_proceso_breadcrumb else url_for('main.home')
 
 
@@ -164,13 +161,9 @@ def despeje_linea_form():
                 validation_errors.append(('trabajo',f"Error validando trabajo: {job_api_res['message']}"))
             else:
                 parte_del_trabajo_api = job_api_res.get('parte', "")
-                # Solo añadir advertencia si la parte del trabajo de la API es diferente a la ingresada
-                # ya que el campo 'parte' en el formulario es readonly y se llena desde la API
-                # Si el campo 'parte' no se llenó, es error de la API o del frontend.
+
                 if datos.get('parte') != parte_del_trabajo_api:
-                    # Esta validación puede ser menos estricta si el campo 'parte' es readonly y ya se validó
-                    # que el trabajo existe. Podría ser un error de sincronización de datos o que la API no devuelva parte.
-                    # Por ahora, la mantenemos como advertencia si los datos no coinciden, aunque en un readonly debería coincidir
+ 
                     validation_errors.append(('parte', f"ADVERTENCIA: La parte del trabajo '{trabajo_input}' según Epicor es '{parte_del_trabajo_api}', diferente a la ingresada ('{datos.get('parte')}')."))
         
         # --- Validación del Autorizador por Carnet ---
@@ -236,9 +229,7 @@ def despeje_linea_form():
             "trabajo": datos.get('trabajo'),
             "parte": datos.get('parte'), 
             "tipo_despeje": datos.get('tipo_despeje'), 
-            # Si "razon_despeje" y "despeje_realizado" y "confirmacion_supervisor"
-            # no están en el formulario HTML, aparecerán como None aquí.
-            # Asegúrate de que tu modelo de DB maneje esto, o asigna valores por defecto.
+
             "razon_despeje": datos.get('razon_despeje'), 
             "despeje_realizado": datos.get('despeje_realizado'), 
             "confirmacion_supervisor": datos.get('confirmacion_supervisor'), 

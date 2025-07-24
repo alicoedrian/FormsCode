@@ -18,7 +18,9 @@ from .blueprints.transversal.empalme_turno import empalme_turno_bp
 from .blueprints.sellado.sellado_form_se30_se47 import se30_se47_bp 
 from .blueprints.transversal.despeje_linea import despeje_linea_bp
 from .blueprints.transversal.monitoreo_cuchillas import monitoreo_cuchillas_bp
-from .blueprints.coordinadores.coordinadores import coordinadores_bp 
+from .blueprints.coordinadores.coordinadores import coordinadores_bp
+from .blueprints.taras.taras import taras_bp
+
 
 
 def create_app():
@@ -26,8 +28,6 @@ def create_app():
 
     # 1. Cargar variables de entorno del archivo .env
     load_dotenv() 
-
-
 
     app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_for_dev')
     app.config['EPICOR_API_TOKEN'] = os.getenv('EPICOR_API_TOKEN')
@@ -47,8 +47,10 @@ def create_app():
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL')
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION')
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR') # Carga la URL del coordinador
+    app.config['WEBHOOK_CORES_URL_SELECT'] = os.getenv('WEBHOOK_CORES_URL_SELECT') # Carga la URL del coordinador
 
-    # Configuración del logger (si no lo tienes ya, es buena práctica)
+
+
     if not app.logger.handlers:
         file_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
         file_handler.setFormatter(logging.Formatter(
@@ -71,5 +73,7 @@ def create_app():
     app.register_blueprint(despeje_linea_bp, url_prefix='/shared')
     app.register_blueprint(monitoreo_cuchillas_bp, url_prefix='/shared') 
     app.register_blueprint(coordinadores_bp)
+    app.register_blueprint(taras_bp)
+
 
     return app

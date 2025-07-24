@@ -59,7 +59,7 @@ def home():
         {"nombre": "Sellado", "url": url_for('sellado.proceso_sellado_dashboard'), "icono": "fas fa-box-open", "descripcion": "Formularios y estándares de Sellado.", "color_icono": "#2ECC71"},
         {"nombre": "Insertadoras", "url": "#", "icono": "fas fa-cogs", "descripcion": "En desarrollo.", "color_icono": "#34495E"}, 
         {"nombre": "Aditamentos", "url": "#", "icono": "fas fa-tools", "descripcion": "En desarrollo.", "color_icono": "#7F8C8D"}, 
-        {"nombre": "Taras", "url": "#", "icono": "fas fa-weight", "descripcion": "En desarrollo.", "color_icono": "#8D6E63"}, 
+        {"nombre": "Taras", "url": url_for('taras.taras_entry'), "icono": "fas fa-weight", "descripcion": "Módulo para la gestión de Taras de producción.", "color_icono": "#8D6E63"}, # <-- ¡CAMBIO AQUÍ!
         {"nombre": "Procesos Manuales", "url": "#", "icono": "fas fa-hand-paper", "descripcion": "En desarrollo.", "color_icono": "#AAB7B8"},
         {"nombre": "Coordinadores de Verificación", "url": url_for('coordinadores.coordinadores_entry'), "icono": "fas fa-user-tie", "descripcion": "Módulo de gestión de usuarios y verificación de datos.", "color_icono": "#3F51B5"},
 
