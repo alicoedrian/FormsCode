@@ -26,11 +26,9 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    color: var(--gray-800);
-    line-height: 1.6;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
 }
+
 
 /* Breadcrumb Navigation */
 .breadcrumb-nav {
@@ -74,11 +72,16 @@ body {
 }
 
 /* Page Header */
+/* Page Header */
 .page-header {
     background: var(--white);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
+    /* ¡CAMBIO IMPORTANTE AQUÍ! */
+    /* Remove or set to a small value (e.g., 0 or 1rem) */
+    /* If you want space between header and breadcrumb/page-header, add it to the first element in main. */
+    margin-top: 0;   /* <-- ¡CAMBIA ESTO! */
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--gray-200);
     position: relative;
@@ -197,30 +200,28 @@ body {
 .option-card {
     background: var(--white);
     border-radius: 16px;
-    padding: 1.75rem;
+    padding: 1.5rem;
     text-decoration: none;
     color: inherit;
-    box-shadow: var(--shadow-sm);
     border: 1px solid var(--gray-200);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
     position: relative;
     overflow: hidden;
-    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.option-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
+.option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--gray-300);
 }
+
 
 .option-card:hover {
     transform: translateY(-6px);

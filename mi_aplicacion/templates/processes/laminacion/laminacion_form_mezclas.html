@@ -77,15 +77,15 @@
                     {# --- FIN NUEVO CAMPO --- #}
                     <div class="form-question-card">
                         <label for="peso_adhesivo" class="form-label">Peso adhesivo (kg) <span class="required-asterisk">*</span></label>
-                        <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 10.50" value="{{ form_data.peso_adhesivo | default('') }}">
+                        <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 100" value="{{ form_data.peso_adhesivo | default('') }}">
                     </div>
                     <div class="form-question-card">
                         <label for="peso_correactante" class="form-label">Peso correactante (kg) <span class="required-asterisk">*</span></label>
-                        <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 1.23" value="{{ form_data.peso_correactante | default('') }}">
+                        <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 78" value="{{ form_data.peso_correactante | default('') }}">
                     </div>
                     <div class="form-question-card">
                         <label for="relacion_mezcla" class="form-label">Relación de mezcla <span class="required-asterisk">*</span></label>
-                        <input type="number" step="0.01" class="form-control" id="relacion_mezcla" name="relacion_mezcla" required placeholder="Ej. 5.67" value="{{ form_data.relacion_mezcla | default('') }}">
+                        <input type="number" step="0.01" class="form-control" id="relacion_mezcla" name="relacion_mezcla" required placeholder="Ej. 1.28" value="{{ form_data.relacion_mezcla | default('') }}">
                     </div>
                 </div>
             </fieldset>

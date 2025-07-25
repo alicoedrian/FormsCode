@@ -1,119 +1,126 @@
 {# d:\DocumentacionEmpaques\mi_aplicacion\templates\layouts\process_base.html #}
 {% extends "layouts/base_minimal.html" %}
 
+{# Estas variables se esperan que sean pasadas por los templates hijos (ej. corte_dashboard.html) #}
+{# Si la vista no las pasa, tendrán los valores por defecto #}
+{% set username = username | default(session.get('user_name', 'Invitado')) %}
+{% set nombre_proceso = nombre_proceso | default('') %}
+
 {# Bloque para el título de la página en la pestaña del navegador #}
-{% block title %}{% block process_title %}Proceso{% endblock %} - Planta Empaque{% endblock %}
+{% block title %}
+    {% block process_title %}{{ nombre_proceso }}{% endblock %} - Planta Empaques
+{% endblock %}
 
 {# Bloque para añadir estilos CSS específicos de la página de proceso #}
 {% block head_css %}
-    {{ super() }} {# <--- ¡ESTA LÍNEA ES CRÍTICA Y DEBE IR AQUÍ! #}
-<style>
-    /* Estilos globales para las páginas de proceso (afectan al body y header/main general) */
-    body.process-page-body {
-        background-color: #f4f6f8; /* Un color de fondo suave para las páginas de proceso */
-        margin: 0;
-        padding: 0;
-        font-family: 'Roboto', sans-serif; /* Fuente recomendada */
-        padding-top: 65px; /* Espacio para el header fijo */
-    }
+    {{ super() }}
 
-    .process-header {
-        background-color: #2C3E50; /* Color de fondo oscuro para la cabecera */
-        color: white; /* Color del texto de la cabecera */
-        padding: 0 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 65px; /* Altura fija de la cabecera */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra suave */
-        position: fixed; /* Hace que la cabecera sea fija al desplazar */
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000; /* Asegura que la cabecera esté siempre encima de otros elementos */
-    }
-    .process-header .logo-area img {
-        max-height: 40px; /* Esto es bueno, es un límite */
-        height: 40px;     /* ¡Asegura la altura fija! */
-        width: auto;      /* Permite que el ancho se ajuste automáticamente */
-        vertical-align: middle;
-        /* Opcional: Si quieres que no se salga del contenedor padre y se ajuste si es muy ancha */
-        object-fit: contain; 
-    }
-    .process-header .user-info {
-        font-size: 0.95em;
-    }
-    .process-header .user-info span {
-        margin-right: 15px;
-    }
-    .process-header .user-info a {
-        color: #ECF0F1; /* Color de enlace claro */
-        text-decoration: none;
-        font-weight: 500;
-        padding: 8px 12px;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-    }
-    .process-header .user-info a:hover {
-        background-color: #3f5870; /* Cambio de color al pasar el ratón */
-    }
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
 
-    .process-main-content {
-        padding: 30px;
-        max-width: 1200px; /* Opcional: limita el ancho máximo del contenido principal */
-        margin: 0 auto; /* Centra el contenido principal en la página */
-    }
+    <style>
+        body.process-page-body {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
+            font-family: 'Poppins', sans-serif;
+            color: var(--gray-800);
+            line-height: 1.6;
+            /* ¡AJUSTA ESTE VALOR! */
+            /* Reemplaza 'Xpx' con la altura exacta que encontraste en el Paso 1 para .home-header */
+            /* Si tu home-header es fijo, este padding es crucial. Si no es fijo, este valor debe ser 0. */
+            padding-top: Xpx; /* Ejemplo: 64px, 72px, etc. */
+            min-height: 100vh;
+        }
 
-    /* Estilos para mensajes flash (notificaciones) */
-    .flash-messages-process { list-style: none; padding: 0; margin: 0 0 20px 0; }
-    .flash-messages-process li {
-        padding: 12px 18px; border-radius: 6px; margin-bottom: 10px; font-size: 0.95em;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .process-main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            /* Si quieres un pequeño espacio entre el encabezado y el contenido principal,
+               puedes añadir un margin-top aquí en process-main-content, por ejemplo: */
+            /* margin-top: 1rem; */
+        }
 
-</style>
-{# Este bloque permite que las plantillas hijas añadan estilos CSS adicionales a la sección <head> #}
-{% block process_head_css %}{% endblock %} 
+        .firma-hm {
+            position: fixed;
+            bottom: 14px;
+            right: 22px;
+            font-size: 1.15rem;
+            color: var(--primary);
+            opacity: 0.7;
+            font-family: 'Poppins', cursive, sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .flash-messages-process { list-style: none; padding: 0; margin: 0 0 20px 0; }
+        .flash-messages-process li {
+            padding: 12px 18px; border-radius: 6px; margin-bottom: 10px; font-size: 0.95em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-danger  { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+    </style>
+    {% block process_head_css %}{% endblock %} 
 {% endblock %}
 
-{# Este bloque 'body_content' es heredado de base_minimal.html y contendrá toda la estructura del body #}
 {% block body_content %}
-    <header class="process-header">
-        <div class="logo-area">
-            {# Enlace a la página principal usando el blueprint 'main' #}
-            <a href="{{ url_for('main.home') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
-            </a>
+    <header class="home-header">
+        <div class="logo-section">
+            <div class="logo-container">
+                <a href="{{ url_for('main.home') }}" class="logo-area">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Empresa">
+                </a>
+            </div>
+            <div class="brand-info">
+                <h1>{{ nombre_proceso }}</h1>
+            </div>
         </div>
-        <div class="user-info">
-            <span><i class="fas fa-user-circle"></i> {{ session.get('user_name', 'Invitado') }}</span>
-            {# Enlace para cerrar sesión usando el blueprint 'main' #}
-            <a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        <div class="user-section">
+            <div class="user-profile">
+                <div class="user-avatar">{{ username[0].upper() }}</div>
+                <div class="user-details">
+                    <div class="user-name">{{ username }}</div>
+                </div>
+            </div>
+            <a href="{{ url_for('main.logout') }}" class="logout-button">
+                <i class="fas fa-sign-out-alt"></i>
+                Salir
+            </a>
         </div>
     </header>
 
     <main class="process-main-content">
-        {# Contenedor para las notificaciones flotantes (AJAX/JS) #}
         <div id="notification-container"></div>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages-process">
+                    {% for category, message in messages %}
+                        <li class="flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-        {# ESTE ES EL BLOQUE PRINCIPAL DONDE SE INYECTARÁ EL CONTENIDO ESPECÍFICO DE CADA PÁGINA #}
         {% block process_page_content %}{% endblock %}
     </main>
+
+    <div class="firma-hm">Hm</div>
+
 {% endblock %}
 
-{# Este bloque 'scripts' es heredado de base_minimal.html y es donde se incluyen todos los scripts JS #}
 {% block scripts %}
-    {{ super() }} {# <--- También es recomendable aquí si base_minimal.html tiene scripts #}
-    {# ESTE ES EL BLOQUE ESPECÍFICO PARA SCRIPTS DE LA PÁGINA INDIVIDUAL #}
-    {# Las plantillas hijas como empalme_turno_form.html deben usar este bloque #}
-    {% block process_page_scripts %}{% endblock %} 
+    {{ super() }}
 
-    {# Pequeño script para añadir una clase al body, si es necesario. Puede moverse al CSS si es estático. #}
     <script>
         document.body.classList.add('process-page-body');
     </script>
+
+    {% block process_page_scripts %}{% endblock %} 
 {% endblock %}
