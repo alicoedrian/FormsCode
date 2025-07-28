@@ -20,12 +20,7 @@ def proceso_impresion_dashboard():
             "url": url_for('empalme_turno.empalme_turno_form', origen='impresion'), 
             "icono": "fas fa-handshake", 
             "descripcion": "Registrar checklist 5S y novedades del empalme de turno."
-    },{ 
-        "nombre": "Despeje de Línea",
-        "url": url_for('despeje_linea.despeje_linea_form', origen='impresion'), 
-        "icono": "fas fa-broom", 
-        "descripcion": "Registrar el despeje de línea antes de una nueva orden."
-        },
+    }
     ]
     
     return render_template(

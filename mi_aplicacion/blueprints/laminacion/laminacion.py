@@ -93,12 +93,7 @@ def proceso_laminacion_dashboard():
         "url": url_for('laminacion.proceso_laminacion_form_mezclas'),
         "icono": "fas fa-flask",
         "descripcion": "Registrar nueva mezcla de adhesivos."
-    },{ 
-        "nombre": "Despeje de Línea",
-        "url": url_for('despeje_linea.despeje_linea_form', origen='laminacion'), 
-        "icono": "fas fa-broom", 
-        "descripcion": "Registrar el despeje de línea antes de una nueva orden."
-        }, {
+    },{
         "nombre": "Solicitud de Cores",
         "url": url_for('shared_forms.solicitud_cores_form', origen='laminacion'),
         "icono": "fas fa-tape",

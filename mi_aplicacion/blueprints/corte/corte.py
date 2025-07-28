@@ -24,12 +24,7 @@ def proceso_corte_dashboard():
             "url": url_for('monitoreo_cuchillas.monitoreo_cuchillas_form', origen='corte'), 
             "icono": "fas fa-cogs", # Opcional: puedes usar 'fas fa-cut' también si quieres
             "descripcion": "Registrar el monitoreo de las cuchillas."
-        },{ 
-        "nombre": "Despeje de Línea",
-        "url": url_for('despeje_linea.despeje_linea_form', origen='corte'), 
-        "icono": "fas fa-broom", 
-        "descripcion": "Registrar el despeje de línea antes de una nueva orden."
-        },
+        }
     ]
     
     return render_template(
