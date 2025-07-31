@@ -98,16 +98,6 @@
     <main class="process-main-content">
         <div id="notification-container"></div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages-process">
-                    {% for category, message in messages %}
-                        <li class="flash-{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-
         {% block process_page_content %}{% endblock %}
     </main>
 

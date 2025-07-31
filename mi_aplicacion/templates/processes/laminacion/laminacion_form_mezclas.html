@@ -76,11 +76,11 @@
                     </div>
                     {# --- FIN NUEVO CAMPO --- #}
                     <div class="form-question-card">
-                        <label for="peso_adhesivo" class="form-label">Peso adhesivo (kg) <span class="required-asterisk">*</span></label>
+                        <label for="peso_adhesivo" class="form-label">Peso adhesivo sin vaso (mg) <span class="required-asterisk">*</span></label>
                         <input type="number" step="0.01" class="form-control" id="peso_adhesivo" name="peso_adhesivo" required placeholder="Ej. 100" value="{{ form_data.peso_adhesivo | default('') }}">
                     </div>
                     <div class="form-question-card">
-                        <label for="peso_correactante" class="form-label">Peso correactante (kg) <span class="required-asterisk">*</span></label>
+                        <label for="peso_correactante" class="form-label">Peso correactante sin vaso (mg) <span class="required-asterisk">*</span></label>
                         <input type="number" step="0.01" class="form-control" id="peso_correactante" name="peso_correactante" required placeholder="Ej. 78" value="{{ form_data.peso_correactante | default('') }}">
                     </div>
                     <div class="form-question-card">
@@ -133,9 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     detailsHtml = `<div class="small mt-1">${response.details}</div>`;
                 } else if (response.data && response.data.relacion_calculada) {
                     detailsHtml = `<div class="small mt-1">Relación calculada: ${response.data.relacion_calculada}</div>`;
-                    if (response.data.id_registro_webhook) {
-                        detailsHtml += `<div class="small mt-1">ID de registro: ${response.data.id_registro_webhook}</div>`;
-                    }
                 }
 
                 alert.innerHTML = `

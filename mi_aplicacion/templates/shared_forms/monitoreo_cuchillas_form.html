@@ -56,8 +56,8 @@
                             <select class="form-select" id="proceso_seleccionado" name="proceso_seleccionado" required>
                                 <option value="">Seleccione un proceso</option>
                                 {# OPCIONES HARDCODEADAS DIRECTAMENTE EN HTML CON EL CASING CORRECTO #}
-                                <option value="Extrusion Empaques" {% if form_data.proceso_seleccionado == 'Extrusion Empaques' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Extrusion Empaques') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Extrusion Empaques</option>
-                                <option value="Impresion Empaques" {% if form_data.proceso_seleccionado == 'Impresion Empaques' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Impresion Empaques') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Impresion Empaques</option>
+                                <option value="Extrusion" {% if form_data.proceso_seleccionado == 'Extrusion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Extrusion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Extrusion</option>
+                                <option value="Impresion" {% if form_data.proceso_seleccionado == 'Impresion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Impresion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Impresion</option>
                                 <option value="Laminacion" {% if form_data.proceso_seleccionado == 'Laminacion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Laminacion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Laminacion</option>
                                 <option value="Corte" {% if form_data.proceso_seleccionado == 'Corte' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Corte') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Corte</option>
                                 <option value="Sellado" {% if form_data.proceso_seleccionado == 'Sellado' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Sellado') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Sellado</option>
@@ -226,8 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Máquinas por proceso ---
     const MAQUINAS_POR_PROCESO_JS = {
-        "Extrusion Empaques": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
-        "Impresion Empaques": ["FL15", "FL16", "FL18", "FL20", "FL21", "FL22"],
+        "Extrusion": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
+        "Impresion": ["FL15", "FL16", "FL18", "FL20", "FL21", "FL22"],
         "Laminacion": ["LA02", "LA03", "LA04", "LA05", "LA06"],
         "Corte": ["RF01", "RF02", "RF03", "RF04", "RF05", "RF06", "RF07", "RF08", "RF09", "RF10", "RF11", "RF12", "RF13", "RF14", "RF15", "RF16", "RF17"],
         "Sellado": ["SE14", "SE15", "SE16", "SE18", "SE19", "SE20", "SE23", "SE25", "SE26", "SE30", "SE31", "SE34", "SE35", "SE38", "SE41", "SE42", "SE45", "SE46", "SE47", "SE50", "SE52", "SE55", "SE56"],

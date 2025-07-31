@@ -241,14 +241,33 @@ def proceso_laminacion_form_mezclas():
         webhook_result = enviar_a_webhook_externo(payload_para_webhook)
         
         if webhook_result["success"]:
+            id_from_webhook = None # Inicializamos la variable que contendrá el ID
+
+            # Obtenemos el contenido de 'data'. Esto podría ser una lista o un diccionario.
+            webhook_data_content = webhook_result.get("data") 
+
+            # Verificamos si es una lista y si tiene elementos
+            if isinstance(webhook_data_content, list) and len(webhook_data_content) > 0:
+                # Si es una lista, intentamos obtener el primer elemento
+                first_item = webhook_data_content[0]
+                # Y si ese primer elemento es un diccionario, obtenemos el ID
+                if isinstance(first_item, dict):
+                    id_from_webhook = first_item.get('id')
+                else:
+                    current_app.logger.warning(f"DEBUG: El primer elemento de 'data' no es un diccionario: {first_item}")
+            elif isinstance(webhook_data_content, dict): # Esto es para el caso en que sea directamente un diccionario (comportamiento anterior)
+                id_from_webhook = webhook_data_content.get('id')
+            else:
+                current_app.logger.warning(f"DEBUG: Formato inesperado para 'webhook_result[\"data\"]': {webhook_data_content}")
+
             return jsonify({
                 "success": True,
                 "message": final_message,
                 "category": final_category,
-                "details": final_details, # Incluye las advertencias aquí
-                "data": { # Puedes incluir datos relevantes para mostrar en la notificación
+                "details": final_details,
+                "data": {
                     "relacion_calculada": relacion_calculada,
-                    "id_registro_webhook": webhook_result["data"].get('id')
+                    "id_registro_webhook": id_from_webhook # <--- Usa el ID extraído de forma segura aquí
                 }
             }), 200
         else:
