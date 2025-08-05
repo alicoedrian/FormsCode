@@ -1,0 +1,267 @@
+/*
+ * Archivo: aprobacion_cuchillas_styles.css
+ * Descripción: Estilos específicos para la página de aprobación de cuchillas.
+ * Se basa en el diseño de los formularios de monitoreo para mantener consistencia.
+ */
+
+/* ==========================================================================
+   Configuraciones de layout y contenedor
+   ========================================================================== */
+
+/* Ajuste del contenedor principal para que todo se vea centrado y profesional */
+.process-main-content {
+    max-width: 1000px !important;
+    width: 100% !important;
+    padding: 1.5rem !important;
+    margin: 0 auto !important;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Breadcrumb y elementos de control
+   ========================================================================== */
+
+.breadcrumb-nav {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-section-container {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 0.8rem 1.2rem;
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    width: 100%;
+    max-width: 1000px;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+}
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-section label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+}
+
+.filter-section select {
+    flex-grow: 0;
+    width: auto;
+    min-width: 160px;
+    height: calc(1.6rem + 2px);
+    padding: 0.15rem 0.3rem;
+    font-size: 0.7rem;
+}
+
+/* ==========================================================================
+   Estilos de la Tabla (Vista de listado)
+   ========================================================================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.aprobacion-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* Ancho mínimo para mantener la estructura */
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.aprobacion-table thead th {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    font-weight: 600;
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    white-space: nowrap;
+}
+/* Añade esto a tu archivo CSS */
+.aprobacion-table tbody tr {
+    cursor: pointer; /* Cambia el cursor a una mano */
+    transition: background-color 0.2s ease; /* Añade una transición suave para el hover */
+}
+
+.aprobacion-table tbody tr:hover {
+    background-color: #f1f1f1; /* Resalta la fila al pasar el ratón */
+}
+
+/* Opcional: si quieres que el ID se vea como un enlace, pero que no sea el único punto de clic, puedes quitarle el estilo de enlace */
+.aprobacion-table tbody tr .clickable-id {
+    color: inherit;
+    text-decoration: none;
+}
+
+.aprobacion-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.aprobacion-table tbody tr:nth-of-type(odd) {
+    background-color: var(--gray-50);
+}
+
+.aprobacion-table tbody tr:hover {
+    background-color: var(--gray-100);
+}
+
+.aprobacion-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+    text-align: center;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.aprobacion-table td:nth-child(5) {
+    text-align: left; /* Alinea el nombre del operario a la izquierda */
+    white-space: normal;
+    max-width: none;
+}
+
+.clickable-id {
+    color: var(--primary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.clickable-id:hover {
+    color: var(--primary-dark);
+    text-decoration: none;
+}
+
+.no-records-message {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--gray-600);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Estilos del Formulario de Detalles (Vista de formulario)
+   ========================================================================== */
+.form-container {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-title {
+    color: var(--primary-dark);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.form-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.card-item {
+    background-color: var(--gray-50);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--gray-200);
+}
+
+.item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.2rem;
+    color: var(--primary);
+}
+
+.item-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.item-header .icon-header {
+    font-size: 1.25rem;
+}
+
+.item-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.field-group label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+}
+
+.field-group .form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+.field-group .readonly-value {
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    word-wrap: break-word; /* Para nombres largos */
+}
+
+/* Botones de acción del formulario */
+.action-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn {
+    min-width: 120px;
+}

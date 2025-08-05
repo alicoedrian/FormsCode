@@ -1,48 +1,44 @@
 {% extends "layouts/process_base.html" %}
 
-{% block process_title %}{{ nombre_proceso }} - {{ subseccion }}{% endblock %}
+{% block process_title %}Aprobación de Cuchillas{% endblock %}
 
 {% block process_head_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/process_styles.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/aprobacion_cuchillas_table_styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aprobacion_cuchillas_styles.css') }}">
 {% endblock %}
 
 {% block process_page_content %}
-    {# BREADCRUMB - COMO ELEMENTO DE NAVEGACIÓN #}
-    <nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
-        <a href="{{ url_for('main.home') }}">
-            <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
-            Inicio
-        </a>
-        <span class="separator">›</span>
-        <a href="{{ url_for('coordinadores.coordinadores_dashboard') }}">
-             Coordinadores de Verificación
-        </a>
-        <span class="separator">›</span>
-        <span class="current-page">Aprobación Cuchillas</span>
-    </nav>
 
-    {# CONTENEDOR SOLO PARA EL FILTRO #}
-    <div class="filter-section-container fade-in-up">
-        <div class="filter-section">
-            <label for="procesoFilter">Filtrar por Proceso:</label>
-            <select id="procesoFilter" class="form-control form-control-sm">
-                <option value="">Todos los Procesos</option>
-                {% set unique_procesos = [] %}
-                {% for item in data %}
-                    {% if item.proceso not in unique_procesos %}
-                        {% set _ = unique_procesos.append(item.proceso) %}
-                        <option value="{{ item.proceso }}">{{ item.proceso }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
+<nav aria-label="breadcrumb" class="breadcrumb-nav fade-in-up">
+    <a href="{{ url_for('main.home') }}">
+        <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+        Inicio
+    </a>
+    <span class="separator">›</span>
+    <a href="{{ url_for('coordinadores.coordinadores_dashboard') }}">
+        Coordinadores de Verificación
+    </a>
+    <span class="separator">›</span>
+    <span class="current-page">Aprobación Cuchillas</span>
+</nav>
+
+<div class="filter-section-container fade-in-up" id="filter-section-container">
+    <div class="filter-section">
+        <label for="procesoFilter">Filtrar por Proceso:</label>
+        <select id="procesoFilter" class="form-control form-control-sm">
+            <option value="">Todos los Procesos</option>
+            {% set unique_procesos = data|map(attribute='proceso_seleccionado')|unique|list %}
+            {% for proceso in unique_procesos %}
+                <option value="{{ proceso }}">{{ proceso }}</option>
+            {% endfor %}
+        </select>
     </div>
+</div>
 
-    {# TABLA DE DATOS #}
-    <div class="aprobacion-table-wrapper fade-in-up">
-        <table class="aprobacion-table table-bordered table-striped" id="aprobacionTable">
+<div class="table-container fade-in-up" id="table-view">
+    <div class="table-responsive">
+        <table class="aprobacion-table table-striped" id="aprobacionTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -50,227 +46,325 @@
                     <th>Proceso</th>
                     <th>Máquina</th>
                     <th>Operario</th>
-                    <th>Minora Cant.</th>
-                    <th>Acerada Cant.</th>
-                    <th>Cumple</th>
-                    <th>Oxidación</th>
-                    <th>Pérdida</th>
-                    <th>Fractura</th>
-                    <th>Quien Recibe</th>
-                    <th>Cant. Verificada</th>
-                    <th>Verificación</th>
-                    <th>Responsable Verificación</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in data %}
-                <tr data-proceso="{{ item.proceso }}">
-                    <td>{{ item.id_monitoreo }}</td>
+                <tr data-proceso="{{ item.proceso_seleccionado }}" data-details='{{ item|tojson }}'>
+                    <td><a href="#" class="clickable-id">{{ item.id_monitoreo }}</a></td>
                     <td>{{ item.fecha }}</td>
-                    <td>{{ item.proceso }}</td>
+                    <td>{{ item.proceso_seleccionado }}</td>
                     <td>{{ item.maquina }}</td>
                     <td>{{ item.id_operario }} - {{ item.nombre_operario }}</td>
-                    <td>{{ item.minora_cantidad }}</td>
-                    <td>{{ item.acerada_cantidad }}</td>
-                    <td>{{ item.estado_cuchilla_cumple_cantidad }}</td>
-                    <td>{{ item.estado_cuchilla_oxidacion_cantidad }}</td>
-                    <td>{{ item.estado_cuchilla_perdida_cantidad }}</td>
-                    <td>{{ item.estado_cuchilla_fractura_cantidad }}</td>
-                    <td>{{ item.id_quien_recibe }} - {{ item.nombre_quien_recibe }}</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" name="cantidad_verificada_{{ item.id_monitoreo }}" value="{{ item.cantidad_verificada if item.cantidad_verificada is not none else '' }}">
-                    </td>
-                    <td>
-                        <select class="form-control form-control-sm" name="verificacion_{{ item.id_monitoreo }}">
-                            <option value="">Seleccionar</option>
-                            <option value="Aprobado" {% if item.verificacion == 'Aprobado' %}selected{% endif %}>Aprobado</option>
-                            <option value="Rechazado" {% if item.verificacion == 'Rechazado' %}selected{% endif %}>Rechazado</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm" name="responsable_verificacion_{{ item.id_monitoreo }}" value="{{ nombre_coordinador }}" readonly>
-                        <input type="hidden" name="id_responsable_verificacion_{{ item.id_monitoreo }}" value="{{ id_coordinador }}">
-                        <input type="hidden" name="nombre_responsable_verificacion_{{ item.id_monitoreo }}" value="{{ nombre_coordinador }}">
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-success btn-sm aprobar-btn" data-id="{{ item.id_monitoreo }}">Aprobar</button>
-                    </td>
                 </tr>
                 {% else %}
-                {# Este mensaje se mostrará si 'data' está vacío al cargar la página #}
                 <tr class="initial-no-records-row">
-                    <td colspan="16" class="no-records-message">No hay registros de monitoreo de cuchillas pendientes de aprobación.</td>
+                    <td colspan="5" class="no-records-message">No hay registros de monitoreo de cuchillas pendientes de aprobación.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
+
+<div class="form-container" id="detail-view" style="display: none;">
+    <h2 class="form-title">Verificación de Monitoreo de Cuchillas</h2>
+    <form id="aprobacionForm" class="form-grid">
+        <input type="hidden" id="current-id-monitoreo">
+
+        <div class="card-item">
+            <div class="item-header">
+                <i class="fas fa-info-circle icon-header"></i>
+                <h3>Datos del Monitoreo</h3>
+            </div>
+            <div class="item-content">
+                <div class="field-group">
+                    <label>ID Monitoreo:</label>
+                    <span id="detail-id" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Fecha:</label>
+                    <span id="detail-fecha" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Proceso:</label>
+                    <span id="detail-proceso" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Máquina:</label>
+                    <span id="detail-maquina" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>ID Operario:</label>
+                    <span id="detail-id-operario" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Nombre Operario:</label>
+                    <span id="detail-nombre-operario" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Turno:</label>
+                    <span id="detail-turno" class="readonly-value"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-item">
+            <div class="item-header">
+                <i class="fas fa-tools icon-header"></i>
+                <h3>Estado de Cuchillas</h3>
+            </div>
+            <div class="item-content">
+                <div class="field-group">
+                    <label>Cantidad Total:</label>
+                    <span id="detail-cantidad-total" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Cuchillas en Máquina:</label>
+                    <span id="detail-numero-cuchillas-maquina" class="readonly-value"></span>
+                </div>
+                
+                <div class="field-group">
+                    <label>Cumple:</label>
+                    <span id="detail-cumple" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label style="opacity: 0;">.</label>
+                    <span class="readonly-value" style="visibility: hidden;">.</span>
+                </div>
+                
+                <div class="field-group">
+                    <label>Oxidación:</label>
+                    <span id="detail-oxidacion" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Pérdida:</label>
+                    <span id="detail-perdida" class="readonly-value"></span>
+                </div>
+                
+                <div class="field-group">
+                    <label>Acciones Oxidación:</label>
+                    <span id="detail-acciones-oxidacion" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Acciones Pérdida:</label>
+                    <span id="detail-acciones-perdida" class="readonly-value"></span>
+                </div>
+
+                <div class="field-group">
+                    <label>Fractura:</label>
+                    <span id="detail-fractura" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label>Acciones Fractura:</label>
+                    <span id="detail-acciones-fractura" class="readonly-value"></span>
+                </div>
+
+            </div>
+        </div>
+        <div class="card-item">
+            <div class="item-header">
+                <i class="fas fa-user-check icon-header"></i>
+                <h3>Verificación</h3>
+            </div>
+            <div class="item-content">
+                <div class="field-group">
+                    <label for="quien-recibe-input">Quien Recibe:</label>
+                    <span id="detail-quien-recibe" class="readonly-value"></span>
+                </div>
+                <div class="field-group">
+                    <label for="cantidad-verificada-input">Cantidad Verificada:</label>
+                    <input type="number" id="cantidad-verificada-input" class="form-control" required>
+                </div>
+                <div class="field-group">
+                    <label for="verificacion-select">Verificación:</label>
+                    <select id="verificacion-select" class="form-control" required>
+                        <option value="">Seleccione...</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Rechazado">Rechazado</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="responsable-verificacion-input">Responsable Verificación:</label>
+                    <input type="text" id="responsable-verificacion-input" class="form-control" readonly value="{{ nombre_coordinador }}">
+                    <input type="hidden" id="id-responsable-verificacion" value="{{ id_coordinador }}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" class="btn btn-secondary" id="back-to-table-btn">Volver</button>
+            <button type="submit" class="btn btn-primary" id="submit-aprobacion-btn">Aprobar</button>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 
 {% block process_page_scripts %}
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const idCoordinador = "{{ id_coordinador }}";
-        const nombreCoordinador = "{{ nombre_coordinador }}";
+document.addEventListener('DOMContentLoaded', function() {
+    const tableContainer = document.getElementById('table-view');
+    const detailContainer = document.getElementById('detail-view');
+    const filterContainer = document.getElementById('filter-section-container');
+    const tableBody = document.querySelector('#aprobacionTable tbody');
+    const procesoFilter = document.getElementById('procesoFilter');
+    const form = document.getElementById('aprobacionForm');
+    const backButton = document.getElementById('back-to-table-btn');
+    const submitButton = document.getElementById('submit-aprobacion-btn');
 
-        console.log("DOMContentLoaded cargado.");
-        console.log("ID Coordinador:", idCoordinador);
-        console.log("Nombre Coordinador:", nombreCoordinador);
+    // Función para mostrar la vista de la tabla y ocultar el formulario de detalles
+    function showTableView() {
+        tableContainer.style.display = 'block';
+        filterContainer.style.display = 'block';
+        detailContainer.style.display = 'none';
+        window.scrollTo(0, 0); // Opcional: regresa al inicio de la página
+    }
 
-        document.querySelectorAll('input[name^="responsable_verificacion_"]').forEach(input => {
-            input.value = nombreCoordinador; // Solo mostrar el nombre
-        });
-        document.querySelectorAll('input[name^="id_responsable_verificacion_"]').forEach(input => {
-            input.value = idCoordinador;
-        });
-        document.querySelectorAll('input[name^="nombre_responsable_verificacion_"]').forEach(input => {
-            input.value = nombreCoordinador;
-        });
+    // Función para mostrar la vista de detalles y rellenar el formulario
+    function showDetailView(data) {
+        // Rellenar el formulario con los datos de la fila
+        document.getElementById('current-id-monitoreo').value = data.id_monitoreo;
+        document.getElementById('detail-id').textContent = data.id_monitoreo;
+        document.getElementById('detail-fecha').textContent = data.fecha;
+        document.getElementById('detail-proceso').textContent = data.proceso_seleccionado;
+        document.getElementById('detail-maquina').textContent = data.maquina;
+        document.getElementById('detail-id-operario').textContent = data.id_operario;
+        document.getElementById('detail-nombre-operario').textContent = data.nombre_operario;
+        document.getElementById('detail-turno').textContent = data.turno;
+        document.getElementById('detail-cantidad-total').textContent = data.cuchilla_cantidad;
+        document.getElementById('detail-cumple').textContent = data.estado_cuchilla_cumple_cantidad;
+        document.getElementById('detail-oxidacion').textContent = data.estado_cuchilla_caso_oxidacion_cantidad;
+        document.getElementById('detail-acciones-oxidacion').textContent = data.acciones_oxidacion || 'N/A';
+        document.getElementById('detail-perdida').textContent = data.estado_cuchilla_caso_perdida_cantidad;
+        document.getElementById('detail-acciones-perdida').textContent = data.acciones_perdida || 'N/A';
+        document.getElementById('detail-fractura').textContent = data.estado_cuchilla_fractura_cantidad;
+        document.getElementById('detail-acciones-fractura').textContent = data.acciones_fractura || 'N/A';
+        document.getElementById('detail-quien-recibe').textContent = data.id_quien_recibe ? `${data.id_quien_recibe} - ${data.nombre_quien_recibe}` : 'N/A';
+        document.getElementById('detail-numero-cuchillas-maquina').textContent = data.numero_cuchillas_maquina || 'N/A';
 
-        document.querySelectorAll('.aprobar-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.dataset.id;
-                const row = this.closest('tr');
-                const cantidadVerificadaInput = row.querySelector(`input[name="cantidad_verificada_${itemId}"]`);
-                const verificacionSelect = row.querySelector(`select[name="verificacion_${itemId}"]`);
+        // Limpiar los campos de verificación para una nueva aprobación
+        document.getElementById('cantidad-verificada-input').value = '';
+        document.getElementById('verificacion-select').value = '';
 
-                const cantidadVerificada = cantidadVerificadaInput.value;
-                const verificacion = verificacionSelect.value;
+        tableContainer.style.display = 'none';
+        filterContainer.style.display = 'none';
+        detailContainer.style.display = 'block';
+        window.scrollTo(0, 0);
+    }
 
-                const idResponsableVerificacion = row.querySelector(`input[name="id_responsable_verificacion_${itemId}"]`).value;
-                const nombreResponsableVerificacion = row.querySelector(`input[name="nombre_responsable_verificacion_${itemId}"]`).value;
+    // Event listener para los clics en toda la fila (Delegación de eventos)
+    tableBody.addEventListener('click', function(e) {
+        // Busca la fila <tr> que fue clickeada
+        const row = e.target.closest('tr');
+        if (row && row.dataset.details) {
+            try {
+                const data = JSON.parse(row.dataset.details);
+                showDetailView(data);
+            } catch (error) {
+                console.error("Error al parsear los datos JSON de la fila:", error);
+                alert("Hubo un error al cargar la información. Por favor, intente de nuevo.");
+            }
+        } else {
+            console.error("No se encontraron datos en la fila.");
+        }
+    });
 
-                console.log(`Intentando aprobar ID: ${itemId}`);
-                console.log(`Cantidad Verificada: ${cantidadVerificada}, Verificación: ${verificacion}`);
-                console.log(`Responsable: ${nombreResponsableVerificacion}`);
+    // Event listener para el botón "Volver"
+    backButton.addEventListener('click', showTableView);
 
-                if (!cantidadVerificada || cantidadVerificada.trim() === '' || isNaN(cantidadVerificada)) {
-                    alert('Por favor, ingrese una Cantidad Verificada numérica válida.');
-                    return;
-                }
-                if (!verificacion || verificacion === "") {
-                    alert('Por favor, seleccione una opción de Verificación.');
-                    return;
-                }
+    // Event listener para el envío del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-                const payload = {
-                    id: itemId,
-                    cantidad_verificada: cantidadVerificada,
-                    verificacion: verificacion,
-                    responsable_verificacion: nombreResponsableVerificacion 
-                };
+        const idMonitoreo = document.getElementById('current-id-monitoreo').value;
+        const cantidadVerificada = document.getElementById('cantidad-verificada-input').value;
+        const verificacion = document.getElementById('verificacion-select').value;
+        const responsableVerificacionNombre = document.getElementById('responsable-verificacion-input').value;
+        if (!cantidadVerificada || verificacion === "") {
+            alert('Por favor, complete todos los campos de verificación.');
+            return;
+        }
 
-                fetch('/coordinadores/validar_monitoreo_cuchillas', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    // Verificar si la respuesta fue una redirección HTTP.
-                    // Si Flask redirige con un flash, response.redirected será true.
-                    if (response.redirected) {
-                        window.location.href = response.url; // Sigue la redirección para cargar la página con el flash
-                        return; // Detiene el procesamiento posterior
-                    }
-                    // Si no fue una redirección, intentamos parsear el JSON (podría ser un error del servidor que no redirigió)
-                    return response.json();
-                })
-                .then(data => {
-                    // Este .then() solo se ejecutará si la respuesta NO fue una redirección HTTP.
-                    // Esto significa que hubo un error y el backend devolvió un JSON de error.
-                    if (data && !data.success) {
-                        alert('Error al registrar la aprobación: ' + (data.message || 'Error desconocido.'));
-                    } else if (data && data.success) {
-                        // En un caso ideal, esto no debería ejecutarse si hay redirección,
-                        // pero es un fallback por si la redirección no se detecta correctamente
-                        // o el backend se comporta de forma inesperada.
-                        console.warn("Backend retornó JSON de éxito sin redirección esperada. Recargando página.");
-                        window.location.reload(); 
-                    }
-                })
-                .catch(error => {
-                    console.error('Error en la solicitud Fetch:', error);
-                    alert('Ocurrió un error de red o interno al intentar aprobar.');
-                });
-            });
-        });
+        const payload = {
+            id: idMonitoreo,
+            cantidad_verificada: parseInt(cantidadVerificada),
+            verificacion: verificacion,
+            responsable_verificacion: responsableVerificacionNombre
 
-        function showNotification(message, category = "success") {
-            const notify = document.getElementById('notificacion-cuchillas');
-            notify.innerHTML = ""; // Limpia anterior
-            const div = document.createElement('div');
-            div.className = `alert alert-${category} alert-dismissible fade show`;
-            div.setAttribute('role', 'alert');
-            div.innerHTML = `
-                <strong>${message}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            notify.appendChild(div);
-            setTimeout(() => { if (div) div.remove(); }, 4000);
-        }
+        };
+        
+        submitButton.disabled = true; // Deshabilitar botón para evitar envíos dobles
+        submitButton.textContent = 'Enviando...';
 
+        fetch('/coordinadores/validar_monitoreo_cuchillas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Si la respuesta indica éxito, recarga la página
+            if (data && data.success) {
+                alert('Registro aprobado exitosamente.'); // Notificación de éxito
+                window.location.reload();
+            } 
+            // Si la respuesta indica un error con un mensaje, muéstralo
+            else if (data && data.message) {
+                alert('Error: ' + data.message);
+            } 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al procesar la solicitud.');
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Aprobar';
+        });
+    });
 
-        const procesoFilter = document.getElementById('procesoFilter');
-        const aprobacionTableBody = document.querySelector('#aprobacionTable tbody');
+    // Lógica de filtrado de la tabla
+    procesoFilter.addEventListener('change', function() {
+        const selectedProceso = this.value;
+        const rows = tableBody.querySelectorAll('tr');
+        let hasRecords = false;
 
-        function filterTableByProceso() {
-            console.log("--- filterTableByProceso() llamada ---");
-            const selectedProceso = procesoFilter.value;
-            console.log("Filtro aplicado. Proceso seleccionado:", selectedProceso);
-            let rowsVisibleCount = 0;
+        // Primero, elimina el mensaje de "no hay registros" si existe
+        let noRecordsRow = tableBody.querySelector('.initial-no-records-row');
+        if (noRecordsRow) {
+            noRecordsRow.remove();
+        }
 
-            document.querySelectorAll('.no-records-message').forEach(el => el.remove());
-            console.log("Mensajes de 'no-records-message' previos eliminados.");
+        rows.forEach(row => {
+            const rowProceso = row.getAttribute('data-proceso');
+            if (selectedProceso === '' || rowProceso === selectedProceso) {
+                row.style.display = '';
+                hasRecords = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
 
-            const currentDataRows = Array.from(aprobacionTableBody.querySelectorAll('tr[data-proceso]'));
-            console.log("Número de filas de datos actuales en el DOM:", currentDataRows.length);
+        // Si no hay registros visibles, crea y añade el mensaje
+        if (!hasRecords) {
+            noRecordsRow = document.createElement('tr');
+            noRecordsRow.classList.add('initial-no-records-row');
+            noRecordsRow.innerHTML = `<td colspan="5" class="no-records-message">No hay registros que coincidan con el filtro.</td>`;
+            tableBody.appendChild(noRecordsRow);
+        }
+    });
 
-            if (currentDataRows.length === 0 && selectedProceso === '') {
-                console.log("No hay filas de datos para filtrar.");
-            } else {
-                currentDataRows.forEach(row => {
-                    const rowProceso = row.dataset.proceso;
-                    console.log(`Evaluando fila. data-proceso: "${rowProceso}", filtro: "${selectedProceso}"`);
-                    if (selectedProceso === '' || rowProceso === selectedProceso) {
-                        row.style.display = 'table-row';
-                        rowsVisibleCount++;
-                        console.log(`    -> Mostrando fila para proceso: ${rowProceso}`);
-                    } else {
-                        row.style.display = 'none';
-                        console.log(`    -> Ocultando fila para proceso: ${rowProceso}`);
-                    }
-                });
-            }
-
-            console.log("Filas visibles después del filtrado:", rowsVisibleCount);
-
-            if (rowsVisibleCount === 0) {
-                const noMessageRow = document.createElement('tr');
-                const messageCell = document.createElement('td');
-                messageCell.colSpan = 16;
-                messageCell.classList.add('no-records-message');
-
-                if (currentDataRows.length === 0) {
-                    messageCell.textContent = 'No hay registros de monitoreo de cuchillas pendientes de aprobación.';
-                    console.log("Mostrando mensaje: 'No hay registros de monitoreo de cuchillas pendientes de aprobación.'");
-                } else {
-                    messageCell.textContent = 'No hay registros que coincidan con el filtro.';
-                    console.log("Mostrando mensaje: 'No hay registros que coincidan con el filtro.'");
-                }
-                noMessageRow.appendChild(messageCell);
-                aprobacionTableBody.appendChild(noMessageRow);
-            }
-        }
-
-        // Llamar a la función de filtrado al cargar la página
-        filterTableByProceso();
-
-        // Adjuntar el event listener para el filtro
-        procesoFilter.addEventListener('change', filterTableByProceso);
-    });
+    // Llamada inicial al filtro para asegurar la correcta visualización al cargar la página
+    procesoFilter.dispatchEvent(new Event('change'));
+});
 </script>
 {% endblock %}

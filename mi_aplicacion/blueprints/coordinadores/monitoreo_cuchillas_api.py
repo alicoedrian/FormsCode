@@ -97,9 +97,11 @@ def update_monitoreo_cuchillas_record(item_id, cantidad_verificada, verificacion
     payload_to_send = {
         "cantidad_verificada": cantidad_verificada,
         "verificacion": verificacion,
-        "responsable_verificacion": responsable_verificacion
+        "responsable_verificacion": responsable_verificacion 
+
+        
     }
-    
+
     try:
         current_app.logger.info(f"Intentando enviar actualización para registro {item_id} a: {update_url_with_id} con payload: {payload_to_send}")
         

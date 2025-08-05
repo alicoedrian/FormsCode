@@ -176,36 +176,60 @@ def aprobacion_monitoreo_cuchillas():
                            nombre_coordinador=nombre_coordinador
                            )
 
+# Reemplaza la función completa en coordinadores.py con este código
 @coordinadores_bp.route('/validar_monitoreo_cuchillas', methods=['POST'])
 @validation_required_coordinador
 @role_required_coordinador(['coordinator', 'admin'])
 def validar_monitoreo_cuchillas():
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    data = request.get_json()
-    item_id = data.get('id')
-    cantidad_verificada = data.get('cantidad_verificada')
-    verificacion = data.get('verificacion')
-    responsable_verificacion_full = data.get('responsable_verificacion')
+    
+    current_app.logger.info("-> INICIO: Recibiendo solicitud para validar monitoreo de cuchillas.")
 
-    # Validación inicial de datos
-    if not item_id or cantidad_verificada is None or not verificacion or not responsable_verificacion_full:
-        message = 'Datos incompletos para la validación.'
+    try:
+        data = request.get_json()
+        current_app.logger.info(f"-> PASO 1: Datos JSON recibidos: {data}")
+    except Exception as e:
+        current_app.logger.error(f"Error al parsear JSON: {e}", exc_info=True)
+        return jsonify(success=False, message="Solicitud inválida. El formato de los datos no es JSON."), 400
+
+    if not data:
+        message = 'No se recibieron datos en la solicitud.'
+        current_app.logger.error(f"-> FALLO: {message}")
+        return jsonify(success=False, message=message, category="danger"), 400
+
+    item_id = data.get('id')
+    cantidad_verificada_str = data.get('cantidad_verificada')
+    verificacion = data.get('verificacion')
+    # --- CORRECCIÓN CLAVE AQUÍ ---
+    # Usar 'id_responsable_verificacion' que es lo que envía el frontend
+    responsable_verificacion = data.get('responsable_verificacion')
+
+    # *** AÑADE ESTA LÍNEA AQUÍ ***
+    current_app.logger.info(f"-> LOG COOR: ID del responsable extraído del JSON: {responsable_verificacion}")
+
+    current_app.logger.info(f"-> PASO 2: Datos extraídos: id={item_id}, cant={cantidad_verificada_str}, verif={verificacion}, resp={responsable_verificacion}")
+
+    if not all([item_id, cantidad_verificada_str, verificacion, responsable_verificacion]):
+        message = f"Datos incompletos para la validación. Datos recibidos: {data}"
+        current_app.logger.error(f"-> FALLO: {message}")
         if is_ajax:
             return jsonify(success=False, message=message, category="danger"), 400
         flash(message, 'danger')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
 
     try:
-        cantidad_verificada = int(cantidad_verificada)
-    except ValueError:
+        cantidad_verificada = int(cantidad_verificada_str)
+    except (ValueError, TypeError):
         message = 'La cantidad verificada debe ser un número entero válido.'
+        current_app.logger.error(f"-> FALLO: Error de tipo al convertir 'cantidad_verificada': '{cantidad_verificada_str}' no es un número.")
         if is_ajax:
             return jsonify(success=False, message=message, category="danger"), 400
         flash(message, 'danger')
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
 
-    # Llama a la función de la API para actualizar el registro
-    result = update_monitoreo_cuchillas_record(item_id, cantidad_verificada, verificacion, responsable_verificacion_full)
+    result = update_monitoreo_cuchillas_record(item_id, cantidad_verificada, verificacion, responsable_verificacion)
+    
+    current_app.logger.info(f"-> PASO 3: Resultado de la API: {result}")
 
     if result['success']:
         message = 'Registro aprobado con éxito.'
@@ -215,6 +239,7 @@ def validar_monitoreo_cuchillas():
         return redirect(url_for('coordinadores.aprobacion_monitoreo_cuchillas'))
     else:
         message = f"Error al actualizar el registro: {result['message']}"
+        current_app.logger.error(f"-> FALLO: {message}")
         if is_ajax:
             return jsonify(success=False, message=message, category="danger"), 400
         flash(message, 'danger')

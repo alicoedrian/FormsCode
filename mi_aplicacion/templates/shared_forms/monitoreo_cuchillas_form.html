@@ -49,32 +49,25 @@
                         </div>
                     </div>
                     
-                    {# CAMBIADO: Campo de proceso principal ahora es un select #}
                     <div class="col-md-6">
                         <div class="form-question-card">
                             <label for="proceso_seleccionado" class="form-label">Proceso:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="proceso_seleccionado" name="proceso_seleccionado" required>
                                 <option value="">Seleccione un proceso</option>
-                                {# OPCIONES HARDCODEADAS DIRECTAMENTE EN HTML CON EL CASING CORRECTO #}
                                 <option value="Extrusion" {% if form_data.proceso_seleccionado == 'Extrusion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Extrusion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Extrusion</option>
-                                <option value="Impresion" {% if form_data.proceso_seleccionado == 'Impresion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Impresion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Impresion</option>
-                                <option value="Laminacion" {% if form_data.proceso_seleccionado == 'Laminacion' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Laminacion') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Laminacion</option>
                                 <option value="Corte" {% if form_data.proceso_seleccionado == 'Corte' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Corte') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Corte</option>
                                 <option value="Sellado" {% if form_data.proceso_seleccionado == 'Sellado' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Sellado') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Sellado</option>
-                                <option value="Insertadoras" {% if form_data.proceso_seleccionado == 'Insertadoras' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Insertadoras') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Insertadoras</option>
-                                <option value="Aditamentos" {% if form_data.proceso_seleccionado == 'Aditamentos' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Aditamentos') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Aditamentos</option>
-                                <option value="Procesos Manuales" {% if form_data.proceso_seleccionado == 'Procesos Manuales' %}selected{% endif %} {% if (proceso_origen|capitalize == 'Procesos Manuales') and (form_data.proceso_seleccionado is none or form_data.proceso_seleccionado == '') %}selected{% endif %}>Procesos Manuales</option>
-                                {# Si tienes más procesos, añádelos aquí con su capitalización correcta #}
                             </select>
                         </div>
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-question-card">
                             <label for="maquina" class="form-label">Máquina:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="maquina" name="maquina" required>
                                 <option value="">Seleccione una máquina</option>
-                                {# Opciones se llenarán dinámicamente con JavaScript #}
                             </select>
                         </div>
                     </div>
@@ -88,7 +81,9 @@
                                 value="{{ form_data.id_operario if form_data.id_operario is not none else '' }}" required>
                         </div>
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-question-card">
                             <label for="nombre_operario" class="form-label">Nombre Operario:</label>
@@ -112,23 +107,25 @@
                             </select>
                         </div>
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="minora_cantidad" class="form-label">Minora (Cantidad):<span class="required-asterisk">*</span></label>
-                            <input type="number" min="0" class="form-control" id="minora_cantidad" name="minora_cantidad"
-                                value="{{ form_data.minora_cantidad if form_data.minora_cantidad is not none else '0' }}" required>
+                            <label for="cuchilla_cantidad" class="form-label">Cuchillas (Cantidad):<span class="required-asterisk">*</span></label>
+                            <input type="number" min="0" class="form-control" id="cuchilla_cantidad" name="cuchilla_cantidad"
+                                value="{{ form_data.cuchilla_cantidad if form_data.cuchilla_cantidad is not none else '0' }}" required>
                         </div>
                     </div>
-                    
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="acerada_cantidad" class="form-label">Acerada (Cantidad):<span class="required-asterisk">*</span></label>
-                            <input type="number" min="0" class="form-control" id="acerada_cantidad" name="acerada_cantidad"
-                                value="{{ form_data.acerada_cantidad if form_data.acerada_cantidad is not none else '0' }}" required>
+                            <label class="form-label">Número de cuchillas en máquina:</label>
+                            <input type="text" class="form-control" id="cuchillas_en_maquina_static" name="cuchillas_en_maquina_static"
+                                value="{{ form_data.numero_cuchillas_maquina if form_data.numero_cuchillas_maquina is not none else '' }}" readonly>
                         </div>
                     </div>
                 </div>
+                <input type="hidden" id="numero_cuchillas_maquina" name="numero_cuchillas_maquina" value="{{ form_data.numero_cuchillas_maquina if form_data.numero_cuchillas_maquina is not none else '' }}">
             </fieldset>
 
             <fieldset>
@@ -139,27 +136,59 @@
                             <tr>
                                 <th>Estado</th>
                                 <th>Cantidad<span class="required-asterisk">*</span></th>
+                                <th style="width: 40%;">Acciones tomadas</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {# Loop para los estados de cuchilla #}
-                            {% set estados_cuchilla_fields = [
-                                ('cumple', 'Cumple'),
-                                ('caso_oxidacion', 'Caso de Oxido'),
-                                ('caso_perdida', 'Caso de Perdida'),
-                                ('fractura', 'Fractura')
-                            ] %}
-                            {% for campo_base, label_estado in estados_cuchilla_fields %}
                             <tr>
-                                <td>{{ label_estado }}</td>
+                                <td>Cumple</td>
                                 <td>
-                                    <input type="number" min="0" class="form-control" 
-                                        name="estado_cuchilla_{{ campo_base }}_cantidad" 
-                                        id="estado_cuchilla_{{ campo_base }}_cantidad" 
-                                        value="{{ form_data['estado_cuchilla_' + campo_base + '_cantidad'] if form_data['estado_cuchilla_' + campo_base + '_cantidad'] is not none else '0' }}" required>
+                                    <input type="number" min="0" class="form-control estado-cuchilla-input" 
+                                        name="estado_cuchilla_cumple_cantidad" 
+                                        id="estado_cuchilla_cumple_cantidad" 
+                                        value="{{ form_data['estado_cuchilla_cumple_cantidad'] if form_data['estado_cuchilla_cumple_cantidad'] is not none else '0' }}" required>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr class="additional-cuchillas-row" style="display: none;">
+                                <td>Caso de Oxido</td>
+                                <td>
+                                    <input type="number" min="0" class="form-control estado-cuchilla-input" 
+                                        name="estado_cuchilla_caso_oxidacion_cantidad" 
+                                        id="estado_cuchilla_caso_oxidacion_cantidad" 
+                                        value="{{ form_data['estado_cuchilla_caso_oxidacion_cantidad'] if form_data['estado_cuchilla_caso_oxidacion_cantidad'] is not none else '0' }}" required>
+                                </td>
+                                <td>
+                                    <select class="form-select acciones-select" id="acciones_oxidacion" name="acciones_oxidacion" disabled>
+                                        </select>
                                 </td>
                             </tr>
-                            {% endfor %}
+                            <tr class="additional-cuchillas-row" style="display: none;">
+                                <td>Caso de Perdida</td>
+                                <td>
+                                    <input type="number" min="0" class="form-control estado-cuchilla-input" 
+                                        name="estado_cuchilla_caso_perdida_cantidad" 
+                                        id="estado_cuchilla_caso_perdida_cantidad" 
+                                        value="{{ form_data['estado_cuchilla_caso_perdida_cantidad'] if form_data['estado_cuchilla_caso_perdida_cantidad'] is not none else '0' }}" required>
+                                </td>
+                                <td>
+                                    <select class="form-select acciones-select" id="acciones_perdida" name="acciones_perdida" disabled>
+                                        </select>
+                                </td>
+                            </tr>
+                            <tr class="additional-cuchillas-row" style="display: none;">
+                                <td>Fractura</td>
+                                <td>
+                                    <input type="number" min="0" class="form-control estado-cuchilla-input" 
+                                        name="estado_cuchilla_fractura_cantidad" 
+                                        id="estado_cuchilla_fractura_cantidad" 
+                                        value="{{ form_data['estado_cuchilla_fractura_cantidad'] if form_data['estado_cuchilla_fractura_cantidad'] is not none else '0' }}" required>
+                                </td>
+                                <td>
+                                    <select class="form-select acciones-select" id="acciones_fractura" name="acciones_fractura" disabled>
+                                        </select>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -175,7 +204,6 @@
                             oninput="this.value=this.value.replace(/[^0-9]/g,'');"
                             onchange="consultarQuienRecibePorID()" 
                             value="{{ form_data.id_quien_recibe if form_data.id_quien_recibe is not none else '' }}">
-
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -187,9 +215,10 @@
                     </div>
                 </div>
             </fieldset>
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-save"></i> Registrar
-                </button>
+            
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Registrar
+            </button>
         </form>
     </div>
 
@@ -214,29 +243,162 @@ document.addEventListener('DOMContentLoaded', function() {
     const notify = document.getElementById('notification-container');
     const procesoSeleccionadoSelect = document.getElementById('proceso_seleccionado');
     const maquinaSelect = document.getElementById('maquina');
+    const turnoSelect = document.getElementById('turno'); // Nuevo: Referencia al selector de turno
     const idOperarioInput = document.getElementById('id_operario');
     const nombreOperarioInput = document.getElementById('nombre_operario');
     const idQuienRecibeInput = document.getElementById('id_quien_recibe');
     const nombreQuienRecibeInput = document.getElementById('nombre_quien_recibe');
+    const cuchillaCantidadInput = document.getElementById('cuchilla_cantidad');
+    const cumpleCantidadInput = document.getElementById('estado_cuchilla_cumple_cantidad');
+    const additionalCuchillasRows = document.querySelectorAll('.additional-cuchillas-row');
+    const estadoCuchillaInputs = document.querySelectorAll('.estado-cuchilla-input');
 
-    if (!form || !notify || !procesoSeleccionadoSelect || !maquinaSelect || !idOperarioInput || !nombreOperarioInput || !idQuienRecibeInput || !nombreQuienRecibeInput) {
+    const oxidacionCantidadInput = document.getElementById('estado_cuchilla_caso_oxidacion_cantidad');
+    const perdidaCantidadInput = document.getElementById('estado_cuchilla_caso_perdida_cantidad');
+    const fracturaCantidadInput = document.getElementById('estado_cuchilla_fractura_cantidad');
+    const accionesOxidacionSelect = document.getElementById('acciones_oxidacion');
+    const accionesPerdidaSelect = document.getElementById('acciones_perdida');
+    const accionesFracturaSelect = document.getElementById('acciones_fractura');
+    
+    // Campo estático de cuchillas por máquina
+    const cuchillasEnMaquinaInput = document.getElementById('cuchillas_en_maquina_static');
+
+    if (!form || !notify || !procesoSeleccionadoSelect || !maquinaSelect || !idOperarioInput || !nombreOperarioInput || !idQuienRecibeInput || !nombreQuienRecibeInput || !cuchillaCantidadInput || !cumpleCantidadInput || estadoCuchillaInputs.length === 0 || !cuchillasEnMaquinaInput || !turnoSelect) {
         console.error("Faltan elementos HTML esenciales para el script.");
         return;
     }
-
-    // --- Máquinas por proceso ---
-    const MAQUINAS_POR_PROCESO_JS = {
-        "Extrusion": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
-        "Impresion": ["FL15", "FL16", "FL18", "FL20", "FL21", "FL22"],
-        "Laminacion": ["LA02", "LA03", "LA04", "LA05", "LA06"],
-        "Corte": ["RF01", "RF02", "RF03", "RF04", "RF05", "RF06", "RF07", "RF08", "RF09", "RF10", "RF11", "RF12", "RF13", "RF14", "RF15", "RF16", "RF17"],
-        "Sellado": ["SE14", "SE15", "SE16", "SE18", "SE19", "SE20", "SE23", "SE25", "SE26", "SE30", "SE31", "SE34", "SE35", "SE38", "SE41", "SE42", "SE45", "SE46", "SE47", "SE50", "SE52", "SE55", "SE56"],
-        "Insertadoras": [],
-        "Aditamentos": [],
-        "Procesos Manuales": []
+    
+    // --- NUEVO: Valores estáticos de cuchillas por máquina ---
+    const CUCHILLAS_POR_MAQUINA = {
+        "Corte": {
+            "default": 14, // Asumimos que todas las máquinas de corte tienen 14 por defecto. Si hay variaciones, deben listarse
+            "RF01": 14, "RF02": 14, "RF03": 14, "RF04": 14, "RF05": 14, "RF06": 14, "RF07": 14, "RF08": 14, "RF09": 14, "RF10": 14, "RF11": 14, "RF12": 14, "RF13": 14, "RF14": 14, "RF15": 14, "RF16": 14, "RF17": 14
+        },
+        "Extrusion": {
+            "EX05": 8,
+            "EX07": 8,
+            "EX11": 8,
+            "EX12": 10,
+            "EX13": 30,
+            "EX14": 30
+        },
+        "Sellado": {
+            "SE11": 3,
+            "SE14": 3,
+            "SE15": 3,
+            "SE16": 3,
+            "SE18": 4,
+            "SE19": 3,
+            "SE20": 3,
+            "SE23": 3,
+            "SE25": 3,
+            "SE26": 3,
+            "SE30": 6,
+            "SE31": 4,
+            "SE34": 3,
+            "SE35": 3,
+            "SE38": 3,
+            "SE41": 3,
+            "SE42": 3,
+            "SE45": 3,
+            "SE46": 3,
+            "SE47": 7,
+            "SE50": 3,
+            "SE52": 3,
+            "SE55": 3,
+            "SE56": 3
+        }
     };
 
-    // --- Helpers globales ---
+    // --- NUEVO: Turnos por proceso ---
+    const TURNOS_POR_PROCESO = {
+        "Corte": [
+            { value: "TURNO 1 (9:30PM - 5:30AM)", text: "TURNO 1 (9:30PM - 5:30AM)" },
+            { value: "TURNO 2 (5:30AM - 1:30 PM)", text: "TURNO 2 (5:30AM - 1:30 PM)" },
+            { value: "TURNO 3 (1:30 PM - 9:30 PM)", text: "TURNO 3 (1:30 PM - 9:30 PM)" }
+        ],
+        "Sellado": [
+            { value: "TURNO 1 (9:30PM - 5:30AM)", text: "TURNO 1 (9:30PM - 5:30AM)" },
+            { value: "TURNO 2 (5:30AM - 1:30 PM)", text: "TURNO 2 (5:30AM - 1:30 PM)" },
+            { value: "TURNO 3 (1:30 PM - 9:30 PM)", text: "TURNO 3 (1:30 PM - 9:30 PM)" }
+        ],
+        "Extrusion": [
+            { value: "TURNO L-J (DIURNO)", text: "TURNO L-J (DIURNO)" },
+            { value: "TURNO L-J (NOCTURNO)", text: "TURNO L-J (NOCTURNO)" },
+            { value: "TURNO V-D (DIURNO)", text: "TURNO V-D (DIURNO)" },
+            { value: "TURNO V-D (NOCTURNO)", text: "TURNO V-D (NOCTURNO)" }
+        ]
+    };
+    
+    // --- Definición de opciones y NA ---
+    const ACCIONES_OPCIONES = [
+        { value: "Búsqueda en la máquina, periféricos y sistema de refile", text: "Búsqueda en la máquina, periféricos y sistema de refile." },
+        { value: "Reporte de la novedad al coordinador, analista de calidad o líder.", text: "Reporte de la novedad al coordinador, analista de calidad o líder." },
+        { value: "Retención del producto desde la última inspección conforme.", text: "Retención del producto desde la última inspección conforme." },
+        { value: "Se separa el producto no conforme y realizar cambio de embobinado, se usa FO-MN-007 Retenido.", text: "Se separa el producto no conforme y realizar cambio de embobinado, se usa FO-MN-007 Retenido." },
+        { value: "Se realiza cambio de cuchilla", text: "Se realiza cambio de cuchilla" }
+    ];
+    const NA_OPCION = { value: "NA", text: "NA" };
+
+    // --- Funciones de ayuda ---
+    function populateSelectWithOptions(selectElement, options, selectedValue = null) {
+        selectElement.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "Seleccione una opción";
+        selectElement.appendChild(defaultOption);
+
+        options.forEach(optionData => {
+            const option = document.createElement('option');
+            option.value = optionData.value;
+            option.textContent = optionData.text;
+            if (selectedValue && selectedValue === optionData.value) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+    }
+
+    function toggleActions(cantidadInput, selectElement) {
+        const cantidad = parseInt(cantidadInput.value, 10) || 0;
+        
+        if (cantidad > 0) {
+            selectElement.disabled = false;
+            // Se puede agregar un valor seleccionado del form_data si existe
+            const selectedActionValue = currentFormData[selectElement.id];
+            populateSelectWithOptions(selectElement, ACCIONES_OPCIONES, selectedActionValue);
+        } else {
+            selectElement.disabled = true;
+            populateSelectWithOptions(selectElement, [NA_OPCION], 'NA');
+        }
+    }
+    
+    // --- Lógica de la aplicación ---
+    const MAQUINAS_POR_PROCESO_JS = {
+        "Extrusion": ["EX05", "EX07", "EX11", "EX12", "EX13", "EX14"],
+        "Corte": ["RF01", "RF02", "RF03", "RF04", "RF05", "RF06", "RF07", "RF08", "RF09", "RF10", "RF11", "RF12", "RF13", "RF14", "RF15", "RF16", "RF17"],
+        "Sellado": ["SE11", "SE14", "SE15", "SE16", "SE18", "SE19", "SE20", "SE23", "SE25", "SE26", "SE30", "SE31", "SE34", "SE35", "SE38", "SE41", "SE42", "SE45", "SE46", "SE47", "SE50", "SE52", "SE55", "SE56"],
+    };
+
+    window.updateTurnosDropdown = function() {
+        const selectedProcessName = procesoSeleccionadoSelect.value;
+        const turnosOptions = TURNOS_POR_PROCESO[selectedProcessName] || [];
+        
+        turnoSelect.innerHTML = '<option value="">Seleccione un turno</option>';
+
+        if (turnosOptions.length > 0) {
+            turnosOptions.forEach(turno => {
+                const option = document.createElement('option');
+                option.value = turno.value;
+                option.textContent = turno.text;
+                if (currentFormData.turno === turno.value) {
+                    option.selected = true;
+                }
+                turnoSelect.appendChild(option);
+            });
+        }
+    };
+
     window.updateMaquinasDropdown = function() {
         const selectedProcessName = procesoSeleccionadoSelect.value;
         maquinaSelect.innerHTML = '<option value="">Seleccione una máquina</option>';
@@ -253,6 +415,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 maquinaSelect.appendChild(option);
             });
         }
+        
+        // Actualiza el dropdown de turnos
+        window.updateTurnosDropdown();
+        
+        // **NUEVO:** Actualiza el campo estático de cuchillas por máquina
+        window.updateCuchillasEnMaquina();
+    };
+    
+    // **NUEVA FUNCIÓN:** Para actualizar el campo estático de cuchillas por máquina
+    window.updateCuchillasEnMaquina = function() {
+        const selectedProcess = procesoSeleccionadoSelect.value;
+        const selectedMachine = maquinaSelect.value;
+        
+        const hiddenCuchillasInput = document.getElementById('numero_cuchillas_maquina');
+
+        let cuchillasCount = 'NA';
+        if (selectedProcess && CUCHILLAS_POR_MAQUINA[selectedProcess]) {
+            if (selectedProcess === "Corte") {
+                cuchillasCount = CUCHILLAS_POR_MAQUINA[selectedProcess]["default"];
+            } else if (selectedMachine && CUCHILLAS_POR_MAQUINA[selectedProcess][selectedMachine] !== undefined) {
+                cuchillasCount = CUCHILLAS_POR_MAQUINA[selectedProcess][selectedMachine];
+            }
+        }
+        
+        cuchillasEnMaquinaInput.value = cuchillasCount;
+        hiddenCuchillasInput.value = cuchillasCount === 'NA' ? '' : cuchillasCount; // Asigna el valor al campo oculto
     };
 
     window.consultarOperarioPorID = async function() {
@@ -274,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nombreOperarioInput.value = "Error en la consulta";
         }
     };
-
+    
     window.consultarQuienRecibePorID = async function() {
         const id = idQuienRecibeInput.value;
         if (!id) {
@@ -294,8 +482,33 @@ document.addEventListener('DOMContentLoaded', function() {
             nombreQuienRecibeInput.value = "Error en la consulta";
         }
     };
+    
+    window.toggleAdditionalFields = function() {
+        const cuchillaCantidad = parseInt(cuchillaCantidadInput.value, 10) || 0;
+        const cumpleCantidad = parseInt(cumpleCantidadInput.value, 10) || 0;
+        const cumpleValor = cumpleCantidadInput.value;
 
-    // --- NOTIFICACIÓN CON SCROLL AL TOPE ---
+        if (cumpleValor === '' || cumpleCantidad >= cuchillaCantidad) {
+            additionalCuchillasRows.forEach(row => {
+                row.style.display = 'none';
+            });
+            document.getElementById('estado_cuchilla_caso_oxidacion_cantidad').value = 0;
+            document.getElementById('estado_cuchilla_caso_perdida_cantidad').value = 0;
+            document.getElementById('estado_cuchilla_fractura_cantidad').value = 0;
+
+            toggleActions(oxidacionCantidadInput, accionesOxidacionSelect);
+            toggleActions(perdidaCantidadInput, accionesPerdidaSelect);
+            toggleActions(fracturaCantidadInput, accionesFracturaSelect);
+        } else {
+            additionalCuchillasRows.forEach(row => {
+                row.style.display = 'table-row';
+            });
+            toggleActions(oxidacionCantidadInput, accionesOxidacionSelect);
+            toggleActions(perdidaCantidadInput, accionesPerdidaSelect);
+            toggleActions(fracturaCantidadInput, accionesFracturaSelect);
+        }
+    };
+    
     function showNotification(response) {
         const container = document.getElementById('notification-container');
         if (!container) return;
@@ -332,25 +545,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
         alert.querySelector('.btn-close').onclick = () => alert.remove();
 
-        // --- SCROLL AL TOPE AL MOSTRAR NOTIFICACIÓN ---
         setTimeout(function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 100); // Espera 100ms para que el alert esté en el DOM y el scroll funcione
+        }, 100);
 
-        // Auto-hide después de 8s (solo success/warning)
         if (['success', 'warning'].includes(response.category)) {
             setTimeout(() => { if (alert.parentNode) alert.remove(); }, 8000);
         }
     }
 
-    // --- Listeners del formulario ---
-    procesoSeleccionadoSelect.addEventListener('change', window.updateMaquinasDropdown);
+    procesoSeleccionadoSelect.addEventListener('change', () => {
+        window.updateMaquinasDropdown();
+        // Cuando se cambia el proceso, el número de cuchillas en máquina debe actualizarse, aunque la máquina no esté seleccionada.
+        // La función `updateMaquinasDropdown` ya llama a `updateCuchillasEnMaquina` al final, por lo que no es necesario aquí.
+    });
+    
+    // Nuevo evento para actualizar el número de cuchillas cuando se cambia la máquina
+    maquinaSelect.addEventListener('change', () => {
+        window.updateCuchillasEnMaquina();
+    });
+
     idOperarioInput.addEventListener('change', window.consultarOperarioPorID);
     idQuienRecibeInput.addEventListener('change', window.consultarQuienRecibePorID);
+    
+    cuchillaCantidadInput.addEventListener('input', window.toggleAdditionalFields);
+    cumpleCantidadInput.addEventListener('input', window.toggleAdditionalFields);
+    
+    oxidacionCantidadInput.addEventListener('input', () => toggleActions(oxidacionCantidadInput, accionesOxidacionSelect));
+    perdidaCantidadInput.addEventListener('input', () => toggleActions(perdidaCantidadInput, accionesPerdidaSelect));
+    fracturaCantidadInput.addEventListener('input', () => toggleActions(fracturaCantidadInput, accionesFracturaSelect));
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        
+        const cuchillaCantidad = parseInt(cuchillaCantidadInput.value, 10) || 0;
+        let sumEstadoCuchillas = 0;
+        estadoCuchillaInputs.forEach(input => {
+            sumEstadoCuchillas += parseInt(input.value, 10) || 0;
+        });
+
+        if (sumEstadoCuchillas !== cuchillaCantidad) {
+            showNotification({
+                category: 'danger',
+                message: 'Error de validación.',
+                details: 'La suma de las cuchillas por estado debe ser exactamente igual a la cantidad total de cuchillas.'
+            });
+            return;
+        }
 
         const btn = form.querySelector('button[type="submit"]');
         const origText = btn.innerHTML;
@@ -365,7 +607,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 payload[key] = value;
             }
         });
-
+        
+        ['acciones_oxidacion', 'acciones_perdida', 'acciones_fractura'].forEach(name => {
+            const selectElement = document.getElementById(name);
+            if (selectElement) {
+                payload[name] = selectElement.value;
+                if (payload[name] === 'NA') {
+                    payload[name] = null;
+                }
+            }
+        });
+        
         try {
             const res = await fetch(form.action, {
                 method: 'POST',
@@ -384,6 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 nombreQuienRecibeInput.value = "";
                 procesoSeleccionadoSelect.value = "{{ proceso_origen|capitalize }}";
                 window.updateMaquinasDropdown();
+                window.toggleAdditionalFields();
             } else {
                 if (result.form_data) {
                     for (const key in result.form_data) {
@@ -402,8 +655,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (currentFormData.maquina) {
                         maquinaSelect.value = currentFormData.maquina;
                     }
-                    if (idOperarioInput.value) await consultarOperarioPorID();
-                    if (idQuienRecibeInput.value) await consultarQuienRecibePorID();
+                    if (idOperarioInput.value) consultarOperarioPorID();
+                    if (idQuienRecibeInput.value) consultarQuienRecibePorID();
+                    
+                    toggleActions(oxidacionCantidadInput, accionesOxidacionSelect);
+                    toggleActions(perdidaCantidadInput, accionesPerdidaSelect);
+                    toggleActions(fracturaCantidadInput, accionesFracturaSelect);
                 }
             }
         } catch (err) {
@@ -435,9 +692,20 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateMaquinasDropdown();
     if (currentFormData.maquina) {
         maquinaSelect.value = currentFormData.maquina;
+        window.updateCuchillasEnMaquina();
+    }
+    window.updateTurnosDropdown();
+    if (currentFormData.turno) {
+        turnoSelect.value = currentFormData.turno;
     }
     if (idOperarioInput.value) consultarOperarioPorID();
     if (idQuienRecibeInput.value) consultarQuienRecibePorID();
+    
+    window.toggleAdditionalFields();
+    
+    toggleActions(oxidacionCantidadInput, accionesOxidacionSelect);
+    toggleActions(perdidaCantidadInput, accionesPerdidaSelect);
+    toggleActions(fracturaCantidadInput, accionesFracturaSelect);
 });
 </script>
 

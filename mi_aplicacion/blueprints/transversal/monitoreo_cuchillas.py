@@ -73,28 +73,29 @@ def monitoreo_cuchillas_form():
         def to_int(x):
             try:
                 if x is not None and str(x).strip() != "":
-                    return int(float(str(x).replace(',', '.')))
+                    # Reemplaza la coma con un punto para manejar decimales si es necesario, aunque en este caso se espera un entero.
+                    # La validación es estricta, solo permite conversión a entero.
+                    return int(str(x))
                 return None
             except (ValueError, TypeError):
                 return None
 
         # --- Validación de campos obligatorios ---
-        PROCESOS_VALIDOS = ["Extrusion Empaques", "Impresion Empaques", "Laminacion", "Corte", "Sellado", "Insertadoras", "Aditamentos", "Procesos Manuales"]
-
+        PROCESOS_VALIDOS = ["Extrusion", "Corte", "Sellado"] # Ajustado a los valores del formulario
+        
         required_fields = {
             'proceso_seleccionado': "Proceso",
             'maquina': "Máquina",
             'id_operario': "ID Operario",
             'turno': "Turno",
-            'minora_cantidad': "Minora (Cantidad)",
-            'acerada_cantidad': "Acerada (Cantidad)",
+            'cuchilla_cantidad': "Cuchillas (Cantidad)", # Nuevo campo
+            'estado_cuchilla_cumple_cantidad': "Cumple (Cantidad)"
         }
         for f, label in required_fields.items():
             val = datos.get(f)
             if val is None or (isinstance(val, str) and val.strip() == ""):
-                if f in ['minora_cantidad', 'acerada_cantidad'] and (val == "0" or val == 0):
-                    continue
-                validation_errors.append((f, f'El campo "{label}" es obligatorio.'))
+                if f not in ['cuchilla_cantidad', 'estado_cuchilla_cumple_cantidad']: # Estos ya tienen valores por defecto en el HTML, pero es buena práctica validarlos.
+                    validation_errors.append((f, f'El campo "{label}" es obligatorio.'))
 
             if f in ['id_operario', 'id_quien_recibe'] and val:
                 num_val = to_int(val)
@@ -103,6 +104,23 @@ def monitoreo_cuchillas_form():
 
             if f == 'proceso_seleccionado' and val not in PROCESOS_VALIDOS:
                 validation_errors.append((f, f'El proceso seleccionado "{val}" no es válido.'))
+        
+        # --- Validación de la suma de cuchillas ---
+        cuchilla_cantidad_total = to_int(datos.get('cuchilla_cantidad'))
+        
+        # Nuevos campos de estado
+        cumple_cantidad = to_int(datos.get('estado_cuchilla_cumple_cantidad')) or 0
+        oxidacion_cantidad = to_int(datos.get('estado_cuchilla_caso_oxidacion_cantidad')) or 0
+        perdida_cantidad = to_int(datos.get('estado_cuchilla_caso_perdida_cantidad')) or 0
+        fractura_cantidad = to_int(datos.get('estado_cuchilla_fractura_cantidad')) or 0
+        
+        sum_estado_cuchillas = cumple_cantidad + oxidacion_cantidad + perdida_cantidad + fractura_cantidad
+
+        if cuchilla_cantidad_total is None or cuchilla_cantidad_total <= 0:
+             validation_errors.append(('cuchilla_cantidad', 'Debe registrar una cantidad total de cuchillas mayor a cero.'))
+
+        if sum_estado_cuchillas != cuchilla_cantidad_total:
+            validation_errors.append(('cuchillas_estados', f'La suma de las cuchillas por estado ({sum_estado_cuchillas}) no coincide con la cantidad total de cuchillas ({cuchilla_cantidad_total}).'))
 
         # --- Validar ID de operario en Epicor ---
         nombre_operario = ""
@@ -123,24 +141,7 @@ def monitoreo_cuchillas_form():
                 validation_errors.append(('id_quien_recibe', f"Error validando ID Quien Recibe: {recibe_api_res['message']}"))
             else:
                 nombre_quien_recibe = recibe_api_res["nombre"] or ""
-
-        # --- Validación de Estados de Cuchilla (al menos uno debe tener cantidad > 0) ---
-        estados_cuchilla = [
-            'cumple', 'oxidacion', 'perdida', 'fractura' # Nombres de keys usados en el frontend/datos
-        ]
-
-        cuchillas_registradas = False
-        for k_base in estados_cuchilla:
-            cantidad_str = datos.get(f'estado_cuchilla_{k_base}_cantidad')
-            cantidad_int = to_int(cantidad_str)
-
-            if cantidad_int is not None and cantidad_int > 0:
-                cuchillas_registradas = True
-                break
-
-        if not cuchillas_registradas:
-            validation_errors.append(('estado_cuchilla', 'Debe registrar al menos una cantidad mayor a cero para un Estado de Cuchilla (Cumple, Oxido, Perdida, Fractura).'))
-
+        
         # --- Si hay errores de validación, devuelve la respuesta adecuada al frontend ---
         if validation_errors:
             details_html = "<br>".join(msg for _,msg in validation_errors)
@@ -156,83 +157,60 @@ def monitoreo_cuchillas_form():
         tz = pytz.timezone(current_app.config.get('TIMEZONE','America/Bogota'))
         ts = datetime.now(tz).strftime("%Y-%m-%dT%H:%M:%S%z")
 
+        # Mapeo de los nombres del formulario a los nombres de la base de datos
         payload_dict = {
             "fecha": ts,
-            "proceso": datos.get('proceso_seleccionado'), 
+            "proceso_seleccionado": datos.get('proceso_seleccionado'), # Nuevo nombre de columna
             "maquina": datos.get('maquina'),
             "id_operario": datos.get('id_operario'),
             "nombre_operario": nombre_operario,
             "turno": datos.get('turno'),
-            "minora_cantidad": to_int(datos.get('minora_cantidad')),
-            "acerada_cantidad": to_int(datos.get('acerada_cantidad')),
-            "estado_cuchilla_cumple_cantidad": to_int(datos.get('estado_cuchilla_cumple_cantidad')),
-            "estado_cuchilla_oxidacion_cantidad": to_int(datos.get('estado_cuchilla_caso_oxidacion_cantidad')), 
-            "estado_cuchilla_perdida_cantidad": to_int(datos.get('estado_cuchilla_caso_perdida_cantidad')),     
-            "estado_cuchilla_fractura_cantidad": to_int(datos.get('estado_cuchilla_fractura_cantidad')),
+            "cuchilla_cantidad": to_int(datos.get('cuchilla_cantidad')), # Nuevo campo
+            "estado_cuchilla_cumple_cantidad": cumple_cantidad,
+            "estado_cuchilla_caso_oxidacion_cantidad": oxidacion_cantidad, # Renombrado
+            "acciones_oxidacion": datos.get('acciones_oxidacion'), # Nuevo campo
+            "estado_cuchilla_caso_perdida_cantidad": perdida_cantidad, # Renombrado
+            "acciones_perdida": datos.get('acciones_perdida'), # Nuevo campo
+            "estado_cuchilla_fractura_cantidad": fractura_cantidad,
+            "acciones_fractura": datos.get('acciones_fractura'), # Nuevo campo
             "id_quien_recibe": datos.get('id_quien_recibe'),
             "nombre_quien_recibe": nombre_quien_recibe,
-            "observaciones": datos.get('observaciones', None),
-            "cantidad_verificada": to_int(datos.get('cantidad_verificada', None)),
-            "verificacion": datos.get('verificacion', None),
-            "responsable_verificacion": datos.get('responsable_verificacion', None)
+            "numero_cuchillas_maquina": to_int(datos.get('numero_cuchillas_maquina')),
+
         }
+        
+        # Eliminar campos del payload que no se envian al webhook.
+        # Esto es un ejemplo, se supone que tu webhook recibe todos los campos.
+        # Si el webhook no procesa campos nulos, podrías limpiarlos:
+        payload_dict_cleaned = {k: v for k, v in payload_dict.items() if v is not None and v != ''}
+
 
         # --- DEBUGGING: Imprime el payload final ANTES de enviarlo ---
-        current_app.logger.info(f"DEBUG: Payload final a enviar al webhook: {payload_dict}")
+        current_app.logger.info(f"DEBUG: Payload final a enviar al webhook: {payload_dict_cleaned}")
 
         # --- ENVÍO AL WEBHOOK ---
         webhook_url = current_app.config.get('WEBHOOK_MONITOREO_CUCHILLAS_URL')
-        webhook_auth = current_app.config.get('WEBHOOK_AUTH') # Esto es 'Basic YWRtaW46SG0xMTkxOTI5'
-
-        # El log de tu .env muestra que WEBHOOK_EMP_TURNO_AUTH NO tiene "Basic"
-        # y WEBHOOK_AUTH SÍ lo tiene. Asegúrate de que el webhook de cuchillas
-        # espera "Basic" si estás usando WEBHOOK_AUTH.
-        # Si el webhook de cuchillas espera un token sin "Basic ",
-        # deberías definir WEBHOOK_MONITOREO_CUCHILLAS_AUTH = "YWRtaW46SG0xMTkxOTI5" en tu .env
-        # y luego usar:
-        # webhook_auth_header = current_app.config.get('WEBHOOK_MONITOREO_CUCHILLAS_AUTH')
-        # headers = {'Authorization': f'Basic {webhook_auth_header}'}
-        # O si ya viene con Basic:
-        # headers = {'Authorization': webhook_auth_header}
-
+        webhook_auth = current_app.config.get('WEBHOOK_AUTH') 
 
         if not webhook_url or not webhook_auth:
             current_app.logger.error("URL o token de autenticación del webhook de Monitoreo de Cuchillas no configurados.")
             return jsonify(success=False, message="Error de configuración del webhook. Contacta a soporte.", category="danger"), 500
 
-        payload_json_string = json.dumps(payload_dict) 
+        payload_json_string = json.dumps(payload_dict_cleaned) 
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': webhook_auth # Usa el token tal como viene de config
+            'Authorization': webhook_auth
         }
 
         try:
-            # Primero intenta con verificación SSL (verify=True)
-            # COMENTARIO: Los logs anteriores muestran que incluso con verify=False el 500 persiste.
-            # Mantendremos verify=False por ahora dado el historial de problemas SSL.
             response = requests.request("POST", webhook_url, headers=headers, data=payload_json_string, timeout=5, verify=False)
-            response.raise_for_status() # Lanza una excepción para errores HTTP (4xx o 5xx)
+            response.raise_for_status() 
             current_app.logger.info(f"Webhook de Cuchillas enviado exitosamente. Respuesta: {response.text}")
             
-            # Devolver respuesta exitosa si todo salió bien
             return jsonify(success=True, message="Monitoreo de Cuchillas registrado.",
-                           category="success", data=payload_dict), 200
+                            category="success", data=payload_dict_cleaned), 200
 
-        except requests.exceptions.SSLError as ssl_error:
-            # Este bloque se ejecutaría si verify=True estuviera activo y fallara SSL
-            # Pero dado que estamos usando verify=False por defecto, es menos probable que se active.
-            current_app.logger.warning(f"Error de SSL en webhook Cuchillas: {str(ssl_error)}. Reintentando sin verificación...")
-            try:
-                response = requests.request("POST", webhook_url, headers=headers, data=payload_json_string, timeout=5, verify=False)
-                response.raise_for_status()
-                current_app.logger.warning("Conexión exitosa sin verificación SSL (solo para desarrollo) para Cuchillas")
-                return jsonify(success=True, message="Monitoreo de Cuchillas registrado y enviado al Webhook (con advertencia SSL).",
-                               category="warning", data=payload_dict), 200
-            except requests.exceptions.RequestException as e:
-                current_app.logger.error(f"Error al enviar datos al webhook de Cuchillas (reintento fallido): {e}")
-                return jsonify(success=False, message="Error crítico al enviar al webhook de Cuchillas.", category="danger", details=str(e)), 500
-            
         except requests.exceptions.RequestException as e:
             current_app.logger.error(f"Error al enviar datos al webhook de Cuchillas: {e}")
             return jsonify(success=False, message="Error al enviar al webhook de Cuchillas.", category="danger", details=str(e)), 500
