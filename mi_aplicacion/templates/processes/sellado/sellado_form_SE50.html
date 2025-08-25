@@ -1,230 +1,37 @@
 {% extends "layouts/process_base.html" %}
 
 {# Define el título de la página #}
-{% block process_title %}Registro Relación de Mezcla - {{ nombre_proceso }}{% endblock %}
+{% block process_title %}SE50 - {{ nombre_proceso }}{% endblock %}
 
 {# Define el CSS específico para esta sección con mejoras de interfaz #}
 {% block process_head_css %}
-<style>
-    /* Estilos existentes para títulos, breadcrumbs, etc. */
-    .page-title-sub {
-        font-size: 1.9em;
-        color: #2C3E50;
-        margin-bottom: 15px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #e0e0e0;
-        display: flex;
-        align-items: center;
-        font-weight: 600;
-    }
-    .page-title-sub i.fa-flask {
-        margin-right: 15px;
-        color: #007bff;
-        font-size: 1.1em;
-    }
-    .breadcrumb-nav {
-        margin-bottom: 30px;
-        font-size: 0.95em;
-    }
-    .breadcrumb-nav a {
-        color: #007bff;
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-    .breadcrumb-nav a:hover {
-        color: #0056b3;
-        text-decoration: underline;
-    }
-    .breadcrumb-nav .separator {
-        margin: 0 10px;
-        color: #adb5bd;
-    }
-    .breadcrumb-nav .current-page {
-        color: #343a40;
-        font-weight: 600;
-    }
-
-    /* ESTILOS CLAVE PARA EL CONTENEDOR Y AGRUPACIONES DEL FORMULARIO */
-    .custom-form-container {
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        background-color: #fff;
-        padding: 35px;
-        margin-bottom: 30px;
-    }
-    /* Estilo para las leyendas de los fieldset (agrupaciones) */
-    .custom-form-container fieldset {
-        border: none;
-        padding: 0;
-        margin-bottom: 25px;
-        background-color: transparent;
-        box-shadow: none;
-    }
-    .custom-form-container legend {
-        float: none;
-        width: auto;
-        padding: 0 15px;
-        font-size: 1.3em;
-        font-weight: bold;
-        color: #0056b3;
-        border-bottom: none;
-        margin-left: 0;
-        background-color: transparent;
-        border-radius: 0;
-        margin-bottom: 20px;
-    }
-
-    /* --- ESTILO PARA CADA PREGUNTA INDIVIDUAL (SIMILAR A GOOGLE FORMS) --- */
-    .form-question-card {
-        background-color: #fff;
-        border: 1px solid #dadce0;
-        border-radius: 8px;
-        padding: 24px;
-        margin-bottom: 20px; /* Espacio entre cada pregunta */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-    .form-question-card:hover {
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        border-color: #c9ccd0;
-    }
-
-    /* Estilo para el asterisco de requerido */
-    .form-label .required-asterisk {
-        color: #dc3545;
-        margin-left: 4px;
-        font-weight: normal;
-    }
-
-    /* Ajustes para inputs y selects para SIMETRÍA Y UNIFORMIDAD */
-    .form-label {
-        font-weight: 400;
-        color: #202124;
-        font-size: 1em;
-        margin-bottom: 12px;
-        display: block;
-    }
-    .form-control, .form-select {
-        border-radius: 4px;
-        padding: 10px 12px;
-        font-size: 1em;
-        border: 1px solid #dadce0;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        min-height: 40px;
-        box-sizing: border-box;
-        background-color: #f8fafd;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #1a73e8;
-        box-shadow: 0 0 0 1px #1a73e8;
-        background-color: #fff;
-    }
-    .form-text { 
-        font-size: 0.85em; 
-        color: #5f6368; 
-        margin-top: 5px; 
-    }
-
-    /* Botones */
-    .btn-success {
-        padding: 12px 25px;
-        font-size: 1.1em;
-        border-radius: 8px;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .btn-success:hover {
-        background-color: #218838;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-
-    /* Estilos para el botón de volver */
-    .btn-back {
-        padding: 12px 25px;
-        font-size: 1.05em;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    }
-    .btn-back:hover {
-        background-color: #5a6268;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
-    }
-
-    /* Estilos para las NOTIFICACIONES (Toast / Alerta Flotante) */
-    .notification-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1050;
-        max-width: 350px;
-    }
-    .toast {
-        background-color: #fff;
-        border: 1px solid rgba(0,0,0,.1);
-        border-radius: .25rem;
-        box-shadow: 0 .25rem .75rem rgba(0,0,0,.1);
-        padding: .75rem 1.25rem;
-        margin-bottom: 1rem;
-        transition: opacity .15s linear;
-        opacity: 0;
-        visibility: hidden;
-        color: #212529;
-    }
-    .toast.show {
-        opacity: 1;
-        visibility: visible;
-    }
-    .toast-header {
-        display: flex;
-        align-items: center;
-        padding-bottom: .25rem;
-        margin-bottom: .5rem;
-        border-bottom: 1px solid rgba(0,0,0,.05);
-    }
-    .toast-header strong {
-        font-weight: 700;
-    }
-    .toast-body {
-        font-size: .875em;
-        word-wrap: break-word;
-    }
-    .toast.bg-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
-    .toast.bg-warning { background-color: #fff3cd; border-color: #ffeeba; color: #856404; }
-    .toast.bg-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
-    .toast .btn-close {
-        padding: 0.5rem;
-        margin-left: auto;
-        cursor: pointer;
-        background: none;
-        border: none;
-        font-size: 1em;
-        line-height: 1;
-        color: inherit;
-        opacity: .5;
-    }
-    .toast .btn-close:hover {
-        opacity: .8;
-    }
-
-</style>
-
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/css4.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/se30_se47_form_styles.css') }}">
 {% endblock %}
 
 {# Contenido principal de la página #}
 {% block process_page_content %}
-    {# Breadcrumb #}
+    {# Breadcrumb - Ajustado para apuntar correctamente al blueprint de sellado #}
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <a href="{{ url_for('proceso_laminacion_dashboard') }}">{{ nombre_proceso }}</a>
-        <span class="separator">&raquo;</span>
+        <a href="{{ url_for('sellado.proceso_sellado_dashboard') }}">
+            <i class="fas fa-home" style="margin-right: 0.25rem;"></i> {# Añadido icono de home #}
+            Inicio
+        </a>
+        <span class="separator">›</span> {# Cambiado de &raquo; #}
+        <a href="{{ url_for('sellado.proceso_sellado_dashboard') }}">{{ nombre_proceso }}</a>
+        <span class="separator">›</span> {# Cambiado de &raquo; #}
         <span class="current-page">{{ subseccion }}</span>
     </nav>
 
     {# Título y Descripción #}
-    <h1 class="page-title-sub"><i class="fas fa-flask"></i> INSTRUCTIVO SE50</h1>
-    <p class="mb-5 text-secondary"></p>
+        <div class="page-title-se30-se47"> {# Clase actualizada #}
+            <i class="fas fa-cog"></i> {# Icono actualizado para parámetros #}
+            <div>
+                <div>{{ subseccion }}</div>
+            </div>
+        </div>
+        <p class="page-description">Ingrese los parámetros de operación para la máquina SE50.</p> {# Texto de descripción actualizado #}
+
 
     {# Contenedor para las notificaciones (AJAX) #}
     <div id="notification-container" class="notification-container">
@@ -233,13 +40,114 @@
 
     {# Contenedor para tu formulario HTML personalizado #}
     <div class="custom-form-container">
-        <form id="registroParametrosForm2" method="POST" action="{{ url_for('proceso_laminacion_form_250') }}">
+
+        {# Mostrar mensajes flash de Flask (si se usan para errores no-AJAX o redirecciones) #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se50' #}
+        <form id="registroParametrosForm2" method="POST" action="{{ url_for('se50.sellado_form_se50') }}">
             <fieldset>
                 <legend>Registro de Parámetros</legend>
-                <div class="row">
+                <div class="row" >
+                    
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="fecha" class="form-label">Fecha:</label>
+                            {# El campo de fecha es de solo lectura y se carga con el valor del backend #}
+                            <input type="text" class="form-control" name="fecha" id="fecha" value="{{ fecha_actual }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="id_empleado" class="form-label">ID Empleado:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="5" class="form-control" id="id_empleado" name="id_empleado"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                onchange="consultarEmpleadoPorID()" 
+                                value="{{ form_data.id_empleado if form_data.id_empleado is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="nombre_empleado" class="form-label">Nombre Empleado:</label>
+                            <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado" 
+                                value="{{ form_data.nombre_empleado if form_data.nombre_empleado is not none else '' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="trabajo" class="form-label">Trabajo:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="8" pattern="^[A-Za-z0-9]{1,8}$"
+                                class="form-control" id="trabajo" name="trabajo"
+                                oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'');"
+                                onchange="consultarDatosTrabajo()" 
+                                value="{{ form_data.trabajo if form_data.trabajo is not none else '' }}" required>
+                        </div>
+                    </div> 
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="parte" class="form-label">Parte:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="7" class="form-control" name="parte" id="parte" readonly 
+                                value="{{ form_data.parte if form_data.parte is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="cliente" class="form-label">Cliente:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="12" class="form-control" name="cliente" id="cliente" 
+                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                                value="{{ form_data.cliente if form_data.cliente is not none else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="estructura" class="form-label">Estructura:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="12" class="form-control" name="estructura" id="estructura" readonly 
+                                value="{{ form_data.estructura if form_data.estructura is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                   <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="ancho" class="form-label">Ancho:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="20" class="form-control" name="ancho" id="ancho" readonly 
+                                value="{{ form_data.ancho if form_data.ancho is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="largo" class="form-label">Largo:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="20" class="form-control" name="largo" id="largo" readonly 
+                                value="{{ form_data.largo if form_data.largo is not none else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="fuelle" class="form-label">Fuelle:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="20" class="form-control" name="fuelle" id="fuelle" readonly 
+                                value="{{ form_data.fuelle if form_data.fuelle is not none else '' }}" required>
+                        </div>
+                    </div> 
+
                     {% set campos_generales = [
                         ('calibre', 3),
-                        ('velocidad_maquina', 3),
+                        ('velocidad', 3),
                         ('ajuste_longitud', 5),
                         ('tiempo_avance', 5),
                         ('tiempo_sello', 5),
@@ -252,130 +160,53 @@
                         ('ajuste_velocidad', 3),
                         ('ciclo_avance', 3)
                     ] %}
-
+                                        
+                    {% for nombre_campo, maxlength in campos_generales %}
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="fecha" class="form-label">Fecha:</label>
-                            <input type="text" class="form-control" name="fecha" id="fecha" value="{{ fecha_actual }}" readonly>
+                            <label for="{{ nombre_campo }}" class="form-label">
+                                {{ nombre_campo|replace('_',' ')|capitalize }}:<span class="required-asterisk">*</span>
+                            </label>
+                            <input type="text" maxlength="{{ maxlength }}" pattern="[0-9.,]{1,{{ maxlength }}}" inputmode="numeric" 
+                                class="form-control" name="{{ nombre_campo }}" id="{{ nombre_campo }}" required 
+                                oninput="this.value=this.value.replace(/[^0-9.,]/g,'');"
+                                value="{{ form_data[nombre_campo] if form_data[nombre_campo] is not none else '' }}">
                         </div>
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="id_empleado" class="form-label">ID Empleado:</label>
-                            <input type="text" maxlength="5" class="form-control" id="id_empleado" name="id_empleado"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                                onchange="consultarEmpleadoPorID(id_empleado)" required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="nombre_empleado" class="form-label">Nombre Empleado:</label>
-                            <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="trabajo" class="form-label">Trabajo:</label>
-                            <input type="text" maxlength="8" pattern="^[A-Za-z0-9]{1,8}$"
-                                class="form-control" id="trabajo" name="trabajo"
-                                oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'');"
-                                onchange="consultarDatosTrabajo()" required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="parte" class="form-label">Parte:</label>
-                            <input type="text" maxlength="7" class="form-control" name="parte" id="parte" readonly required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="cliente" class="form-label">Cliente:</label>
-                            <input type="text" maxlength="12" class="form-control" name="cliente" id="cliente"
-                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')"
-                            required>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="estructura" class="form-label">Estructura:</label>
-                            <input type="text" maxlength="12" class="form-control" name="estructura" id="estructura" readonly required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="ancho" class="form-label">Ancho:</label>
-                            <input type="text" maxlength="20" class="form-control" name="ancho" id="ancho" readonly required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="largo" class="form-label">Largo:</label>
-                            <input type="text" maxlength="20" class="form-control" name="largo" id="largo" readonly required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="fuelle" class="form-label">Fuelle:</label>
-                            <input type="text" maxlength="20" class="form-control" name="fuelle" id="fuelle" readonly required>
-                        </div>
-                    </div>
-
-                    {% for nombre, maxlength in campos_generales %}
-                        {% if nombre in ['parte', 'cliente'] %}
-                        <div class="col-md-6">
-                            <div class="form-question-card">
-                                <label for="{{ nombre }}" class="form-label">{{ nombre.replace('_', ' ')|capitalize }}:</label>
-                                <input type="text" maxlength="{{ maxlength }}" class="form-control" name="{{ nombre }}" id="{{ nombre }}" required oninput="this.value=this.value.replace(/[^A-Za-z0-9.,]/g,'');">
-                            </div>
-                        </div>
-                        {% else %}
-                        <div class="col-md-6">
-                            <div class="form-question-card">
-                                <label for="{{ nombre }}" class="form-label">{{ nombre.replace('_', ' ')|capitalize }}:</label>
-                                <input type="text" maxlength="{{ maxlength }}" class="form-control" name="{{ nombre }}" id="{{ nombre }}" required oninput="this.value=this.value.replace(/[^0-9.,]/g,'');">
-                            </div>
-                        </div>
-                        {% endif %}
                     {% endfor %}
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="modo_trabajo" class="form-label">Modo Trabajo:</label>
+                            <label for="modo_trabajo" class="form-label">Modo Trabajo:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="modo_trabajo" name="modo_trabajo" required>
-                                <option value="print stand">En blanco</option>
-                                <option value="plain">Impreso</option>
+                                <option value="">Seleccionar</option>
+                                <option value="en_blanco" {% if form_data.modo_trabajo == 'en_blanco' %}selected{% endif %}>En blanco</option>
+                                <option value="impreso" {% if form_data.modo_trabajo == 'impreso' %}selected{% endif %}>Impreso</option>
                             </select>
                         </div>
                     </div>
 
-                    {% set modos = ['Marca 3', 'modo_saltar', 'modo_perforacion'] %}
+                    {% set modos = ['marca_3', 'modo_saltar', 'modo_perforacion'] %}
                     {% for m in modos %}
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="{{ m }}" class="form-label">{{ m.replace('_', ' ')|capitalize }}:</label>
+                            <label for="{{ m }}" class="form-label">{{ m.replace('_', ' ')|capitalize }}:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="{{ m }}" name="{{ m }}" required>
-                                <option value="enable">Habilitado</option>
-                                <option value="disable">Deshabilitado</option>
+                                <option value="">Seleccionar</option>
+                                <option value="habilitado" {% if form_data.m == 'habilitado' %}selected{% endif %}>Habilitado</option>
+                                <option value="deshabilitado" {% if form_data.m == 'deshabilitado' %}selected{% endif %}>Deshabilitado</option>
                             </select>
                         </div>
                     </div>
                     {% endfor %}
+
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="modo_pouch" class="form-label">Modo Pouch:</label>
+                            <label for="modo_pouch" class="form-label">Modo Pouch:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="modo_pouch" name="modo_pouch" required>
-                                <option value="habilitar">Habilitar</option>
-                                <option value="inhabilitar">Inhabilitar</option>
+                                <option value="">Seleccionar</option>
+                                <option value="habilitar" {% if form_data.modo_pouch == 'habilitar' %}selected{% endif %}>Habilitar</option>
+                                <option value="inhabilitar" {% if form_data.modo_pouch == 'inhabilitar' %}selected{% endif %}>Inhabilitar</option>
                             </select>
                         </div>
                     </div>
@@ -388,14 +219,20 @@
                     {% for i in range(1, 5) %}
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="servo_{{ i }}_der" class="form-label">Rodillo Servo {{ i }} Derecha:</label>
-                            <input type="text" maxlength="3" class="form-control" name="servo_{{ i }}_der" id="servo_{{ i }}_der" required oninput="this.value=this.value.replace(/[^0-9.,]/g,'');">
+                            <label for="rodillo_servo{{ i }}_der" class="form-label">Rodillo Servo {{ i }} Derecha:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="3" class="form-control" 
+                                name="rodillo_servo{{ i }}_der" id="rodillo_servo_{{ i }}_der" required 
+                                oninput="this.value=this.value.replace(/[^0-9.,]/g,'');"
+                                value="{{ form_data['rodillo_servo' + i|string + '_der'] if form_data['rodillo_servo' + i|string + '_der'] is not none else '' }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="servo_{{ i }}_izq" class="form-label">Rodillo Servo {{ i }} Izquierda:</label>
-                            <input type="text" maxlength="3" class="form-control" name="servo_{{ i }}_izq" id="servo_{{ i }}_izq" required oninput="this.value=this.value.replace(/[^0-9.,]/g,'');">
+                            <label for="rodillo_servo{{ i }}_izq" class="form-label">Rodillo Servo {{ i }} Izquierda:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="3" class="form-control" 
+                                name="rodillo_servo{{ i }}_izq" id="rodillo_servo{{ i }}_izq" required 
+                                oninput="this.value=this.value.replace(/[^0-9.,]/g,'');"
+                                value="{{ form_data['rodillo_servo' + i|string + '_izq'] if form_data['rodillo_servo' + i|string + '_izq'] is not none else '' }}">
                         </div>
                     </div>
                     {% endfor %}
@@ -408,21 +245,24 @@
                     {% for i in [1, 2] %}
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="balancin_{{ i }}" class="form-label">Balancín {{ i }}:</label>
-                            <input type="text" maxlength="3" class="form-control" name="balancin_{{ i }}" id="balancin_{{ i }}" required oninput="this.value=this.value.replace(/[^0-9.,]/g,'');">
+                            <label for="balancin_{{ i }}" class="form-label">Balancín {{ i }}:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="3" class="form-control" name="balancin_{{ i }}" id="balancin_{{ i }}" required oninput="this.value=this.value.replace(/[^0-9.,]/g,'');"
+                            value="{{ form_data[balancin_] if form_data[balancin_] is not none else '' }}">
                         </div>
                     </div>
                     {% endfor %}
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="balancin_doypack_3" class="form-label">Balancín 3 doy pack:</label>
-                            <input type="text" maxlength="3" class="form-control" name="balancin_doypack_3" id="balancin_doypack_3" required oninput="this.value=this.value.replace(/[^0-9].,/g,'');">
+                            <label for="balancin_3_doypack" class="form-label">Balancín 3 doy pack:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="3" class="form-control" name="balancin_3_doypack" id="balancin_3_doypack" required oninput="this.value=this.value.replace(/[^0-9].,/g,'');"
+                            value="{{ form_data[balancin_3_doypack] if form_data[balancin_3_doypack] is not none else '' }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="freno_rodillo" class="form-label">Freno Rodillo:</label>
-                            <input type="text" maxlength="3" class="form-control" name="freno_rodillo" id="freno_rodillo" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                            <label for="freno_rodillo" class="form-label">Freno Rodillo:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="3" class="form-control" name="freno_rodillo" id="freno_rodillo" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                            value="{{ form_data[freno_rodillo] if form_data[freno_rodillo] is not none else '' }}">
                         </div>
                     </div>
                 </div>
@@ -435,53 +275,82 @@
                         <!-- Sellador válvulas (Preselle) -->
                         <div class="col-md-6">
                             <div class="form-question-card">
-                                <label for="temp_1" class="form-label">Sellador Válvulas -PRESELLE- Superior 1:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_1" id="temp_1" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                                <label for="sellador_valvulas_preselle_superior_1" class="form-label">Sellador Válvulas -PRESELLE- Superior 1:<span class="required-asterisk">*</span></label>
+                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="sellador_valvulas_preselle_superior_1" id="sellador_valvulas_preselle_superior_1" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                value="{{ form_data[sellador_valvulas_preselle_superior_1] if form_data[sellador_valvulas_preselle_superior_1] is not none else '' }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-question-card">
-                                <label for="temp_2" class="form-label">Sellador Válvulas - PRESELLE - Inferior 2:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_2" id="temp_2" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                                <label for="sellador_valvulas_preselle_inferior_2" class="form-label">Sellador Válvulas - PRESELLE - Inferior 2:<span class="required-asterisk">*</span></label>
+                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="sellador_valvulas_preselle_inferior_2" id="sellador_valvulas_preselle_inferior_2" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                value="{{ form_data[sellador_valvulas_preselle_inferior_2] if form_data[sellador_valvulas_preselle_inferior_2] is not none else '' }}">
                             </div>
                         </div>
 
                         <!-- Sellador transversal 19 -->
                         <div class="col-md-6">
                             <div class="form-question-card">
-                                <label for="temp_9" class="form-label">Sellador Transversal - Superior 9:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_9" id="temp_9" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                                <label for="sellador_transversal_superior_9" class="form-label">Sellador Transversal - Superior 9:<span class="required-asterisk">*</span></label>
+                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="sellador_transversal_superior_9" id="sellador_transversal_superior_9" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                value="{{ form_data[sellador_transversal_superior_9] if form_data[sellador_transversal_superior_9] is not none else '' }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-question-card">
-                                <label for="temp_10" class="form-label">Sellador Transversal - Inferior 10:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_10" id="temp_10" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                                <label for="sellador_transversal_inferior_10" class="form-label">Sellador Transversal - Inferior 10:<span class="required-asterisk">*</span></label>
+                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="sellador_transversal_inferior_10" id="sellador_transversal_inferior_10" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                value="{{ form_data[sellador_transversal_inferior_10] if form_data[sellador_transversal_inferior_10] is not none else '' }}">
                             </div>
                         </div>
 
-                        <!-- Sellador transversal 20 -->
-                        {% for i in [11, 12, 13, 14, 15, 16] %}
-                        <div class="col-md-6">
-                            <div class="form-question-card">
-                                <label for="temp_{{ i }}" class="form-label">Sellador Transversal - {{ 'Superior' if i % 2 != 0 else 'Inferior' }} {{ i }}:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_{{ i }}" id="temp_{{ i }}" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                        
+                        <!-- Selladores Transversales -->
+                        {% for i in range(11, 17) %}
+                            {% set posicion = 'superior' if i % 2 != 0 else 'inferior' %}
+                            <div class="col-md-6">
+                                <div class="form-question-card">
+                                    <label for="sellador_transversal_{{ posicion }}_{{ i }}" class="form-label">
+                                        Sellador Transversal - {{ posicion|capitalize }} {{ i }}:<span class="required-asterisk">*</span>
+                                    </label>
+                                    <input type="text"
+                                        maxlength="3"
+                                        pattern="[0-9]{1,3}"
+                                        inputmode="numeric"
+                                        class="form-control"
+                                        name="sellador_transversal_{{ posicion }}_{{ i }}"
+                                        id="sellador_transversal_{{ posicion }}_{{ i }}"
+                                        required
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                        value="{{ form_data['sellador_transversal_' ~ posicion ~ '_' ~ i] if form_data['sellador_transversal_' ~ posicion ~ '_' ~ i] is not none else '' }}">
+                                </div>
                             </div>
-                        </div>
                         {% endfor %}
-
-                        <!-- Sellador longitudinal -->
-                        {% for i in [17, 18, 19, 20, 21, 22] %}
-                        <div class="col-md-6">
-                            <div class="form-question-card">
-                                <label for="temp_{{ i }}" class="form-label">Sellador Longitudinal - {{ 'Superior' if i % 2 != 0 else 'Inferior' }} {{ i }}:</label>
-                                <input type="text" maxlength="3" pattern="[0-9]{1,3}" inputmode="numeric" class="form-control" name="temp_{{ i }}" id="temp_{{ i }}" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                        
+                        <!-- Selladores Longitudinales -->
+                        {% for i in range(17, 23) %}
+                            {% set posicion = 'superior' if i % 2 != 0 else 'inferior' %}
+                            <div class="col-md-6">
+                                <div class="form-question-card">
+                                    <label for="sellador_longitudinal_{{ posicion }}_{{ i }}" class="form-label">
+                                        Sellador Longitudinal - {{ posicion|capitalize }} {{ i }}:<span class="required-asterisk">*</span>
+                                    </label>
+                                    <input type="text"
+                                        maxlength="3"
+                                        pattern="[0-9]{1,3}"
+                                        inputmode="numeric"
+                                        class="form-control"
+                                        name="sellador_longitudinal_{{ posicion }}_{{ i }}"
+                                        id="sellador_longitudinal_{{ posicion }}_{{ i }}"
+                                        required
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                        value="{{ form_data['sellador_longitudinal_' ~ posicion ~ '_' ~ i] if form_data['sellador_longitudinal_' ~ posicion ~ '_' ~ i] is not none else '' }}">
+                                </div>
                             </div>
-                        </div>
                         {% endfor %}
+       
                     </div>
             </fieldset>
-
 
             <button type="submit" class="btn btn-success me-2">Enviar Registro</button>
         </form>
@@ -489,68 +358,208 @@
 
     {# Botón de Volver #}
     <div class="back-button-container">
-        <a href="{{ url_volver or url_for('proceso_laminacion_dashboard') }}" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Volver a Opciones de Laminación
+        {# La URL para volver debe apuntar al dashboard de sellado, no al de laminación #}
+        <a href="{{ url_volver or url_for('sellado.proceso_sellado_dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Volver a Sellado
         </a>
     </div>
 {% endblock %}
 
-{# Script JavaScript para manejar submission AJAX y truncar decimales en tiempo real #}
+{# Script JavaScript para manejar submission AJAX y autocompletado #}
 {% block process_page_scripts %}
 <script>
+    // VERIFICAR SI ESTA ES NECESARIA EN ESTE FORM
+    // --- Funciones auxiliares globales para ser accesibles desde onchange/onload ---
+    window.mostrarInputFotocelda = function(selectElement) { 
+        const container = document.getElementById('fotocelda_otro_container');
+        const input = document.getElementById('fotocelda_otro');
+        if (!container || !input) return; 
+        if (selectElement.value === 'otro') {
+            container.style.display = 'block';
+            input.required = true;
+        } else {
+            container.style.display = 'none';
+            input.value = '';
+            input.required = false;
+        }
+    };
 
-
-    function consultarDatosTrabajo() {
-        const trabajo = document.getElementById("trabajo").value;
-        if (!trabajo) return;
-
-        fetch(`/api/trabajo/${trabajo}`)
-            .then(response => {
-                if (!response.ok) throw new Error("Trabajo no encontrado");
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById("parte").value = data.parte || "";
-                document.getElementById("estructura").value = data.estructura || "";
-
-                // 🟡 Lógica especial para el campo CLIENTE
-                const clienteInput = document.getElementById("cliente");
-                if (data.cliente && data.cliente.trim() !== "") {
-                    clienteInput.value = data.cliente;
-                    clienteInput.setAttribute("readonly", true);
-                } else {
-                    clienteInput.value = "";
-                    clienteInput.removeAttribute("readonly");
-                }
-
-                // ✅ Otros campos formateados con dos decimales
-                document.getElementById("ancho").value = data.ancho ? parseFloat(data.ancho).toFixed(2) : "";
-                document.getElementById("largo").value = data.largo ? parseFloat(data.largo).toFixed(2) : "";
-                document.getElementById("fuelle").value = data.fuelle ? parseFloat(data.fuelle).toFixed(2) : "";
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("No se encontró el trabajo o hubo un error al consultar la API.");
-            });
-    }
-
-    async function consultarEmpleadoPorID(id_empleado) {
-        const id = document.getElementById("id_empleado").value;
-        if (!id) return;
-
+    window.consultarDatosTrabajo = async function() {
+        const trabajoInput = document.getElementById("trabajo");
+        const trabajo = trabajoInput.value;
+        const parteInput = document.getElementById("parte");
+        const estructuraInput = document.getElementById("estructura");
+        const clienteInput = document.getElementById("cliente");
+        const anchoInput = document.getElementById("ancho");
+        const largoInput = document.getElementById("largo");
+        const fuelleInput = document.getElementById("fuelle");
+        if (!trabajo) {
+            parteInput.value = "";
+            estructuraInput.value = "";
+            clienteInput.value = "";
+            clienteInput.removeAttribute("readonly");
+            anchoInput.value = "";
+            largoInput.value = "";
+            fuelleInput.value = "";
+            return;
+        }
         try {
-            const response = await fetch(`/api/empleado?id=${id}`);
+            const response = await fetch(`/sellado/se50/api/trabajo/${trabajo}`);
             const data = await response.json();
-
-            if (data && data.nombre) {
-                document.getElementById("nombre_empleado").value = data.nombre;
+            if (!response.ok) throw new Error(data.error || "Error desconocido al consultar trabajo.");
+            parteInput.value = data.parte || "";
+            estructuraInput.value = data.estructura || "";
+            if (data.cliente && data.cliente.trim() !== "") {
+                clienteInput.value = data.cliente;
+                clienteInput.setAttribute("readonly", "true"); 
             } else {
-                document.getElementById("nombre_empleado").value = "No encontrado";
+                clienteInput.value = "";
+                clienteInput.removeAttribute("readonly");
+            }
+            anchoInput.value = data.ancho ? parseFloat(data.ancho).toFixed(2) : "";
+            largoInput.value = data.largo ? parseFloat(data.largo).toFixed(2) : "";
+            fuelleInput.value = data.fuelle ? parseFloat(data.fuelle).toFixed(2) : "";
+        } catch (error) {
+            console.error("Error al consultar el trabajo:", error);
+            alert(`Error al consultar el trabajo: ${error.message || 'No se encontró el trabajo o hubo un problema de conexión.'}`);
+            parteInput.value = "";
+            estructuraInput.value = "";
+            clienteInput.value = "";
+            clienteInput.removeAttribute("readonly");
+            anchoInput.value = "";
+            largoInput.value = "";
+            fuelleInput.value = "";
+        }
+    };
+    
+    window.consultarEmpleadoPorID = async function() {
+        const idInput = document.getElementById("id_empleado");
+        const id = idInput.value;
+        const nombreEmpleadoInput = document.getElementById("nombre_empleado");
+        if (!id) {
+            nombreEmpleadoInput.value = "";
+            return;
+        }
+        try {
+            const response = await fetch(`/sellado/se50/api/empleado?id=${id}`);
+            const data = await response.json();
+            if (data && data.success) {
+                nombreEmpleadoInput.value = data.nombre || 'No encontrado';
+            } else {
+                nombreEmpleadoInput.value = data.nombre || 'No encontrado'; 
             }
         } catch (error) {
             console.error("Error al consultar el empleado:", error);
-            document.getElementById("nombre_empleado").value = "Error en la consulta";
+            nombreEmpleadoInput.value = "Error en la consulta";
         }
+    };
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const btn = form.querySelector('button[type="submit"]');
+        const origText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Enviando...`;
+
+        const payload = {};
+        new FormData(form).forEach((value, key) => {
+            payload[key] = value;
+        });
+        // VERIFICAR USO DE ESTA VALIDACION (POR FOTOCELDAS SE47-30)
+        const fotoceldaValue = payload['fotocelda'];
+        const fotoceldaOtroValue = payload['fotocelda_otro'];
+        if (fotoceldaValue !== 'otro') {
+            payload['fotocelda_otro'] = null; 
+        } else if (fotoceldaOtroValue === undefined || fotoceldaOtroValue.trim() === "") {
+            payload['fotocelda_otro'] = null;
+        }
+
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            showNotification(result);
+            if (res.ok && result.success) {
+                form.reset();
+                form.querySelectorAll('select').forEach(s => {
+                    if (s.options.length > 0) {
+                        s.selectedIndex = 0; 
+                    }
+                });
+                mostrarInputFotocelda(document.getElementById('fotocelda'));
+                document.getElementById('nombre_empleado').value = "";
+                document.getElementById('parte').value = "";
+                document.getElementById('cliente').value = "";
+                document.getElementById('cliente').removeAttribute('readonly');
+                document.getElementById('estructura').value = "";
+                document.getElementById('ancho').value = "";
+                document.getElementById('largo').value = "";
+                document.getElementById('fuelle').value = "";
+            } else {
+                if (result.form_data) {
+                    for (const key in result.form_data) {
+                        const input = document.getElementById(key);
+                        if (input) {
+                            if (input.tagName === 'SELECT') {
+                                input.value = result.form_data[key];
+                                if (key === 'fotocelda') {
+                                    mostrarInputFotocelda(input);
+                                }
+                            } else {
+                                input.value = result.form_data[key];
+                            }
+                        }
+                    }
+                    const trabajoInput = document.getElementById('trabajo');
+                    if (trabajoInput.value) { 
+                        await consultarDatosTrabajo(); 
+                    }
+                    const empleadoIdInput = document.getElementById('id_empleado');
+                    if (empleadoIdInput.value) { 
+                        await consultarEmpleadoPorID();
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('AJAX error:', err);
+            showNotification({
+                category: 'danger',
+                message: 'Error de red o servidor.',
+                details: 'Por favor, verifica tu conexión a internet e inténtalo de nuevo.'
+            });
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    });
+
+    form.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'submit') {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelectorAll('input[inputmode="numeric"]').forEach(input => {
+        input.addEventListener('wheel', e => e.preventDefault());
+    });
+
+    const idEmpleadoInput = document.getElementById('id_empleado');
+    const trabajoInput = document.getElementById('trabajo');
+    const fotoceldaSelect = document.getElementById('fotocelda');
+    if (idEmpleadoInput.value) {
+        consultarEmpleadoPorID();
     }
+    if (trabajoInput.value) {
+        consultarDatosTrabajo();
+    }
+    mostrarInputFotocelda(fotoceldaSelect);
+
 </script>
 {% endblock %}
