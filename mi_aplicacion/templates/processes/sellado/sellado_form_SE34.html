@@ -40,18 +40,6 @@
 
     {# Contenedor para tu formulario HTML personalizado #}
     <div class="custom-form-container">
-        {# Mostrar mensajes flash de Flask (si se usan para errores no-AJAX o redirecciones) #}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
         {# Formulario HTML - Action ajustado para apuntar al blueprint 'se34' #}
         <form id="registroParametrosForm" method="POST" action="{{ url_for('se34.sellado_form_se34') }}">
             <fieldset>

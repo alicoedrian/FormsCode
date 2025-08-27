@@ -40,18 +40,6 @@
 
     {# Contenedor para tu formulario HTML personalizado #}
     <div class="custom-form-container">
-        {# Mostrar mensajes flash de Flask (si se usan para errores no-AJAX o redirecciones) #}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
         {# Formulario HTML - Action ajustado para apuntar al blueprint 'se30_se47' #}
         <form id="registroParametrosForm" method="POST" action="{{ url_for('se30_se47.sellado_form_se30_se47') }}">
             <fieldset>
@@ -307,7 +295,8 @@
                         <div class="form-question-card">
                             <label for="observaciones" class="form-label">Notas / Observaciones:</label>
                             <textarea class="form-control" id="observaciones" name="observaciones" rows="4" maxlength="500"
-                                placeholder="Escriba aquí cualquier comentario o novedad relevante..."></textarea>
+                                placeholder="Escriba aquí cualquier comentario o novedad relevante..."></textarea
+                                value="{{ form_data.observaciones if form_data.observaciones is not none else '' }}">
                         </div>
                     </div>
                 </div>

@@ -243,7 +243,7 @@ def sellado_form_se34():
             "ubicacion_modulo_2": datos.get('ubicacion_modulo_2') if datos.get('ubicacion_modulo_2') == 'otro' else None,
             "ubicacion_modulo_3": datos.get('ubicacion_modulo_3') if datos.get('ubicacion_modulo_3') == 'otro' else None,
             **{f"tmodulo{i}": datos.get(f"modulo_{i}") for i in range(1,23)},
-            "observaciones": datos.get('observaciones') if datos.get('observaciones') == 'otro' else None
+            "observaciones": datos.get('observaciones')
         }
         
         current_app.logger.info("JSON del Payload del Formulario SE34 (Simulado):")

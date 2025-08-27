@@ -177,6 +177,9 @@ def sellado_form_se50():
                 datos[field] = converted_value 
 
 
+        if datos.get('observaciones')=='otro' and (datos.get('observaciones') is None or str(datos.get('observaciones')).strip() == ""):
+            validation_errors.append(('observaciones',"Especifique alguna observación'."))
+
         nombre_empleado = "" 
         employee_id_input = datos.get('id_empleado')
         if employee_id_input and to_int(employee_id_input) is not None: 
@@ -238,7 +241,8 @@ def sellado_form_se50():
             "modo_perforacion": datos.get('modo_perforacion'),
             "modo_pouch": datos.get('modo_pouch'),
             "balancin_3_doypack": datos.get('balancin_3_doypack'),
-            "freno_rodillo": datos.get('freno_rodillo')  
+            "freno_rodillo": datos.get('freno_rodillo'),
+            "observaciones": datos.get('observaciones') 
         }
 
          # --- RODILLOS (coinciden con las columnas de la DB) ---

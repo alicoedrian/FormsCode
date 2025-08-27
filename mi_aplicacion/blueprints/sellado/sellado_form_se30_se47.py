@@ -171,6 +171,9 @@ def sellado_form_se30_se47():
         if datos.get('fotocelda')=='otro' and (datos.get('fotocelda_otro') is None or str(datos.get('fotocelda_otro')).strip() == ""):
             validation_errors.append(('fotocelda_otro',"Especifique Fotocelda cuando elija 'Otro'."))
 
+        if datos.get('observaciones')=='otro' and (datos.get('observaciones') is None or str(datos.get('observaciones')).strip() == ""):
+            validation_errors.append(('observaciones',"Especifique alguna observación'."))
+
         nombre_empleado = "" 
         employee_id_input = datos.get('id_empleado')
         if employee_id_input and to_int(employee_id_input) is not None: 
@@ -232,7 +235,7 @@ def sellado_form_se30_se47():
             "skip_mode": datos.get('skip_mode'),
             "mark_missing_stop": datos.get('mark_missing_stop'),
             **{f"tmodulo{i}": datos.get(f"modulo_{i}") for i in range(1,13)},
-            "observaciones": datos.get('observaciones') if datos.get('observaciones') == 'otro' else None
+            "observaciones": datos.get('observaciones')
         }
         
         current_app.logger.info("JSON del Payload del Formulario SE30/SE47 (Simulado):")
