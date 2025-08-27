@@ -11,11 +11,11 @@ from ...utils.epicor_api import get_employee_name_from_id, get_job_data
 # Desactivar advertencias de SSL inseguro (solo para desarrollo, si tu webhook usa HTTPS auto-firmado)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-se30_se47_bp = Blueprint(
-    'se30_se47', __name__,
+se34_bp = Blueprint(
+    'se34', __name__,
     template_folder='../../../templates',
     static_folder='../../../static',
-    url_prefix='/sellado/se30_se47'
+    url_prefix='/sellado/se34'
 )
 
 # === FUNCION PARA LA HORA DE COLOMBIA SIEMPRE ===
@@ -23,15 +23,15 @@ def get_colombia_now():
     return datetime.now(pytz.timezone('America/Bogota'))
 
 # --- FUNCIÓN PARA ENVIAR DATOS AL WEBHOOK ---
-def enviar_a_webhook_se30_se47(datos_payload):
+def enviar_a_webhook_se34(datos_payload):
     """
-    Envía el payload JSON al webhook configurado para SE30/SE47.
+    Envía el payload JSON al webhook configurado para SE34.
     """
-    webhook_url = current_app.config.get('WEBHOOK_SE30_SE47_URL')
-    webhook_token = current_app.config.get('WEBHOOK_SE30_SE47_AUTH')
+    webhook_url = current_app.config.get('WEBHOOK_SE34_URL')
+    webhook_token = current_app.config.get('WEBHOOK_SE34_AUTH')
 
     if not webhook_url or not webhook_token:
-        current_app.logger.error("Webhook SE30/SE47 URL o AUTH no configurados en app.config.")
+        current_app.logger.error("Webhook SE34 URL o AUTH no configurados en app.config.")
         return {"success": False, "message": "Error interno: configuración de webhook faltante."}
 
     headers = {
@@ -66,7 +66,7 @@ def enviar_a_webhook_se30_se47(datos_payload):
         current_app.logger.error(f"Error inesperado al enviar webhook: {e}", exc_info=True)
         return {"success": False, "message": f"Error interno al procesar el envío de datos: {str(e)}"}
 
-@se30_se47_bp.route('/api/empleado', methods=['GET'])
+@se34_bp.route('/api/empleado', methods=['GET'])
 def api_empleado():
     eid = request.args.get('id')
     if not eid:
@@ -76,7 +76,7 @@ def api_empleado():
         return jsonify(success=True, nombre=res["nombre"])
     return jsonify(success=False, nombre=res["message"]), 404
 
-@se30_se47_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
+@se34_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
 def api_trabajo(trabajo_id):
     if not trabajo_id:
         return jsonify(success=False, error="Trabajo ID faltante"), 400
@@ -85,8 +85,8 @@ def api_trabajo(trabajo_id):
         return jsonify(res)
     return jsonify(success=False, error=res["message"]), 404
 
-@se30_se47_bp.route('/', methods=['GET','POST'])
-def sellado_form_se30_se47():
+@se34_bp.route('/', methods=['GET','POST'])
+def sellado_form_se34():
     if 'user_id' not in session:
         flash('Por favor, inicia sesión.', 'warning')
         return redirect(url_for('main.login', next=request.url))
@@ -122,10 +122,10 @@ def sellado_form_se30_se47():
             'id_empleado': "ID Empleado", 'trabajo': "Trabajo",
             'parte': "Parte", 'cliente': "Cliente", 'estructura': "Estructura",
             'ancho': "Ancho", 'largo': "Largo", 'fuelle': "Fuelle",
-            'work_mode': "Work Mode", 'cutter_set': "Cutter Set",
-            'skip_mode': "Skip Mode", 'mark_missing_stop': "Mark Missing Stop",
-            'fotocelda': "Fotocelda", 'cortasolapa': "Cortasolapa",
-            'formato': "Formato"
+            'tipo_bolsa': "Tipo de Bolsa", 'abre_boca': "Abre Boca",
+            'fotocelda': "Fotocelda", 'work_mode': "Work Mode", 
+            'color_sensor_fotoc': "Color Sensor Fotocelda",'doble_corte': "Doble corte", 
+            'zipper': "Zipper", 'pedido_critico': "Pedido crítico"
         }
         for f, label in required_basic_fields.items():
             val = datos.get(f)
@@ -134,16 +134,13 @@ def sellado_form_se30_se47():
 
         numeric_fields_info = {
             'calibre': {'label': 'Calibre', 'type': int},
-            'length_set': {'label': 'Length Set', 'type': float},
+            'velocidad': {'label': 'Velocidad', 'type': int},
+            'seal_set': {'label': 'Seal Set', 'type': float},
             'speed_set': {'label': 'Speed Set', 'type': float},
             'feed_rate': {'label': 'Feed Rate', 'type': float},
             'tension_adjustment': {'label': 'Tension Adjustment', 'type': int},
-            'seal_time': {'label': 'Seal Time', 'type': int},
-            'mark_sensing_range': {'label': 'Mark Sensing Range', 'type': float},
-            'Group_conveying_time': {'label': 'Group Conveying Time', 'type': int},
-            'velocidad': {'label': 'Velocidad', 'type': int},
-            'selladores_transversales': {'label': 'Selladores Transversales', 'type': int},
-            'selladores_longitudinales': {'label': 'Selladores Longitudinales', 'type': int}, 
+            'cara': {'label': 'Cara', 'type': int},
+            'medida_doblecor': {'label': 'medida_doblecor', 'type': float}       
         }
 
         for field, info in numeric_fields_info.items():
@@ -157,7 +154,7 @@ def sellado_form_se30_se47():
                     validation_errors.append((field, f'El campo "{label}" debe ser un número válido.'))
                 datos[field] = converted_value 
 
-        for i in range(1,13):
+        for i in range(1,22):
             key = f'modulo_{i}'
             v = datos.get(key)
             if v is None or str(v).strip() == "":
@@ -168,8 +165,18 @@ def sellado_form_se30_se47():
                     validation_errors.append((key, f'Módulo {i} debe ser un número entero válido.'))
                 datos[key] = converted_module_val 
 
-        if datos.get('fotocelda')=='otro' and (datos.get('fotocelda_otro') is None or str(datos.get('fotocelda_otro')).strip() == ""):
-            validation_errors.append(('fotocelda_otro',"Especifique Fotocelda cuando elija 'Otro'."))
+
+        if datos.get('num_fotoceldas')=='otro' and (datos.get('num_fotoceldas') is None or str(datos.get('num_fotoceldas')).strip() == ""):
+            validation_errors.append(('num_fotoceldas',"Especifique # de fotoceldas si elige SI en opción FOTOCELDA'."))
+
+        if datos.get('num_fotoceldas')>'1' and (datos.get('desc_foto_1') is None or str(datos.get('desc_foto_1')).strip() == ""):
+            validation_errors.append(('desc_foto_1',"Especifique ubicación de la fotocelda 1"))
+
+        if datos.get('num_fotoceldas')>'1' and (datos.get('desc_foto_2') is None or str(datos.get('desc_foto_2')).strip() == ""):
+            validation_errors.append(('desc_foto_2',"Especifique ubicación de la fotocelda 2"))    
+
+        if datos.get('num_fotoceldas')>'1' and (datos.get('desc_foto_3') is None or str(datos.get('desc_foto_3')).strip() == ""):
+            validation_errors.append(('desc_foto_3',"Especifique ubicación de la fotocelda 3"))  
 
         nombre_empleado = "" 
         employee_id_input = datos.get('id_empleado')
@@ -188,8 +195,8 @@ def sellado_form_se30_se47():
                                form_data=datos), 400 
             flash(details_html,'danger')
             return render_template(
-                'processes/sellado/sellado_form_se30_se47.html',
-                nombre_proceso="Sellado", subseccion="Formulario SE30/SE47",
+                'processes/sellado/sellado_form_se34.html',
+                nombre_proceso="Sellado", subseccion="Formulario SE34",
                 fecha_actual=get_colombia_now().strftime('%Y-%m-%d'),
                 form_data=datos, 
                 username=session.get('user_name'),
@@ -213,33 +220,37 @@ def sellado_form_se30_se47():
             "largo": datos.get('largo'),
             "fuelle": datos.get('fuelle'),
             "calibre": datos.get('calibre'),
-            "length_set": datos.get('length_set'),
+            "velocidad": datos.get('velocidad'),
+            "seal_set": datos.get('seal_set'),
             "speed_set": datos.get('speed_set'),
             "feed_rate": datos.get('feed_rate'),
             "tension_adjustment": datos.get('tension_adjustment'),
-            "seal_time": datos.get('seal_time'),
-            "mark_sensing_range": datos.get('mark_sensing_range'),
-            "group_conveying_time": datos.get('Group_conveying_time'),
-            "velocidad": datos.get('velocidad'),
-            "selladores_transversales": datos.get('selladores_transversales'),
-            "selladores_longitudinales": datos.get('selladores_longitudinales'), 
+            "tipo_bolsa": datos.get('tipo_bolsa'),
+            "abre_boca": datos.get('abre_boca'),
+            "cara": datos.get('cara'),
             "fotocelda": datos.get('fotocelda'),
-            "fotocelda_otro": datos.get('fotocelda_otro') if datos.get('fotocelda') == 'otro' else None,
-            "cortasolapa": datos.get('cortasolapa'),
-            "formato": datos.get('formato'),
+            "num_fotoceldas": datos.get('num_fotoceldas') if datos.get('num_fotoceldas') == 'otro' else None,
+            "desc_foto_1": datos.get('desc_foto_1') if datos.get('desc_foto_1') == 'otro' else None,
+            "desc_foto_2": datos.get('desc_foto_2') if datos.get('desc_foto_2') == 'otro' else None,
+            "desc_foto_3": datos.get('desc_foto_3') if datos.get('desc_foto_3') == 'otro' else None,
             "work_mode": datos.get('work_mode'),
-            "cutter_set": datos.get('cutter_set'),
-            "skip_mode": datos.get('skip_mode'),
-            "mark_missing_stop": datos.get('mark_missing_stop'),
-            **{f"tmodulo{i}": datos.get(f"modulo_{i}") for i in range(1,13)},
+            "color_sensor_fotoc": datos.get('color_sensor_fotoc'),
+            "doble_corte": datos.get('doble_corte'),
+            "medida_doblecor": datos.get('medida_doblecor'),
+            "zipper": datos.get('zipper'),
+            "pedido_critico": datos.get('pedido_critico'),
+            "ubicacion_modulo_1": datos.get('ubicacion_modulo_1') if datos.get('ubicacion_modulo_1') == 'otro' else None,
+            "ubicacion_modulo_2": datos.get('ubicacion_modulo_2') if datos.get('ubicacion_modulo_2') == 'otro' else None,
+            "ubicacion_modulo_3": datos.get('ubicacion_modulo_3') if datos.get('ubicacion_modulo_3') == 'otro' else None,
+            **{f"tmodulo{i}": datos.get(f"modulo_{i}") for i in range(1,23)},
             "observaciones": datos.get('observaciones') if datos.get('observaciones') == 'otro' else None
         }
         
-        current_app.logger.info("JSON del Payload del Formulario SE30/SE47 (Simulado):")
+        current_app.logger.info("JSON del Payload del Formulario SE34 (Simulado):")
         current_app.logger.info(payload)
 
         # --- ENVÍO DE DATOS AL WEBHOOK ---
-        webhook_result = enviar_a_webhook_se30_se47(payload)
+        webhook_result = enviar_a_webhook_se34(payload)
         
         if request.is_json:
             if webhook_result["success"]:
@@ -251,13 +262,13 @@ def sellado_form_se30_se47():
 
         flash("Formulario enviado correctamente." if webhook_result["success"] else f"Error al enviar: {webhook_result['message']}",
               "success" if webhook_result["success"] else "danger")
-        return redirect(url_for('se30_se47.sellado_form_se30_se47'))
+        return redirect(url_for('se34.sellado_form_se34'))
 
     # GET: Mostrar formulario vacío y fecha/hora de Bogotá en el campo
     return render_template(
-        'processes/sellado/sellado_form_se30_se47.html',
+        'processes/sellado/sellado_form_se34.html',
         nombre_proceso="Sellado", 
-        subseccion="Formulario SE30/SE47 (FORMATO EN PRUEBA)", 
+        subseccion="Formulario SE34 (FORMATO EN PRUEBA)", 
         fecha_actual=get_colombia_now().strftime('%Y-%m-%d %H:%M:%S'),
         form_data={}, 
         username=session.get('user_name'),

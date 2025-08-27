@@ -21,6 +21,7 @@ from .blueprints.transversal.monitoreo_cuchillas import monitoreo_cuchillas_bp
 from .blueprints.coordinadores.coordinadores import coordinadores_bp
 from .blueprints.taras.taras import taras_bp
 from .blueprints.sellado.sellado_form_Se50 import se50_bp
+from .blueprints.sellado.sellado_form_se34 import se34_bp
 
 
 
@@ -50,7 +51,8 @@ def create_app():
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR') # Carga la URL del coordinador
     app.config['WEBHOOK_CORES_URL_SELECT'] = os.getenv('WEBHOOK_CORES_URL_SELECT') # Carga la URL del coordinador
     app.config['WEBHOOK_SE50'] = os.getenv('WEBHOOK_SE50')
-   
+    app.config['WEBHOOK_SE34_URL'] = os.getenv('WEBHOOK_SE34_URL')
+    app.config['WEBHOOK_SE34_AUTH'] = os.getenv('WEBHOOK_SE34_AUTH')
 
 
 
@@ -78,6 +80,7 @@ def create_app():
     app.register_blueprint(coordinadores_bp)
     app.register_blueprint(taras_bp)
     app.register_blueprint(se50_bp)
+    app.register_blueprint(se34_bp)
 
 
     return app

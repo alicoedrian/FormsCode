@@ -1,7 +1,7 @@
 {% extends "layouts/process_base.html" %}
 
 {# Define el título de la página #}
-{% block process_title %}SE30/SE47 – {{ nombre_proceso }}{% endblock %}
+{% block process_title %}SE34 – {{ nombre_proceso }}{% endblock %}
 
 {# Define el CSS específico para esta sección con mejoras de interfaz #}
 {% block process_head_css %}
@@ -24,13 +24,13 @@
     </nav>
     
     {# Título y Descripción #}
-        <div class="page-title-se30-se47"> {# Clase actualizada #}
+        <div class="page-title-se34"> {# Clase actualizada #}
             <i class="fas fa-cog"></i> {# Icono actualizado para parámetros #}
             <div>
                 <div>{{ subseccion }}</div>
             </div>
         </div>
-        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE30/SE47.</p> {# Texto de descripción actualizado #}
+        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE34.</p> {# Texto de descripción actualizado #}
 
 
     {# Contenedor para las notificaciones (AJAX) #}
@@ -52,8 +52,8 @@
             {% endif %}
         {% endwith %}
 
-        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se30_se47' #}
-        <form id="registroParametrosForm" method="POST" action="{{ url_for('se30_se47.sellado_form_se30_se47') }}">
+        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se34' #}
+        <form id="registroParametrosForm" method="POST" action="{{ url_for('se34.sellado_form_se34') }}">
             <fieldset>
                 <legend>Registro de Parámetros</legend>
                 <div class="row">
@@ -93,7 +93,7 @@
                                 onchange="consultarDatosTrabajo()" 
                                 value="{{ form_data.trabajo if form_data.trabajo is not none else '' }}" required>
                         </div>
-                    </div> 
+                    </div>
                     
                     <div class="col-md-6">
                         <div class="form-question-card">
@@ -146,14 +146,11 @@
                     {# Los campos numéricos que se repiten con un bucle #}
                     {% set campos_numericos = [
                         ('calibre', 'Calibre', 3), 
-                        ('length_set', 'Length Set', 5), 
+                        ('velocidad', 'Velocidad', 3),
+                        ('seal_set', 'Seal Set', 5),
                         ('speed_set', 'Speed Set', 3),
-                        ('feed_rate', 'Feed Rate', 5),  
-                        ('tension_adjustment', 'Tension Adjustment', 3),
-                        ('seal_time', 'Seal Time', 5), 
-                        ('mark_sensing_range', 'Mark Sensing Range', 5), 
-                        ('Group_conveying_time', 'Group Conveying Time', 3), 
-                        ('velocidad', 'Velocidad', 3)
+                        ('feed_rate', 'Feed Rate', 5),
+                        ('tension_adjustment', 'Tension Adjustment', 3)                        
                     ] %}
 
                     {% for nombre_campo, label_campo, maxlength in campos_numericos %}
@@ -170,124 +167,196 @@
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="work_mode" class="form-label">Work Mode:<span class="required-asterisk">*</span></label>
-                            <select class="form-select" id="work_mode" name="work_mode" required>
-                                <option value="print stand" {% if form_data.work_mode == 'print stand' %}selected{% endif %}>Print Stand</option>
-                                <option value="plain" {% if form_data.work_mode == 'plain' %}selected{% endif %}>Plain</option>
-                                <option value="plain stand" {% if form_data.work_mode == 'plain stand' %}selected{% endif %}>Plain Stand</option>
+                            <label for="tipo_bolsa" class="form-label">Tipo de Bolsa:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="tipo_bolsa" name="tipo_bolsa" required>
+                                <option value="">Seleccionar</option>
+                                <option value="rollo_arr_abj" {% if form_data.tipo_bolsa == 'rollo_arr_abj' %}selected{% endif %}>Rollo Arriba Rollo Abajo</option>
+                                <option value="plana" {% if form_data.tipo_bolsa == 'plana' %}selected{% endif %}>Plana</option>
+                                <option value="plana_zipp" {% if form_data.tipo_bolsa == 'plana_zipp' %}selected{% endif %}>Plana con Zipper</option>
+                                <option value="flowpack" {% if form_data.tipo_bolsa == 'flowpack' %}selected{% endif %}>Flow Pack</option>
+                                <option value="flex_up" {% if form_data.tipo_bolsa == 'flex_up' %}selected{% endif %}>Flex Up</option>
+                                <option value="flex_up_zipp" {% if form_data.tipo_bolsa == 'flex_up_zipp' %}selected{% endif %}>Flex Up con Zipper</option>
+                                <option value="manga" {% if form_data.tipo_bolsa == 'manga' %}selected{% endif %}>Manga Pastelera</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="cutter_set" class="form-label">Cutter Set:<span class="required-asterisk">*</span></label>
-                            <select class="form-select" id="cutter_set" name="cutter_set" required>
-                                <option value="seal1" {% if form_data.cutter_set == 'seal1' %}selected{% endif %}>Seal 1</option>
-                                <option value="seal2" {% if form_data.cutter_set == 'seal2' %}selected{% endif %}>Seal 2</option>
-                                <option value="seal3" {% if form_data.cutter_set == 'seal3' %}selected{% endif %}>Seal 3</option>
-                                <option value="seal4" {% if form_data.cutter_set == 'seal4' %}selected{% endif %}>Seal 4</option>
-                                <option value="seal5" {% if form_data.cutter_set == 'seal5' %}selected{% endif %}>Seal 5</option>
+                            <label for="abre_boca" class="form-label">Abre Boca:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="abre_boca" name="abre_boca" required>
+                                <option value="">Seleccionar</option>
+                                <option value="si" {% if form_data.abre_boca == 'si' %}selected{% endif %}>SI</option>
+                                <option value="no" {% if form_data.abre_boca == 'no' %}selected{% endif %}>NO</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="skip_mode" class="form-label">Skip Mode:<span class="required-asterisk">*</span></label>
-                            {# Corregido el ID y Name de este campo #}
-                            <select class="form-select" id="skip_mode" name="skip_mode" required> 
-                                <option value="enable" {% if form_data.skip_mode == 'enable' %}selected{% endif %}>Enable</option>
-                                <option value="disable" {% if form_data.skip_mode == 'disable' %}selected{% endif %}>Disable</option>
+                            <label for="cara" class="form-label">Cara:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="cara" name="cara" required>
+                                <option value="">Seleccionar</option>
+                                <option value="1" {% if form_data.cara == '1' %}selected{% endif %}>1</option>
+                                <option value="2" {% if form_data.cara == '2' %}selected{% endif %}>2</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="mark_missing_stop" class="form-label">Mark Missing Stop:<span class="required-asterisk">*</span></label>
-                            {# Corregido el ID y Name de este campo #}
-                            <select class="form-select" id="mark_missing_stop" name="mark_missing_stop" required>
-                                <option value="enable" {% if form_data.mark_missing_stop == 'enable' %}selected{% endif %}>Enable</option>
-                                <option value="disable" {% if form_data.mark_missing_stop == 'disable' %}selected{% endif %}>Disable</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="selladores_transversales" class="form-label">Selladores Transversales (Cantidad):<span class="required-asterisk">*</span></label>
-                            <input type="text" maxlength="2" pattern="[0-9]{1,2}" inputmode="numeric"
-                                class="form-control" name="selladores_transversales" id="selladores_transversales" required
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                                value="{{ form_data.selladores_transversales if form_data.selladores_transversales is not none else '' }}">
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-question-card">
-                            <label for="selladores_longitudinales" class="form-label">Selladores Longitudinales (Cantidad):<span class="required-asterisk">*</span></label>
-                            <input type="text" maxlength="2" pattern="[0-9]{1,2}" inputmode="numeric"
-                                class="form-control" name="selladores_longitudinales" id="selladores_longitudinales" required
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                                value="{{ form_data.selladores_longitudinales if form_data.selladores_longitudinales is not none else '' }}">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-question-card">
                             <label for="fotocelda" class="form-label">Fotocelda:<span class="required-asterisk">*</span></label>
-                            <select class="form-select" id="fotocelda" name="fotocelda" required onchange="mostrarInputFotocelda(this)">
-                                <option value="" {% if form_data.fotocelda == '' %}selected{% endif %}>Seleccione...</option>
-                                <option value="N/A" {% if form_data.fotocelda == 'N/A' %}selected{% endif %}>N/A</option>
-                                <option value="otro" {% if form_data.fotocelda == 'otro' %}selected{% endif %}>Otro (especifique)</option>
+                            <select class="form-select" id="fotocelda" name="fotocelda" onchange="manejarFotocelda()" required>
+                                <option value="">Seleccionar</option>
+                                <option value="si" {% if form_data.fotocelda == 'si' %}selected{% endif %}>SI</option>
+                                <option value="no" {% if form_data.fotocelda == 'no' %}selected{% endif %}>NO</option>
                             </select>
                         </div>
                     </div>
 
-                    {# Contenedor para el campo "fotocelda_otro" #}
-                    <div class="col-md-6" id="fotocelda_otro_container" style="display: none;"> {# CAMBIADO A display: none para control total por JS #}
+                    <div class="col-md-6 d-none" id="grupo_num_fotoceldas">
                         <div class="form-question-card">
-                            <label for="fotocelda_otro" class="form-label">Especificar Fotocelda:<span class="required-asterisk">*</span></label>
-                            <input type="text" class="form-control" id="fotocelda_otro" name="fotocelda_otro" maxlength="50" 
-                                placeholder="Describir ubicación y posicionamiento"
-                                value="{{ form_data.fotocelda_otro if form_data.fotocelda_otro is not none else '' }}"
-                                {# required ya no se controla con Jinja aquí, sino en JS #}>
+                            <label for="num_fotoceldas" class="form-label">Número de Fotoceldas:</label>
+                            <select class="form-select" id="num_fotoceldas" name="num_fotoceldas" onchange="mostrarDescripciones()">
+                                <option value="">Seleccionar</option>
+                                <option value="2" {% if form_data.num_fotoceldas == '2' %}selected{% endif %}>2</option>
+                                <option value="3" {% if form_data.num_fotoceldas == '3' %}selected{% endif %}>3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Descripciones dinámicas -->
+                    <div class="col-md-6 d-none" id="desc_foto_1">
+                        <div class="form-question-card">
+                            <label for="desc_foto_1" class="form-label">Descripción Fotocelda 1:</label>
+                            <input type="text" maxlength="300" class="form-control" name="desc_foto_1" id="desc_foto_1" placeholder="Describir ubicación y posicionamiento"
+                            value="{{ form_data.desc_foto_1 if form_data.desc_foto_1 is not none else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 d-none" id="desc_foto_2">
+                        <div class="form-question-card">
+                            <label for="desc_foto_2" class="form-label">Descripción Fotocelda 2:</label>
+                            <input type="text" maxlength="300" class="form-control" name="desc_foto_2" id="desc_foto_2" placeholder="Describir ubicación y posicionamiento"
+                            value="{{ form_data.desc_foto_2 if form_data.desc_foto_2 is not none else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 d-none" id="desc_foto_3">
+                        <div class="form-question-card">
+                            <label for="desc_foto_3" class="form-label">Descripción Fotocelda 3:</label>
+                            <input type="text" maxlength="300" class="form-control" name="desc_foto_3" id="desc_foto_3" placeholder="Describir ubicación y posicionamiento"
+                            value="{{ form_data.desc_foto_3 if form_data.desc_foto_3 is not none else '' }}">
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="work_mode" class="form-label">Work Mode:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="work_mode" name="work_mode" required>
+                                <option value="">Seleccionar</option>
+                                <option value="print stand" {% if form_data.work_mode == 'print stand' %}selected{% endif %}>Print Stand</option>
+                                <option value="plain" {% if form_data.work_mode == 'plain' %}selected{% endif %}>Plain</option>
+                                <option value="plain stand" {% if form_data.work_mode == 'plain stand' %}selected{% endif %}>Plain Stand</option>
+                                <option value="print" {% if form_data.work_mode == 'print' %}selected{% endif %}>Print</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="cortasolapa" class="form-label">Cortasolapa:<span class="required-asterisk">*</span></label>
-                            <select class="form-select" id="cortasolapa" name="cortasolapa" required>
-                                <option value="X1" {% if form_data.cortasolapa == 'X1' %}selected{% endif %}>X1</option>
-                                <option value="X2" {% if form_data.cortasolapa == 'X2' %}selected{% endif %}>X2</option>
-                                <option value="X3" {% if form_data.cortasolapa == 'X3' %}selected{% endif %}>X3</option>
-                                <option value="X4" {% if form_data.cortasolapa == 'X4' %}selected{% endif %}>X4</option>
-                                <option value="X5" {% if form_data.cortasolapa == 'X5' %}selected{% endif %}>X5</option>
+                            <label for="color_sensor_fotoc" class="form-label">Color Sensor Fotocelda:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="color_sensor_fotoc" name="color_sensor_fotoc" required>
+                                <option value="">Seleccionar</option>
+                                <option value="verde" {% if form_data.color_sensor_fotoc == 'verde' %}selected{% endif %}>Verde</option>
+                                <option value="rojo" {% if form_data.color_sensor_fotoc == 'rojo' %}selected{% endif %}>Rojo</option>
+                                <option value="azul" {% if form_data.color_sensor_fotoc == 'azul' %}selected{% endif %}>Azúl</option>
+                                <option value="noaplica" {% if form_data.color_sensor_fotoc == 'noaplica' %}selected{% endif %}>N/A (Sin Impresión)</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-question-card">
-                            <label for="formato" class="form-label">Formato:<span class="required-asterisk">*</span></label>
-                            <select class="form-select" id="formato" name="formato" required>
-                                <option value="Doble" {% if form_data.formato == 'Doble' %}selected{% endif %}>Doble</option>
-                                <option value="Triple" {% if form_data.formato == 'Triple' %}selected{% endif %}>Triple</option>
-                                <option value="Cuádruple" {% if form_data.formato == 'Cuádruple' %}selected{% endif %}>Cuádruple</option>
-                                <option value="Quíntuple" {% if form_data.formato == 'Quíntuple' %}selected{% endif %}>Quíntuple</option>
-                                <option value="Sextuple" {% if form_data.formato == 'Sextuple' %}selected{% endif %}>Sextuple</option>
+                            <label for="doble_corte" class="form-label"> (Cutter Mode) Doble corte:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="doble_corte" name="doble_corte" required>
+                                <option value="">Seleccionar</option>
+                                <option value="si" {% if form_data.doble_corte == 'si' %}selected{% endif %}>SI</option>
+                                <option value="no" {% if form_data.doble_corte == 'no' %}selected{% endif %}>NO</option>
                             </select>
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="medida_doblecor" class="form-label">(Cutter Offset) Medida del doble corte:<span class="required-asterisk">*</span></label>
+                            <input type="text" maxlength="4" pattern="[0-9]{1,2}" inputmode="numeric"
+                                class="form-control" name="medida_doblecor" id="medida_doblecor" required
+                                oninput="this.value=this.value.replace(/[^0-9.,]/g,'');" placeholder="Si no lleva doble corte ingresar 0"
+                                value="{{ form_data.medida_doblecor if form_data.medida_doblecor is not none else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-question-card">
+                            <label for="zipper" class="form-label"> Zipper <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="zipper" name="zipper" required>
+                                <option value="">Seleccionar</option>
+                                <option value="enable" {% if form_data.zipper == 'enable' %}selected{% endif %}>Enable</option>
+                                <option value="disable" {% if form_data.zipper == 'disable' %}selected{% endif %}>Disable</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <fieldset>
+                        <legend>Ubicación de aditamentos y módulos (En pedidos complejos)</legend>
+
+                        <div class="col-md-6">
+                            <div class="form-question-card">
+                                <label for="pedido_critico" class="form-label">¿Es un pedido crítico?<span class="required-asterisk">*</span></label>
+                                <select class="form-select" id="pedido_critico" name="pedido_critico" onchange="manejarPedidoCritico()" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="si" {% if form_data.pedido_critico == 'si' %}selected{% endif %}>SI</option>
+                                    <option value="no" {% if form_data.pedido_critico == 'no' %}selected{% endif %}>NO</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="campos_aditamentos" class="row d-none">
+                            <div class="col-md-6">
+                                <div class="form-question-card">
+                                    <label for="ubicacion_modulo_1" class="form-label">Ubicación Aditamentos Módulo 1:</label>
+                                    <input type="text" maxlength="100" class="form-control" name="ubicacion_modulo_1" rows="3" id="ubicacion_modulo_1" placeholder="Describir posición y ubicación"
+                                    value="{{ form_data.ubicacion_modulo_1 if form_data.ubicacion_modulo_1 is not none else '' }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-question-card">
+                                    <label for="ubicacion_modulo_2" class="form-label">Ubicación Aditamentos Módulo 2:</label>
+                                    <input type="text" maxlength="100" class="form-control" name="ubicacion_modulo_2" rows="3" id="ubicacion_modulo_2" placeholder="Describir posición y ubicación"
+                                    value="{{ form_data.ubicacion_modulo_2 if form_data.ubicacion_modulo_2 is not none else '' }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-question-card">
+                                    <label for="ubicacion_modulo_3" class="form-label">Ubicación Aditamentos Módulo 3:</label>
+                                    <input type="text" maxlength="100" class="form-control" name="ubicacion_modulo_3" rows="3" id="ubicacion_modulo_3" placeholder="Describir posición y ubicación"
+                                    value="{{ form_data.ubicacion_modulo_3 if form_data.ubicacion_modulo_3 is not none else '' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>               
                 </div>
             </fieldset>
+
 
             <fieldset>
                 <legend>Temperaturas por Módulo</legend>
                 <div class="row">
-                    {% for i in range(1, 13) %}
+                    {% for i in range(1, 23) %}
                     <div class="col-md-3">
                         <div class="form-question-card">
                             <label for="modulo_{{ i }}" class="form-label">Módulo {{ i }}:<span class="required-asterisk">*</span></label>
@@ -300,6 +369,7 @@
                     {% endfor %}
                 </div>
             </fieldset>
+
             <fieldset>
                 <legend>Observaciones</legend>
                 <div class="row">
@@ -369,7 +439,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se30_se47/api/trabajo/${trabajo}`);
+                const response = await fetch(`/sellado/se34/api/trabajo/${trabajo}`);
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || "Error desconocido al consultar trabajo.");
                 parteInput.value = data.parte || "";
@@ -406,7 +476,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se30_se47/api/empleado?id=${id}`);
+                const response = await fetch(`/sellado/se34/api/empleado?id=${id}`);
                 const data = await response.json();
                 if (data && data.success) {
                     nombreEmpleadoInput.value = data.nombre || 'No encontrado';
@@ -567,7 +637,53 @@
         if (trabajoInput.value) {
             consultarDatosTrabajo();
         }
-        mostrarInputFotocelda(fotoceldaSelect);
+        mostrarInputFotocelda(fotoceldaSelect)
+
     });
+
+    function manejarFotocelda() {
+        const valor = document.getElementById("fotocelda").value;
+        const grupoNum = document.getElementById("grupo_num_fotoceldas");
+
+        // Ocultar descripciones siempre al cambiar fotocelda
+        ocultarDescripciones();
+
+        if (valor === "si") {
+            grupoNum.classList.remove("d-none");
+        } else {
+            grupoNum.classList.add("d-none");
+        }
+    }
+
+    function mostrarDescripciones() {
+        ocultarDescripciones();
+        const cantidad = document.getElementById("num_fotoceldas").value;
+
+        if (cantidad >= 1) document.getElementById("desc_foto_1").classList.remove("d-none");
+        if (cantidad >= 2) document.getElementById("desc_foto_2").classList.remove("d-none");
+        if (cantidad == 3) document.getElementById("desc_foto_3").classList.remove("d-none");
+    }
+
+    function ocultarDescripciones() {
+        document.getElementById("desc_foto_1").classList.add("d-none");
+        document.getElementById("desc_foto_2").classList.add("d-none");
+        document.getElementById("desc_foto_3").classList.add("d-none");
+    }
+
+    function manejarPedidoCritico() {
+        const seleccion = document.getElementById("pedido_critico").value;
+        const campos = document.getElementById("campos_aditamentos");
+
+        if (seleccion === "si") {
+            campos.classList.remove("d-none");
+        } else {
+            campos.classList.add("d-none");
+
+            // Limpiar valores si se oculta
+            document.getElementById("ubicacion_modulo_1").value = "";
+            document.getElementById("ubicacion_modulo_2").value = "";
+            document.getElementById("ubicacion_modulo_3").value = "";
+        }
+    }
 </script>
 {% endblock %}
