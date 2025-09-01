@@ -1,7 +1,7 @@
 {% extends "layouts/process_base.html" %}
 
 {# Define el título de la página #}
-{% block process_title %}SE34 – {{ nombre_proceso }}{% endblock %}
+{% block process_title %}SE35 – {{ nombre_proceso }}{% endblock %}
 
 {# Define el CSS específico para esta sección con mejoras de interfaz #}
 {% block process_head_css %}
@@ -24,13 +24,13 @@
     </nav>
     
     {# Título y Descripción #}
-        <div class="page-title-se34"> {# Clase actualizada #}
+        <div class="page-title-se35"> {# Clase actualizada #}
             <i class="fas fa-cog"></i> {# Icono actualizado para parámetros #}
             <div>
                 <div>{{ subseccion }}</div>
             </div>
         </div>
-        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE34.</p> {# Texto de descripción actualizado #}
+        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE35.</p> {# Texto de descripción actualizado #}
 
 
     {# Contenedor para las notificaciones (AJAX) #}
@@ -40,8 +40,8 @@
 
     {# Contenedor para tu formulario HTML personalizado #}
     <div class="custom-form-container">
-        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se34' #}
-        <form id="registroParametrosForm" method="POST" action="{{ url_for('se34.sellado_form_se34') }}">
+        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se35' #}
+        <form id="registroParametrosForm" method="POST" action="{{ url_for('se35.sellado_form_se35') }}">
             <fieldset>
                 <legend>Registro de Parámetros</legend>
                 <div class="row">
@@ -281,7 +281,7 @@
                             <label for="medida_doblecor" class="form-label">(Cutter Offset) Medida del doble corte:<span class="required-asterisk">*</span></label>
                             <input type="text" maxlength="5" pattern="^\d{1,2}([.,]\d{1,2})?$" inputmode="numeric"
                                 class="form-control" name="medida_doblecor" id="medida_doblecor" required
-                                oninput="this.value=this.value.replace(/[^0-9.,]/g,'');" placeholder="Si no lleva doble corte ingresar 0"
+                                oninput="this.value=this.value.replace(/[^0-9,.]/g,'');" placeholder="Si no lleva doble corte ingresar 0"
                                 value="{{ form_data.medida_doblecor if form_data.medida_doblecor is not none else '' }}">
                         </div>
                     </div>
@@ -432,7 +432,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se34/api/trabajo/${trabajo}`);
+                const response = await fetch(`/sellado/se35/api/trabajo/${trabajo}`);
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || "Error desconocido al consultar trabajo.");
                 parteInput.value = data.parte || "";
@@ -469,7 +469,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se34/api/empleado?id=${id}`);
+                const response = await fetch(`/sellado/se35/api/empleado?id=${id}`);
                 const data = await response.json();
                 if (data && data.success) {
                     nombreEmpleadoInput.value = data.nombre || 'No encontrado';
@@ -621,65 +621,65 @@
         });
 
         document.querySelectorAll('input[inputmode="numeric"]').forEach(input => {
-            input.addEventListener('wheel', e => e.preventDefault());
+                input.addEventListener('wheel', e => e.preventDefault());
+            });
+
+            const idEmpleadoInput = document.getElementById('id_empleado');
+            const trabajoInput = document.getElementById('trabajo');
+            const fotoceldaSelect = document.getElementById('fotocelda');
+            if (idEmpleadoInput.value) {
+                consultarEmpleadoPorID();
+            }
+            if (trabajoInput.value) {
+                consultarDatosTrabajo();
+            }
+            mostrarInputFotocelda(fotoceldaSelect)
+
         });
 
-        const idEmpleadoInput = document.getElementById('id_empleado');
-        const trabajoInput = document.getElementById('trabajo');
-        const fotoceldaSelect = document.getElementById('fotocelda');
-        if (idEmpleadoInput.value) {
-            consultarEmpleadoPorID();
+        function manejarFotocelda() {
+            const valor = document.getElementById("fotocelda").value;
+            const grupoNum = document.getElementById("grupo_num_fotoceldas");
+
+            // Ocultar descripciones siempre al cambiar fotocelda
+            ocultarDescripciones();
+
+            if (valor === "si") {
+                grupoNum.classList.remove("d-none");
+            } else {
+                grupoNum.classList.add("d-none");
+            }
         }
-        if (trabajoInput.value) {
-            consultarDatosTrabajo();
+
+        function mostrarDescripciones() {
+            ocultarDescripciones();
+            const cantidad = document.getElementById("num_fotoceldas").value;
+
+            if (cantidad >= 1) document.getElementById("desc_foto_1").classList.remove("d-none");
+            if (cantidad >= 2) document.getElementById("desc_foto_2").classList.remove("d-none");
+            if (cantidad == 3) document.getElementById("desc_foto_3").classList.remove("d-none");
         }
-        mostrarInputFotocelda(fotoceldaSelect)
 
-    });
-
-    function manejarFotocelda() {
-        const valor = document.getElementById("fotocelda").value;
-        const grupoNum = document.getElementById("grupo_num_fotoceldas");
-
-        // Ocultar descripciones siempre al cambiar fotocelda
-        ocultarDescripciones();
-
-        if (valor === "si") {
-            grupoNum.classList.remove("d-none");
-        } else {
-            grupoNum.classList.add("d-none");
+        function ocultarDescripciones() {
+            document.getElementById("desc_foto_1").classList.add("d-none");
+            document.getElementById("desc_foto_2").classList.add("d-none");
+            document.getElementById("desc_foto_3").classList.add("d-none");
         }
-    }
 
-    function mostrarDescripciones() {
-        ocultarDescripciones();
-        const cantidad = document.getElementById("num_fotoceldas").value;
+        function manejarPedidoCritico() {
+            const seleccion = document.getElementById("pedido_critico").value;
+            const campos = document.getElementById("campos_aditamentos");
 
-        if (cantidad >= 1) document.getElementById("desc_foto_1").classList.remove("d-none");
-        if (cantidad >= 2) document.getElementById("desc_foto_2").classList.remove("d-none");
-        if (cantidad == 3) document.getElementById("desc_foto_3").classList.remove("d-none");
-    }
+            if (seleccion === "si") {
+                campos.classList.remove("d-none");
+            } else {
+                campos.classList.add("d-none");
 
-    function ocultarDescripciones() {
-        document.getElementById("desc_foto_1").classList.add("d-none");
-        document.getElementById("desc_foto_2").classList.add("d-none");
-        document.getElementById("desc_foto_3").classList.add("d-none");
-    }
-
-    function manejarPedidoCritico() {
-        const seleccion = document.getElementById("pedido_critico").value;
-        const campos = document.getElementById("campos_aditamentos");
-
-        if (seleccion === "si") {
-            campos.classList.remove("d-none");
-        } else {
-            campos.classList.add("d-none");
-
-            // Limpiar valores si se oculta
-            document.getElementById("ubicacion_modulo_1").value = "";
-            document.getElementById("ubicacion_modulo_2").value = "";
-            document.getElementById("ubicacion_modulo_3").value = "";
+                // Limpiar valores si se oculta
+                document.getElementById("ubicacion_modulo_1").value = "";
+                document.getElementById("ubicacion_modulo_2").value = "";
+                document.getElementById("ubicacion_modulo_3").value = "";
+            }
         }
-    }
 </script>
 {% endblock %}

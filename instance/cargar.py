@@ -1,42 +1,42 @@
 import requests
 import json
 
-url = "https://apps.alico-sa.com/webhook/5fa36282-590d-41de-be92-a7597865e4ba"
+url = "https://apps.alico-sa.com/webhook/455ef59d-441e-44f6-b80e-d46354512137"
 
 payload = json.dumps({
-  "fecha": "2025-08-26 14:21:00",
-  "id_empleado": 201,
-  "nombre_empleado": "Pedro López",
-  "trabajo": "SE34-003",
-  "parte": "Parte C",
-  "cliente": "Cliente Y",
-  "estructura": "PE/PET",
-  "ancho": 350.5,
-  "largo": 500.25,
-  "fuelle": 15,
-  "calibre": 30,
-  "velocidad": 120,
-  "seal_set": 1.5,
-  "speed_set": 2,
-  "feed_rate": 0.8,
-  "tension_adjustment": 1,
-  "tipo_bolsa": "Bolsa de pie",
-  "abre_boca": "Sí",
-  "cara": 1,
+  "fecha": "2025-09-01 14:00:00",
+  "id_empleado": 301,
+  "nombre_empleado": "Luis García",
+  "trabajo": "SE35-001",
+  "parte": "Parte D",
+  "cliente": "Empresa Z",
+  "estructura": "PET/AL/LDPE",
+  "ancho": 450.5,
+  "largo": 600,
+  "fuelle": 20,
+  "calibre": 40,
+  "velocidad": 135,
+  "seal_set": 2,
+  "speed_set": 2.5,
+  "feed_rate": 0.9,
+  "tension_adjustment": 2,
+  "tipo_bolsa": "Bolsa de 3 sellos",
+  "abre_boca": "No",
+  "cara": 2,
   "fotocelda": "Sí",
-  "num_fotoceldas": 2,
-  "desc_foto_1": "Sensor de borde",
-  "desc_foto_2": "Sensor de corte",
-  "desc_foto_3": "código de barras",
-  "work_mode": "Automático",
-  "color_sensor_fotoc": "Rojo",
+  "num_fotoceldas": 1,
+  "desc_foto_1": "Sensor de registro",
+  "desc_foto_2": None,
+  "desc_foto_3": None,
+  "work_mode": "Manual",
+  "color_sensor_fotoc": "Azul",
   "doble_corte": "No",
   "medida_doblecor": 0,
-  "zipper": "Sí",
-  "pedido_critico": "No",
-  "ubicacion_modulo_1": "Superior",
-  "ubicacion_modulo_2": "Inferior",
-  "ubicacion_modulo_3": "código de barras",
+  "zipper": "No",
+  "pedido_critico": "Sí",
+  "ubicacion_modulo_1": "Lateral",
+  "ubicacion_modulo_2": None,
+  "ubicacion_modulo_3": None,
   "tmodulo1": 150,
   "tmodulo2": 145,
   "tmodulo3": 160,
@@ -58,7 +58,8 @@ payload = json.dumps({
   "tmodulo19": 240,
   "tmodulo20": 235,
   "tmodulo21": 250,
-  "tmodulo22": 245
+  "tmodulo22": 245,
+  "observaciones": "Hola"
 })
 headers = {
   'Content-Type': 'application/json',
@@ -68,4 +69,3 @@ headers = {
 response = requests.request("POST", url, headers=headers, data=payload)
 
 print(response.text)
-

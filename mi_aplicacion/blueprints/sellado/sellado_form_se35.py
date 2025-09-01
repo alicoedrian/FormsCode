@@ -11,11 +11,11 @@ from ...utils.epicor_api import get_employee_name_from_id, get_job_data
 # Desactivar advertencias de SSL inseguro (solo para desarrollo, si tu webhook usa HTTPS auto-firmado)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-se34_bp = Blueprint(
-    'se34', __name__,
+se35_bp = Blueprint(
+    'se35', __name__,
     template_folder='../../../templates',
     static_folder='../../../static',
-    url_prefix='/sellado/se34'
+    url_prefix='/sellado/se35'
 )
 
 # === FUNCION PARA LA HORA DE COLOMBIA SIEMPRE ===
@@ -23,15 +23,15 @@ def get_colombia_now():
     return datetime.now(pytz.timezone('America/Bogota'))
 
 # --- FUNCIÓN PARA ENVIAR DATOS AL WEBHOOK ---
-def enviar_a_webhook_se34(datos_payload):
+def enviar_a_webhook_se35(datos_payload):
     """
-    Envía el payload JSON al webhook configurado para SE34.
+    Envía el payload JSON al webhook configurado para SE35.
     """
-    webhook_url = current_app.config.get('WEBHOOK_SE34_URL')
-    webhook_token = current_app.config.get('WEBHOOK_SE34_AUTH')
+    webhook_url = current_app.config.get('WEBHOOK_SE35_URL')
+    webhook_token = current_app.config.get('WEBHOOK_SE35_AUTH')
 
     if not webhook_url or not webhook_token:
-        current_app.logger.error("Webhook SE34 URL o AUTH no configurados en app.config.")
+        current_app.logger.error("Webhook SE35 URL o AUTH no configurados en app.config.")
         return {"success": False, "message": "Error interno: configuración de webhook faltante."}
 
     headers = {
@@ -66,7 +66,7 @@ def enviar_a_webhook_se34(datos_payload):
         current_app.logger.error(f"Error inesperado al enviar webhook: {e}", exc_info=True)
         return {"success": False, "message": f"Error interno al procesar el envío de datos: {str(e)}"}
 
-@se34_bp.route('/api/empleado', methods=['GET'])
+@se35_bp.route('/api/empleado', methods=['GET'])
 def api_empleado():
     eid = request.args.get('id')
     if not eid:
@@ -76,7 +76,7 @@ def api_empleado():
         return jsonify(success=True, nombre=res["nombre"])
     return jsonify(success=False, nombre=res["message"]), 404
 
-@se34_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
+@se35_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
 def api_trabajo(trabajo_id):
     if not trabajo_id:
         return jsonify(success=False, error="Trabajo ID faltante"), 400
@@ -85,8 +85,8 @@ def api_trabajo(trabajo_id):
         return jsonify(res)
     return jsonify(success=False, error=res["message"]), 404
 
-@se34_bp.route('/', methods=['GET','POST'])
-def sellado_form_se34():
+@se35_bp.route('/', methods=['GET','POST'])
+def sellado_form_se35():
     if 'user_id' not in session:
         flash('Por favor, inicia sesión.', 'warning')
         return redirect(url_for('main.login', next=request.url))
@@ -187,8 +187,8 @@ def sellado_form_se34():
                                form_data=datos), 400 
             flash(details_html,'danger')
             return render_template(
-                'processes/sellado/sellado_form_se34.html',
-                nombre_proceso="Sellado", subseccion="Formulario SE34",
+                'processes/sellado/sellado_form_se35.html',
+                nombre_proceso="Sellado", subseccion="Formulario SE35",
                 fecha_actual=get_colombia_now().strftime('%Y-%m-%d'),
                 form_data=datos, 
                 username=session.get('user_name'),
@@ -238,11 +238,11 @@ def sellado_form_se34():
             "observaciones": datos.get('observaciones')
         }
         
-        current_app.logger.info("JSON del Payload del Formulario SE34 (Simulado):")
+        current_app.logger.info("JSON del Payload del Formulario SE35 (Simulado):")
         current_app.logger.info(payload)
 
         # --- ENVÍO DE DATOS AL WEBHOOK ---
-        webhook_result = enviar_a_webhook_se34(payload)
+        webhook_result = enviar_a_webhook_se35(payload)
         
         if request.is_json:
             if webhook_result["success"]:
@@ -254,13 +254,13 @@ def sellado_form_se34():
 
         flash("Formulario enviado correctamente." if webhook_result["success"] else f"Error al enviar: {webhook_result['message']}",
               "success" if webhook_result["success"] else "danger")
-        return redirect(url_for('se34.sellado_form_se34'))
+        return redirect(url_for('se35.sellado_form_se35'))
 
     # GET: Mostrar formulario vacío y fecha/hora de Bogotá en el campo
     return render_template(
-        'processes/sellado/sellado_form_se34.html',
+        'processes/sellado/sellado_form_se35.html',
         nombre_proceso="Sellado", 
-        subseccion="Formulario SE34 (FORMATO EN PRUEBA)", 
+        subseccion="Formulario SE35 (FORMATO EN PRUEBA)", 
         fecha_actual=get_colombia_now().strftime('%Y-%m-%d %H:%M:%S'),
         form_data={}, 
         username=session.get('user_name'),

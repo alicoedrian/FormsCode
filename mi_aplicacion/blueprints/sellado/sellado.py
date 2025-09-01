@@ -17,6 +17,7 @@ def proceso_sellado_dashboard():
 
         {"nombre": "Formulario SE30/SE47", "url": url_for('se30_se47.sellado_form_se30_se47'), "icono": "fas fa-cogs", "descripcion": "Registro de parámetros de máquinas SE30 y SE47."},
         {"nombre": "Formulario SE34", "url": url_for('se34.sellado_form_se34'), "icono": "fas fa-cogs", "descripcion": "Registro de parámetros de máquina SE34."},
+        {"nombre": "Formulario SE35", "url": url_for('se35.sellado_form_se35'), "icono": "fas fa-cogs", "descripcion": "Registro de parámetros de máquina SE35."},
         {"nombre": "Formulario SE50", "url": url_for('se50.sellado_form_se50'), "icono": "fas fa-cogs", "descripcion": "Registro de parámetros de máquina SE50."},
         {"nombre": "Empalme de Turno (Checklist 5S)", "url": url_for('empalme_turno.empalme_turno_form', origen='sellado'), "icono": "fas fa-handshake", "descripcion": "Registrar checklist 5S y novedades del empalme de turno."},
         {

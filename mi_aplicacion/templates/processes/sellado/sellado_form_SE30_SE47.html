@@ -302,7 +302,11 @@
                 </div>
             </fieldset>
 
-            <button type="submit" class="btn btn-success me-2">Enviar Registro</button>
+            <button type="submit" class="btn-submit">Enviar Registro</button>
+            
+            <div style="position:fixed; bottom:10px; right:10px; font-size:24px; font-weight: bold; color:#999;">
+                EE
+            </div>
         </form>
     </div>
 
@@ -313,7 +317,7 @@
             <i class="fas fa-arrow-left"></i> Volver a Sellado
         </a>
     </div>
-{% endblock %}
+{% endblock %} 
 
 {# Script JavaScript para manejar submission AJAX y autocompletado #}
 {% block process_page_scripts %}
@@ -538,8 +542,11 @@
         });
 
         form.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'submit') {
-                e.preventDefault();
+            if (e.key === 'Enter') {
+                const activeElement = document.activeElement;
+                if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type !== 'submit') {
+                    e.preventDefault();
+                }
             }
         });
 

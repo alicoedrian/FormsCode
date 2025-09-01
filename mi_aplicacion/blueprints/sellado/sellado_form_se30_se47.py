@@ -256,6 +256,8 @@ def sellado_form_se30_se47():
               "success" if webhook_result["success"] else "danger")
         return redirect(url_for('se30_se47.sellado_form_se30_se47'))
 
+    
+
     # GET: Mostrar formulario vacío y fecha/hora de Bogotá en el campo
     return render_template(
         'processes/sellado/sellado_form_se30_se47.html',
