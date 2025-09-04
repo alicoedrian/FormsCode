@@ -166,8 +166,25 @@ def sellado_form_se35():
                 datos[key] = converted_module_val 
 
 
-        if datos.get('num_fotoceldas')=='otro' and (datos.get('num_fotoceldas') is None or str(datos.get('num_fotoceldas')).strip() == ""):
-            validation_errors.append(('num_fotoceldas',"Especifique # de fotoceldas si elige SI en opción FOTOCELDA'."))
+        # --- Validaciones condicionales ---
+        if datos.get('fotocelda', '').lower() == 'si':
+            num_fotos = to_int(datos.get('num_fotoceldas'))
+            if not num_fotos or num_fotos <= 0:
+                validation_errors.append(('num_fotoceldas', 'Debe indicar un número válido de fotoceldas si selecciona SI en fotocelda.'))
+            else:
+                # Validar solo la cantidad seleccionada
+                for i in range(1, num_fotos + 1):
+                    key = f'desc_foto_{i}'
+                    if not datos.get(key):
+                        validation_errors.append((key, f'Debe llenar la descripción de fotocelda {i}.'))
+
+        if datos.get('pedido_critico', '').lower() == 'si':
+            if not datos.get('ubicacion_modulo_1'):
+                validation_errors.append(('ubicacion_modulo_1', 'Debe indicar la ubicación del módulo 1 si selecciona SI en pedido crítico.'))
+            if not datos.get('ubicacion_modulo_2'):
+                validation_errors.append(('ubicacion_modulo_2', 'Debe indicar la ubicación del módulo 2.'))
+            if not datos.get('ubicacion_modulo_3'):
+                validation_errors.append(('ubicacion_modulo_3', 'Debe indicar la ubicación del módulo 3.'))
 
 
         nombre_empleado = "" 
@@ -221,19 +238,19 @@ def sellado_form_se35():
             "abre_boca": datos.get('abre_boca'),
             "cara": datos.get('cara'),
             "fotocelda": datos.get('fotocelda'),
-            "num_fotoceldas": datos.get('num_fotoceldas') if datos.get('num_fotoceldas') == 'otro' else None,
-            "desc_foto_1": datos.get('desc_foto_1') if datos.get('desc_foto_1') == 'otro' else None,
-            "desc_foto_2": datos.get('desc_foto_2') if datos.get('desc_foto_2') == 'otro' else None,
-            "desc_foto_3": datos.get('desc_foto_3') if datos.get('desc_foto_3') == 'otro' else None,
+            "num_fotoceldas": datos.get('num_fotoceldas'),
+            "desc_foto_1": datos.get('desc_foto_1'),
+            "desc_foto_2": datos.get('desc_foto_2'),
+            "desc_foto_3": datos.get('desc_foto_3'),
             "work_mode": datos.get('work_mode'),
             "color_sensor_fotoc": datos.get('color_sensor_fotoc'),
             "doble_corte": datos.get('doble_corte'),
             "medida_doblecor": datos.get('medida_doblecor'),
             "zipper": datos.get('zipper'),
             "pedido_critico": datos.get('pedido_critico'),
-            "ubicacion_modulo_1": datos.get('ubicacion_modulo_1') if datos.get('ubicacion_modulo_1') == 'otro' else None,
-            "ubicacion_modulo_2": datos.get('ubicacion_modulo_2') if datos.get('ubicacion_modulo_2') == 'otro' else None,
-            "ubicacion_modulo_3": datos.get('ubicacion_modulo_3') if datos.get('ubicacion_modulo_3') == 'otro' else None,
+            "ubicacion_modulo_1": datos.get('ubicacion_modulo_1'),
+            "ubicacion_modulo_2": datos.get('ubicacion_modulo_2'),
+            "ubicacion_modulo_3": datos.get('ubicacion_modulo_3'),
             **{f"tmodulo{i}": datos.get(f"modulo_{i}") for i in range(1,23)},
             "observaciones": datos.get('observaciones')
         }

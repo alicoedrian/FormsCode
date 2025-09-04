@@ -23,6 +23,8 @@ from .blueprints.taras.taras import taras_bp
 from .blueprints.sellado.sellado_form_Se50 import se50_bp
 from .blueprints.sellado.sellado_form_se34 import se34_bp
 from .blueprints.sellado.sellado_form_se35 import se35_bp
+from .blueprints.sellado.sellado_form_se25 import se25_bp
+from .blueprints.sellado.sellado_form_se26 import se26_bp
 
 
 
@@ -56,6 +58,10 @@ def create_app():
     app.config['WEBHOOK_SE34_AUTH'] = os.getenv('WEBHOOK_SE34_AUTH')
     app.config['WEBHOOK_SE35_URL'] = os.getenv('WEBHOOK_SE35_URL')
     app.config['WEBHOOK_SE35_AUTH'] = os.getenv('WEBHOOK_SE35_AUTH')
+    app.config['WEBHOOK_SE25_URL'] = os.getenv('WEBHOOK_SE25_URL')
+    app.config['WEBHOOK_SE25_AUTH'] = os.getenv('WEBHOOK_SE25_AUTH')
+    app.config['WEBHOOK_SE26_URL'] = os.getenv('WEBHOOK_SE26_URL')
+    app.config['WEBHOOK_SE26_AUTH'] = os.getenv('WEBHOOK_SE26_AUTH')
 
 
 
@@ -85,6 +91,8 @@ def create_app():
     app.register_blueprint(se50_bp)
     app.register_blueprint(se34_bp)
     app.register_blueprint(se35_bp)
+    app.register_blueprint(se25_bp)
+    app.register_blueprint(se26_bp)
 
 
     return app
