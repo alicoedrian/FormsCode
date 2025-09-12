@@ -1,42 +1,42 @@
 import requests
 import json
 
-url = "https://apps.alico-sa.com/webhook/cd42f1c3-9cd7-449b-bb9a-49da334f3f05"
+url = "https://apps.alico-sa.com/webhook/f4763f3a-6a22-4cc1-b88b-8b77a755c628"
 
 payload = json.dumps({
-  "fecha": "2025-09-04 15:35:15",
-  "id_empleado": 401,
-  "nombre_empleado": "Diana López",
-  "trabajo": "SE25-001",
-  "parte": "Parte F",
-  "cliente": "Empresa Omega",
-  "estructura": "PET/LDPE",
-  "ancho": 380,
-  "largo": 525.5,
-  "fuelle": 18,
-  "calibre": 35,
-  "velocidad": 110,
-  "seal_set": 1.5,
-  "speed_set": 2.2,
-  "feed_rate": 0.8,
+  "fecha": "2025-09-12",
+  "id_empleado": 601,
+  "nombre_empleado": "Ricardo Mena",
+  "trabajo": "SE26-001",
+  "parte": "Parte H",
+  "cliente": "Empresa Gamma",
+  "estructura": "PET/PE",
+  "ancho": 350.5,
+  "largo": 580,
+  "fuelle": 15,
+  "calibre": 30,
+  "velocidad": 105,
+  "seal_set": 1.2,
+  "speed_set": 2,
+  "feed_rate": 0.7,
   "tension_adjustment": 1,
   "tipo_bolsa": "Bolsa de 3 sellos",
   "abre_boca": "No",
   "cara": 1,
   "fotocelda": "Sí",
   "num_fotoceldas": 1,
-  "desc_foto_1": "Sensor de borde",
-  "desc_foto_2": "None",
-  "desc_foto_3": "None",
+  "desc_foto_1": "Sensor de registro superior",
+  "desc_foto_2": None,
+  "desc_foto_3": None,
   "work_mode": "Automático",
-  "color_sensor_fotoc": "Rojo",
-  "doble_corte": "Sí",
-  "medida_doblecor": 125,
-  "zipper": "No",
+  "color_sensor_fotoc": "Azul",
+  "doble_corte": "No",
+  "medida_doblecor": 0,
+  "zipper": "Sí",
   "pedido_critico": "No",
-  "ubicacion_modulo_1": "Izquierda",
-  "ubicacion_modulo_2": "None",
-  "ubicacion_modulo_3": "None",
+  "ubicacion_modulo_1": "Inferior",
+  "ubicacion_modulo_2": None,
+  "ubicacion_modulo_3": None,
   "tmodulo1": 150,
   "tmodulo2": 155,
   "tmodulo3": 160,
@@ -59,13 +59,13 @@ payload = json.dumps({
   "tmodulo20": 245,
   "tmodulo21": 250,
   "tmodulo22": 255,
-  "observaciones": "Se hizo un ajuste fino en el sensor para mejor precisión."
+  "observaciones": "Se realizó mantenimiento preventivo antes del inicio del turno."
 })
 headers = {
   'Content-Type': 'application/json',
   'Authorization': 'Basic YWRtaW46SG0xMTkxOTI5'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+response = requests.request("POST", url, headers=headers, data=payload)
 
 print(response.text)

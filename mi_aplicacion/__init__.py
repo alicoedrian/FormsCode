@@ -15,17 +15,19 @@ from .blueprints.corte.corte import corte_bp
 from .blueprints.extrusion.extrusion import extrusion_bp
 from .blueprints.sellado.sellado import sellado_bp
 from .blueprints.transversal.empalme_turno import empalme_turno_bp
-from .blueprints.sellado.sellado_form_se30_se47 import se30_se47_bp 
+
 from .blueprints.transversal.despeje_linea import despeje_linea_bp
 from .blueprints.transversal.monitoreo_cuchillas import monitoreo_cuchillas_bp
 from .blueprints.coordinadores.coordinadores import coordinadores_bp
 from .blueprints.taras.taras import taras_bp
-from .blueprints.sellado.sellado_form_Se50 import se50_bp
-from .blueprints.sellado.sellado_form_se34 import se34_bp
-from .blueprints.sellado.sellado_form_se35 import se35_bp
+
 from .blueprints.sellado.sellado_form_se25 import se25_bp
 from .blueprints.sellado.sellado_form_se26 import se26_bp
-
+from .blueprints.sellado.sellado_form_se30 import se30_bp
+from .blueprints.sellado.sellado_form_se34 import se34_bp
+from .blueprints.sellado.sellado_form_se35 import se35_bp
+from .blueprints.sellado.sellado_form_se47 import se47_bp
+from .blueprints.sellado.sellado_form_Se50 import se50_bp
 
 
 def create_app():
@@ -45,23 +47,29 @@ def create_app():
     app.config['WEBHOOK_EMP_TURNO_AUTH'] = os.getenv('WEBHOOK_EMP_TURNO_AUTH')
     app.config['EPICOR_API_PAUSAS_ACTIVAS'] = os.getenv('EPICOR_API_PAUSAS_ACTIVAS')
     app.config['EPICOR_API_TRABAJOS_FORM'] = os.getenv('EPICOR_API_TRABAJOS_FORM')
-    app.config['WEBHOOK_SE30_SE47_URL'] = os.getenv('WEBHOOK_SE30_SE47_URL')
-    app.config['WEBHOOK_SE30_SE47_AUTH'] = os.getenv('WEBHOOK_SE30_SE47_AUTH')
+    
     app.config['TIMEZONE'] = os.getenv('TIMEZONE', 'America/Bogota')
     app.config['EPICOR_API_CARNET_LOOKUP'] = os.getenv('EPICOR_API_CARNET_LOOKUP')
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL')
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION')
     app.config['WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR'] = os.getenv('WEBHOOK_MONITOREO_CUCHILLAS_URL_VALIDACION_COOR') # Carga la URL del coordinador
     app.config['WEBHOOK_CORES_URL_SELECT'] = os.getenv('WEBHOOK_CORES_URL_SELECT') # Carga la URL del coordinador
-    app.config['WEBHOOK_SE50'] = os.getenv('WEBHOOK_SE50')
-    app.config['WEBHOOK_SE34_URL'] = os.getenv('WEBHOOK_SE34_URL')
-    app.config['WEBHOOK_SE34_AUTH'] = os.getenv('WEBHOOK_SE34_AUTH')
-    app.config['WEBHOOK_SE35_URL'] = os.getenv('WEBHOOK_SE35_URL')
-    app.config['WEBHOOK_SE35_AUTH'] = os.getenv('WEBHOOK_SE35_AUTH')
+    
+    
     app.config['WEBHOOK_SE25_URL'] = os.getenv('WEBHOOK_SE25_URL')
     app.config['WEBHOOK_SE25_AUTH'] = os.getenv('WEBHOOK_SE25_AUTH')
     app.config['WEBHOOK_SE26_URL'] = os.getenv('WEBHOOK_SE26_URL')
     app.config['WEBHOOK_SE26_AUTH'] = os.getenv('WEBHOOK_SE26_AUTH')
+    app.config['WEBHOOK_SE30_URL'] = os.getenv('WEBHOOK_SE30_URL')
+    app.config['WEBHOOK_SE30_AUTH'] = os.getenv('WEBHOOK_SE30_AUTH')
+    app.config['WEBHOOK_SE34_URL'] = os.getenv('WEBHOOK_SE34_URL')
+    app.config['WEBHOOK_SE34_AUTH'] = os.getenv('WEBHOOK_SE34_AUTH')
+    app.config['WEBHOOK_SE35_URL'] = os.getenv('WEBHOOK_SE35_URL')
+    app.config['WEBHOOK_SE35_AUTH'] = os.getenv('WEBHOOK_SE35_AUTH')
+    app.config['WEBHOOK_SE47_URL'] = os.getenv('WEBHOOK_SE47_URL')
+    app.config['WEBHOOK_SE47_AUTH'] = os.getenv('WEBHOOK_SE47_AUTH')
+    app.config['WEBHOOK_SE50'] = os.getenv('WEBHOOK_SE50')
+    
 
 
 
@@ -83,16 +91,18 @@ def create_app():
     app.register_blueprint(extrusion_bp, url_prefix='/extrusion')
     app.register_blueprint(sellado_bp, url_prefix='/sellado')
     app.register_blueprint(empalme_turno_bp, url_prefix='/empalme_turno')
-    app.register_blueprint(se30_se47_bp) 
+    
     app.register_blueprint(despeje_linea_bp, url_prefix='/shared')
     app.register_blueprint(monitoreo_cuchillas_bp, url_prefix='/shared') 
     app.register_blueprint(coordinadores_bp)
     app.register_blueprint(taras_bp)
-    app.register_blueprint(se50_bp)
-    app.register_blueprint(se34_bp)
-    app.register_blueprint(se35_bp)
+    
     app.register_blueprint(se25_bp)
     app.register_blueprint(se26_bp)
-
+    app.register_blueprint(se30_bp)
+    app.register_blueprint(se34_bp)
+    app.register_blueprint(se35_bp)
+    app.register_blueprint(se47_bp)
+    app.register_blueprint(se50_bp)
 
     return app

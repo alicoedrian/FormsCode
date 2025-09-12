@@ -11,11 +11,11 @@ from ...utils.epicor_api import get_employee_name_from_id, get_job_data
 # Desactivar advertencias de SSL inseguro (solo para desarrollo, si tu webhook usa HTTPS auto-firmado)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-se30_se47_bp = Blueprint(
-    'se30_se47', __name__,
+se30_bp = Blueprint(
+    'se30', __name__,
     template_folder='../../../templates',
     static_folder='../../../static',
-    url_prefix='/sellado/se30_se47'
+    url_prefix='/sellado/se30'
 )
 
 # === FUNCION PARA LA HORA DE COLOMBIA SIEMPRE ===
@@ -23,15 +23,15 @@ def get_colombia_now():
     return datetime.now(pytz.timezone('America/Bogota'))
 
 # --- FUNCIÓN PARA ENVIAR DATOS AL WEBHOOK ---
-def enviar_a_webhook_se30_se47(datos_payload):
+def enviar_a_webhook_se30(datos_payload):
     """
-    Envía el payload JSON al webhook configurado para SE30/SE47.
+    Envía el payload JSON al webhook configurado para SE30.
     """
-    webhook_url = current_app.config.get('WEBHOOK_SE30_SE47_URL')
-    webhook_token = current_app.config.get('WEBHOOK_SE30_SE47_AUTH')
+    webhook_url = current_app.config.get('WEBHOOK_SE30_URL')
+    webhook_token = current_app.config.get('WEBHOOK_SE30_AUTH')
 
     if not webhook_url or not webhook_token:
-        current_app.logger.error("Webhook SE30/SE47 URL o AUTH no configurados en app.config.")
+        current_app.logger.error("Webhook SE30 URL o AUTH no configurados en app.config.")
         return {"success": False, "message": "Error interno: configuración de webhook faltante."}
 
     headers = {
@@ -66,7 +66,7 @@ def enviar_a_webhook_se30_se47(datos_payload):
         current_app.logger.error(f"Error inesperado al enviar webhook: {e}", exc_info=True)
         return {"success": False, "message": f"Error interno al procesar el envío de datos: {str(e)}"}
 
-@se30_se47_bp.route('/api/empleado', methods=['GET'])
+@se30_bp.route('/api/empleado', methods=['GET'])
 def api_empleado():
     eid = request.args.get('id')
     if not eid:
@@ -76,7 +76,7 @@ def api_empleado():
         return jsonify(success=True, nombre=res["nombre"])
     return jsonify(success=False, nombre=res["message"]), 404
 
-@se30_se47_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
+@se30_bp.route('/api/trabajo/<trabajo_id>', methods=['GET'])
 def api_trabajo(trabajo_id):
     if not trabajo_id:
         return jsonify(success=False, error="Trabajo ID faltante"), 400
@@ -85,8 +85,8 @@ def api_trabajo(trabajo_id):
         return jsonify(res)
     return jsonify(success=False, error=res["message"]), 404
 
-@se30_se47_bp.route('/', methods=['GET','POST'])
-def sellado_form_se30_se47():
+@se30_bp.route('/', methods=['GET','POST'])
+def sellado_form_se30():
     if 'user_id' not in session:
         flash('Por favor, inicia sesión.', 'warning')
         return redirect(url_for('main.login', next=request.url))
@@ -191,8 +191,8 @@ def sellado_form_se30_se47():
                                form_data=datos), 400 
             flash(details_html,'danger')
             return render_template(
-                'processes/sellado/sellado_form_se30_se47.html',
-                nombre_proceso="Sellado", subseccion="Formulario SE30/SE47",
+                'processes/sellado/sellado_form_se30.html',
+                nombre_proceso="Sellado", subseccion="Formulario SE30",
                 fecha_actual=get_colombia_now().strftime('%Y-%m-%d'),
                 form_data=datos, 
                 username=session.get('user_name'),
@@ -238,11 +238,11 @@ def sellado_form_se30_se47():
             "observaciones": datos.get('observaciones')
         }
         
-        current_app.logger.info("JSON del Payload del Formulario SE30/SE47 (Simulado):")
+        current_app.logger.info("JSON del Payload del Formulario SE30 (Simulado):")
         current_app.logger.info(payload)
 
         # --- ENVÍO DE DATOS AL WEBHOOK ---
-        webhook_result = enviar_a_webhook_se30_se47(payload)
+        webhook_result = enviar_a_webhook_se30(payload)
         
         if request.is_json:
             if webhook_result["success"]:
@@ -254,15 +254,15 @@ def sellado_form_se30_se47():
 
         flash("Formulario enviado correctamente." if webhook_result["success"] else f"Error al enviar: {webhook_result['message']}",
               "success" if webhook_result["success"] else "danger")
-        return redirect(url_for('se30_se47.sellado_form_se30_se47'))
+        return redirect(url_for('se30.sellado_form_se30'))
 
     
 
     # GET: Mostrar formulario vacío y fecha/hora de Bogotá en el campo
     return render_template(
-        'processes/sellado/sellado_form_se30_se47.html',
+        'processes/sellado/sellado_form_se30.html',
         nombre_proceso="Sellado", 
-        subseccion="Formulario SE30/SE47 (FORMATO EN PRUEBA)", 
+        subseccion="Formulario SE30 (FORMATO EN PRUEBA)", 
         fecha_actual=get_colombia_now().strftime('%Y-%m-%d %H:%M:%S'),
         form_data={}, 
         username=session.get('user_name'),

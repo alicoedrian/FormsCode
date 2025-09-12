@@ -1,7 +1,7 @@
 {% extends "layouts/process_base.html" %}
 
 {# Define el título de la página #}
-{% block process_title %}SE30/SE47 – {{ nombre_proceso }}{% endblock %}
+{% block process_title %}SE47 – {{ nombre_proceso }}{% endblock %}
 
 {# Define el CSS específico para esta sección con mejoras de interfaz #}
 {% block process_head_css %}
@@ -24,13 +24,13 @@
     </nav>
     
     {# Título y Descripción #}
-        <div class="page-title-se30-se47"> {# Clase actualizada #}
+        <div class="page-title-se47"> {# Clase actualizada #}
             <i class="fas fa-cog"></i> {# Icono actualizado para parámetros #}
             <div>
                 <div>{{ subseccion }}</div>
             </div>
         </div>
-        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE30/SE47.</p> {# Texto de descripción actualizado #}
+        <p class="page-description">Ingrese los parámetros de operación para las máquinas SE47.</p> {# Texto de descripción actualizado #}
 
 
     {# Contenedor para las notificaciones (AJAX) #}
@@ -40,8 +40,8 @@
 
     {# Contenedor para tu formulario HTML personalizado #}
     <div class="custom-form-container">
-        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se30_se47' #}
-        <form id="registroParametrosForm" method="POST" action="{{ url_for('se30_se47.sellado_form_se30_se47') }}">
+        {# Formulario HTML - Action ajustado para apuntar al blueprint 'se47' #}
+        <form id="registroParametrosForm" method="POST" action="{{ url_for('se47.sellado_form_se47') }}">
             <fieldset>
                 <legend>Registro de Parámetros</legend>
                 <div class="row">
@@ -160,6 +160,7 @@
                         <div class="form-question-card">
                             <label for="work_mode" class="form-label">Work Mode:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="work_mode" name="work_mode" required>
+                                <option value="">Seleccionar</option>
                                 <option value="print stand" {% if form_data.work_mode == 'print stand' %}selected{% endif %}>Print Stand</option>
                                 <option value="plain" {% if form_data.work_mode == 'plain' %}selected{% endif %}>Plain</option>
                                 <option value="plain stand" {% if form_data.work_mode == 'plain stand' %}selected{% endif %}>Plain Stand</option>
@@ -171,6 +172,7 @@
                         <div class="form-question-card">
                             <label for="cutter_set" class="form-label">Cutter Set:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="cutter_set" name="cutter_set" required>
+                                <option value="">Seleccionar</option>
                                 <option value="seal1" {% if form_data.cutter_set == 'seal1' %}selected{% endif %}>Seal 1</option>
                                 <option value="seal2" {% if form_data.cutter_set == 'seal2' %}selected{% endif %}>Seal 2</option>
                                 <option value="seal3" {% if form_data.cutter_set == 'seal3' %}selected{% endif %}>Seal 3</option>
@@ -185,6 +187,7 @@
                             <label for="skip_mode" class="form-label">Skip Mode:<span class="required-asterisk">*</span></label>
                             {# Corregido el ID y Name de este campo #}
                             <select class="form-select" id="skip_mode" name="skip_mode" required> 
+                                <option value="">Seleccionar</option>
                                 <option value="enable" {% if form_data.skip_mode == 'enable' %}selected{% endif %}>Enable</option>
                                 <option value="disable" {% if form_data.skip_mode == 'disable' %}selected{% endif %}>Disable</option>
                             </select>
@@ -196,6 +199,7 @@
                             <label for="mark_missing_stop" class="form-label">Mark Missing Stop:<span class="required-asterisk">*</span></label>
                             {# Corregido el ID y Name de este campo #}
                             <select class="form-select" id="mark_missing_stop" name="mark_missing_stop" required>
+                                <option value="">Seleccionar</option>
                                 <option value="enable" {% if form_data.mark_missing_stop == 'enable' %}selected{% endif %}>Enable</option>
                                 <option value="disable" {% if form_data.mark_missing_stop == 'disable' %}selected{% endif %}>Disable</option>
                             </select>
@@ -226,7 +230,7 @@
                         <div class="form-question-card">
                             <label for="fotocelda" class="form-label">Fotocelda:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="fotocelda" name="fotocelda" required onchange="mostrarInputFotocelda(this)">
-                                <option value="" {% if form_data.fotocelda == '' %}selected{% endif %}>Seleccione...</option>
+                                <option value="">Seleccionar</option>
                                 <option value="N/A" {% if form_data.fotocelda == 'N/A' %}selected{% endif %}>N/A</option>
                                 <option value="otro" {% if form_data.fotocelda == 'otro' %}selected{% endif %}>Otro (especifique)</option>
                             </select>
@@ -248,6 +252,7 @@
                         <div class="form-question-card">
                             <label for="cortasolapa" class="form-label">Cortasolapa:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="cortasolapa" name="cortasolapa" required>
+                                <option value="">Seleccionar</option>
                                 <option value="X1" {% if form_data.cortasolapa == 'X1' %}selected{% endif %}>X1</option>
                                 <option value="X2" {% if form_data.cortasolapa == 'X2' %}selected{% endif %}>X2</option>
                                 <option value="X3" {% if form_data.cortasolapa == 'X3' %}selected{% endif %}>X3</option>
@@ -261,6 +266,7 @@
                         <div class="form-question-card">
                             <label for="formato" class="form-label">Formato:<span class="required-asterisk">*</span></label>
                             <select class="form-select" id="formato" name="formato" required>
+                                <option value="">Seleccionar</option>
                                 <option value="Doble" {% if form_data.formato == 'Doble' %}selected{% endif %}>Doble</option>
                                 <option value="Triple" {% if form_data.formato == 'Triple' %}selected{% endif %}>Triple</option>
                                 <option value="Cuádruple" {% if form_data.formato == 'Cuádruple' %}selected{% endif %}>Cuádruple</option>
@@ -362,7 +368,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se30_se47/api/trabajo/${trabajo}`);
+                const response = await fetch(`/sellado/se47/api/trabajo/${trabajo}`);
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || "Error desconocido al consultar trabajo.");
                 parteInput.value = data.parte || "";
@@ -399,7 +405,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/sellado/se30_se47/api/empleado?id=${id}`);
+                const response = await fetch(`/sellado/se47/api/empleado?id=${id}`);
                 const data = await response.json();
                 if (data && data.success) {
                     nombreEmpleadoInput.value = data.nombre || 'No encontrado';
